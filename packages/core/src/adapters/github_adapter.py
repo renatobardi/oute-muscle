@@ -30,11 +30,18 @@ class GitHubAdapter:
         if not self.app_id or not self.private_key:
             logger.warning("GitHub App credentials not configured; adapter will fail gracefully")
 
-    def _get_client(self) -> Any:
-        """Get authenticated GitHub client.
+    def _get_client(self, installation_id: int | None = None) -> Any:
+        """Get an authenticated GitHub client.
+
+        When installation_id is provided, uses a GitHub App installation access
+        token (scoped to that installation).  Without it, falls back to an
+        anonymous client (rate-limited — only useful for public repos in tests).
+
+        Args:
+            installation_id: GitHub App installation ID from the webhook payload.
 
         Raises:
-            GitHubError: If credentials not configured.
+            GitHubError: If credentials not configured or token exchange fails.
         """
         if not self.app_id or not self.private_key:
             raise GitHubError(
@@ -43,19 +50,33 @@ class GitHubAdapter:
 
         try:
             from github import Github
-            from github.GithubIntegration import GithubIntegration  # noqa: F401
+            from github import GithubIntegration
         except ImportError as e:
             raise GitHubError("PyGithub not installed. Install with: pip install PyGithub") from e
 
-        # TODO: Get installation ID from webhook payload
-        # For now, return a base client
-        return Github()
+        if installation_id is None:
+            # No installation context — anonymous client (limited use)
+            logger.warning("_get_client called without installation_id; using anonymous client")
+            return Github()
+
+        try:
+            integration = GithubIntegration(
+                int(self.app_id),
+                self.private_key,
+            )
+            access_token = integration.get_access_token(installation_id)
+            return Github(login_or_token=access_token.token)
+        except Exception as exc:
+            raise GitHubError(
+                f"Failed to obtain installation access token for {installation_id}: {exc}"
+            ) from exc
 
     async def get_pr_diff(
         self,
         repository: str,
         pr_number: int,
         *,
+        installation_id: int | None = None,
         max_lines: int = 3000,
     ) -> PullRequestDiff:
         """Fetch and return the diff for a pull request.
@@ -78,7 +99,7 @@ class GitHubAdapter:
             raise GitHubError("PyGithub not installed") from e
 
         try:
-            client = self._get_client()
+            client = self._get_client(installation_id)
             repo = client.get_repo(repository)
             pr = repo.get_pull(pr_number)
 
@@ -126,6 +147,7 @@ class GitHubAdapter:
         repository: str,
         commit_sha: str,
         *,
+        installation_id: int | None = None,
         name: str,
         conclusion: str,
         title: str,
@@ -155,7 +177,7 @@ class GitHubAdapter:
             raise GitHubError("PyGithub not installed") from e
 
         try:
-            client = self._get_client()
+            client = self._get_client(installation_id)
             repo = client.get_repo(repository)
 
             check_run = repo.create_check_run(
@@ -186,6 +208,7 @@ class GitHubAdapter:
         pr_number: int,
         body: str,
         *,
+        installation_id: int | None = None,
         commit_sha: str,
         path: str | None = None,
         line: int | None = None,
@@ -212,7 +235,7 @@ class GitHubAdapter:
             raise GitHubError("PyGithub not installed") from e
 
         try:
-            client = self._get_client()
+            client = self._get_client(installation_id)
             repo = client.get_repo(repository)
             pr = repo.get_pull(pr_number)
 
@@ -239,6 +262,7 @@ class GitHubAdapter:
         self,
         repository: str,
         *,
+        installation_id: int | None = None,
         title: str,
         body: str,
         head: str,
@@ -267,7 +291,7 @@ class GitHubAdapter:
             raise GitHubError("PyGithub not installed") from e
 
         try:
-            client = self._get_client()
+            client = self._get_client(installation_id)
             repo = client.get_repo(repository)
 
             pr = repo.create_pull(
