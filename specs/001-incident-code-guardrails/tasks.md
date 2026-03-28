@@ -31,18 +31,18 @@
 
 **Purpose**: Initialize monorepo structure, tooling, and shared configuration. No GCP dependency.
 
-- [ ] T001 Create monorepo root with pyproject.toml, Makefile, and .editorconfig at /
-- [ ] T002 [P] Initialize apps/api/ with pyproject.toml, FastAPI dependencies (fastapi, uvicorn, asyncpg, pydantic v2) in apps/api/pyproject.toml
-- [ ] T003 [P] Initialize apps/web/ with SvelteKit, TypeScript strict, Tailwind CSS, shadcn-svelte in apps/web/package.json
-- [ ] T004 [P] Initialize apps/mcp/ with pyproject.toml and MCP SDK dependency in apps/mcp/pyproject.toml
-- [ ] T005 [P] Initialize packages/core/ with pyproject.toml (domain logic, no framework deps) in packages/core/pyproject.toml
-- [ ] T006 [P] Initialize packages/db/ with pyproject.toml (SQLAlchemy, asyncpg, alembic) in packages/db/pyproject.toml
-- [ ] T007 [P] Initialize packages/semgrep-rules/ with directory structure for 10 categories in packages/semgrep-rules/rules/
-- [ ] T008 Configure Python linting (Ruff) and type checking (mypy strict) in pyproject.toml
-- [ ] T009 [P] Configure frontend linting (ESLint + eslint-plugin-svelte + Prettier) in apps/web/.eslintrc.cjs
-- [ ] T010 [P] Create .gitignore with Python, Node.js, and universal patterns at .gitignore
-- [ ] T011 [P] Create GitHub Actions CI workflow for lint + type-check + test in .github/workflows/ci.yml
-- [ ] T012 Create dev-setup.sh script for local environment initialization in scripts/dev-setup.sh
+- [x] T001 Create monorepo root with pyproject.toml, Makefile, and .editorconfig at /
+- [x] T002 [P] Initialize apps/api/ with pyproject.toml, FastAPI dependencies (fastapi, uvicorn, asyncpg, pydantic v2) in apps/api/pyproject.toml
+- [x] T003 [P] Initialize apps/web/ with SvelteKit, TypeScript strict, Tailwind CSS, shadcn-svelte in apps/web/package.json
+- [x] T004 [P] Initialize apps/mcp/ with pyproject.toml and MCP SDK dependency in apps/mcp/pyproject.toml
+- [x] T005 [P] Initialize packages/core/ with pyproject.toml (domain logic, no framework deps) in packages/core/pyproject.toml
+- [x] T006 [P] Initialize packages/db/ with pyproject.toml (SQLAlchemy, asyncpg, alembic) in packages/db/pyproject.toml
+- [x] T007 [P] Initialize packages/semgrep-rules/ with directory structure for 10 categories in packages/semgrep-rules/rules/
+- [x] T008 Configure Python linting (Ruff) and type checking (mypy strict) in pyproject.toml
+- [x] T009 [P] Configure frontend linting (ESLint + eslint-plugin-svelte + Prettier) in apps/web/.eslintrc.cjs
+- [x] T010 [P] Create .gitignore with Python, Node.js, and universal patterns at .gitignore
+- [x] T011 [P] Create GitHub Actions CI workflow for lint + type-check + test in .github/workflows/ci.yml
+- [x] T012 Create dev-setup.sh script for local environment initialization in scripts/dev-setup.sh
 
 **Checkpoint**: All packages install, linting passes, CI workflow runs green on empty project.
 
@@ -54,21 +54,21 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T013 Define incident category enum and severity enum as domain value objects in packages/core/src/domain/incidents/enums.py
-- [ ] T014 [P] Define Incident domain entity with all fields from data-model.md in packages/core/src/domain/incidents/entity.py
-- [ ] T015 [P] Define SemgrepRule domain entity with category-prefixed ID scheme in packages/core/src/domain/rules/entity.py
-- [ ] T016 [P] Define Finding and Advisory domain entities in packages/core/src/domain/scanning/entities.py
-- [ ] T017 [P] Define Scan domain entity with risk_level and composite score in packages/core/src/domain/scanning/scan.py
-- [ ] T018 Define LLM port interface (Protocol) with generate and generate_structured methods in packages/core/src/ports/llm.py
-- [ ] T019 [P] Define Embedding port interface in packages/core/src/ports/embedding.py
-- [ ] T020 [P] Define IncidentRepo port interface with CRUD + search + optimistic locking in packages/core/src/ports/incident_repo.py
-- [ ] T021 [P] Define RuleRepo port interface with create, list_active, toggle, next_sequence_number in packages/core/src/ports/rule_repo.py
-- [ ] T022 [P] Define VectorSearch port interface with find_similar in packages/core/src/ports/vector_search.py
-- [ ] T023 [P] Define GitHub port interface with get_pr_diff, create_check_run, post_review_comment, create_pr in packages/core/src/ports/github.py
-- [ ] T024 Implement compute_risk_score function (composite formula, thresholds low<5, med 5-12, high>12) in packages/core/src/domain/scanning/risk_score.py
-- [ ] T025 Write unit tests for compute_risk_score covering all threshold boundaries in packages/core/tests/test_risk_score.py
-- [ ] T026 Write unit tests for domain entity validation (Incident required fields, SemgrepRule ID format) in packages/core/tests/test_entities.py
-- [ ] T027 Create conftest.py with shared test fixtures for packages/core in packages/core/tests/conftest.py
+- [x] T013 Define incident category enum and severity enum as domain value objects in packages/core/src/domain/incidents/enums.py
+- [x] T014 [P] Define Incident domain entity with all fields from data-model.md in packages/core/src/domain/incidents/entity.py
+- [x] T015 [P] Define SemgrepRule domain entity with category-prefixed ID scheme in packages/core/src/domain/rules/entity.py
+- [x] T016 [P] Define Finding and Advisory domain entities in packages/core/src/domain/scanning/entities.py
+- [x] T017 [P] Define Scan domain entity with risk_level and composite score in packages/core/src/domain/scanning/scan.py
+- [x] T018 Define LLM port interface (Protocol) with generate and generate_structured methods in packages/core/src/ports/llm.py
+- [x] T019 [P] Define Embedding port interface in packages/core/src/ports/embedding.py
+- [x] T020 [P] Define IncidentRepo port interface with CRUD + search + optimistic locking in packages/core/src/ports/incident_repo.py
+- [x] T021 [P] Define RuleRepo port interface with create, list_active, toggle, next_sequence_number in packages/core/src/ports/rule_repo.py
+- [x] T022 [P] Define VectorSearch port interface with find_similar in packages/core/src/ports/vector_search.py
+- [x] T023 [P] Define GitHub port interface with get_pr_diff, create_check_run, post_review_comment, create_pr in packages/core/src/ports/github.py
+- [x] T024 Implement compute_risk_score function (composite formula, thresholds low<5, med 5-12, high>12) in packages/core/src/domain/scanning/risk_score.py
+- [x] T025 Write unit tests for compute_risk_score covering all threshold boundaries in packages/core/tests/test_risk_score.py
+- [x] T026 Write unit tests for domain entity validation (Incident required fields, SemgrepRule ID format) in packages/core/tests/test_entities.py
+- [x] T027 Create conftest.py with shared test fixtures for packages/core in packages/core/tests/conftest.py
 
 **Checkpoint**: All domain entities defined, all port interfaces declared, risk score tests pass. Zero external dependencies.
 
@@ -84,35 +84,35 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T028 [P] [US1] Write Semgrep rule test for unsafe-regex-001 (catastrophic backtracking) in packages/semgrep-rules/rules/unsafe-regex/unsafe-regex-001.test.py
-- [ ] T029 [P] [US1] Write Semgrep rule test for race-condition-001 in packages/semgrep-rules/rules/race-condition/race-condition-001.test.py
-- [ ] T030 [P] [US1] Write Semgrep rule test for missing-error-handling-001 in packages/semgrep-rules/rules/missing-error-handling/missing-error-handling-001.test.py
-- [ ] T031 [P] [US1] Write Semgrep rule test for injection-001 in packages/semgrep-rules/rules/injection/injection-001.test.py
-- [ ] T032 [P] [US1] Write Semgrep rule test for resource-exhaustion-001 in packages/semgrep-rules/rules/resource-exhaustion/resource-exhaustion-001.test.py
-- [ ] T033 [P] [US1] Write Semgrep rule test for missing-safety-check-001 in packages/semgrep-rules/rules/missing-safety-check/missing-safety-check-001.test.py
-- [ ] T034 [P] [US1] Write Semgrep rule test for deployment-error-001 in packages/semgrep-rules/rules/deployment-error/deployment-error-001.test.py
-- [ ] T035 [P] [US1] Write Semgrep rule test for data-consistency-001 in packages/semgrep-rules/rules/data-consistency/data-consistency-001.test.py
-- [ ] T036 [P] [US1] Write Semgrep rule test for unsafe-api-usage-001 in packages/semgrep-rules/rules/unsafe-api-usage/unsafe-api-usage-001.test.py
-- [ ] T037 [P] [US1] Write Semgrep rule test for cascading-failure-001 in packages/semgrep-rules/rules/cascading-failure/cascading-failure-001.test.py
-- [ ] T038 [US1] Write integration test for Semgrep scan runner (scan file, assert SARIF output) in packages/semgrep-rules/tests/test_scan_runner.py
+- [x] T028 [P] [US1] Write Semgrep rule test for unsafe-regex-001 (catastrophic backtracking) in packages/semgrep-rules/rules/unsafe-regex/unsafe-regex-001.test.py
+- [x] T029 [P] [US1] Write Semgrep rule test for race-condition-001 in packages/semgrep-rules/rules/race-condition/race-condition-001.test.py
+- [x] T030 [P] [US1] Write Semgrep rule test for missing-error-handling-001 in packages/semgrep-rules/rules/missing-error-handling/missing-error-handling-001.test.py
+- [x] T031 [P] [US1] Write Semgrep rule test for injection-001 in packages/semgrep-rules/rules/injection/injection-001.test.py
+- [x] T032 [P] [US1] Write Semgrep rule test for resource-exhaustion-001 in packages/semgrep-rules/rules/resource-exhaustion/resource-exhaustion-001.test.py
+- [x] T033 [P] [US1] Write Semgrep rule test for missing-safety-check-001 in packages/semgrep-rules/rules/missing-safety-check/missing-safety-check-001.test.py
+- [x] T034 [P] [US1] Write Semgrep rule test for deployment-error-001 in packages/semgrep-rules/rules/deployment-error/deployment-error-001.test.py
+- [x] T035 [P] [US1] Write Semgrep rule test for data-consistency-001 in packages/semgrep-rules/rules/data-consistency/data-consistency-001.test.py
+- [x] T036 [P] [US1] Write Semgrep rule test for unsafe-api-usage-001 in packages/semgrep-rules/rules/unsafe-api-usage/unsafe-api-usage-001.test.py
+- [x] T037 [P] [US1] Write Semgrep rule test for cascading-failure-001 in packages/semgrep-rules/rules/cascading-failure/cascading-failure-001.test.py
+- [x] T038 [US1] Write integration test for Semgrep scan runner (scan file, assert SARIF output) in packages/semgrep-rules/tests/test_scan_runner.py
 
 ### Implementation for User Story 1
 
-- [ ] T039 [P] [US1] Create unsafe-regex-001.yaml rule with incident metadata (ID, URL, severity, category, remediation) in packages/semgrep-rules/rules/unsafe-regex/unsafe-regex-001.yaml
-- [ ] T040 [P] [US1] Create race-condition-001.yaml rule with incident metadata in packages/semgrep-rules/rules/race-condition/race-condition-001.yaml
-- [ ] T041 [P] [US1] Create missing-error-handling-001.yaml rule with incident metadata in packages/semgrep-rules/rules/missing-error-handling/missing-error-handling-001.yaml
-- [ ] T042 [P] [US1] Create injection-001.yaml rule with incident metadata in packages/semgrep-rules/rules/injection/injection-001.yaml
-- [ ] T043 [P] [US1] Create resource-exhaustion-001.yaml rule with incident metadata in packages/semgrep-rules/rules/resource-exhaustion/resource-exhaustion-001.yaml
-- [ ] T044 [P] [US1] Create missing-safety-check-001.yaml rule with incident metadata in packages/semgrep-rules/rules/missing-safety-check/missing-safety-check-001.yaml
-- [ ] T045 [P] [US1] Create deployment-error-001.yaml rule with incident metadata in packages/semgrep-rules/rules/deployment-error/deployment-error-001.yaml
-- [ ] T046 [P] [US1] Create data-consistency-001.yaml rule with incident metadata in packages/semgrep-rules/rules/data-consistency/data-consistency-001.yaml
-- [ ] T047 [P] [US1] Create unsafe-api-usage-001.yaml rule with incident metadata in packages/semgrep-rules/rules/unsafe-api-usage/unsafe-api-usage-001.yaml
-- [ ] T048 [P] [US1] Create cascading-failure-001.yaml rule with incident metadata in packages/semgrep-rules/rules/cascading-failure/cascading-failure-001.yaml
-- [ ] T049 [US1] Create rule registry JSON mapping rule IDs to incident IDs and revisions in packages/semgrep-rules/metadata/registry.json
-- [ ] T050 [US1] Create Semgrep test runner script (semgrep --test) in packages/semgrep-rules/tests/run_tests.sh
-- [ ] T051 [US1] Create pre-commit hook configuration (.pre-commit-config.yaml) that runs Semgrep on staged files in .pre-commit-config.yaml
-- [ ] T052 [US1] Create GitHub Action workflow for Semgrep scan + SARIF upload to Security Tab in .github/workflows/semgrep-scan.yml
-- [ ] T053 [US1] Verify all 10 rule tests pass via run_tests.sh in packages/semgrep-rules/tests/run_tests.sh
+- [x] T039 [P] [US1] Create unsafe-regex-001.yaml rule with incident metadata (ID, URL, severity, category, remediation) in packages/semgrep-rules/rules/unsafe-regex/unsafe-regex-001.yaml
+- [x] T040 [P] [US1] Create race-condition-001.yaml rule with incident metadata in packages/semgrep-rules/rules/race-condition/race-condition-001.yaml
+- [x] T041 [P] [US1] Create missing-error-handling-001.yaml rule with incident metadata in packages/semgrep-rules/rules/missing-error-handling/missing-error-handling-001.yaml
+- [x] T042 [P] [US1] Create injection-001.yaml rule with incident metadata in packages/semgrep-rules/rules/injection/injection-001.yaml
+- [x] T043 [P] [US1] Create resource-exhaustion-001.yaml rule with incident metadata in packages/semgrep-rules/rules/resource-exhaustion/resource-exhaustion-001.yaml
+- [x] T044 [P] [US1] Create missing-safety-check-001.yaml rule with incident metadata in packages/semgrep-rules/rules/missing-safety-check/missing-safety-check-001.yaml
+- [x] T045 [P] [US1] Create deployment-error-001.yaml rule with incident metadata in packages/semgrep-rules/rules/deployment-error/deployment-error-001.yaml
+- [x] T046 [P] [US1] Create data-consistency-001.yaml rule with incident metadata in packages/semgrep-rules/rules/data-consistency/data-consistency-001.yaml
+- [x] T047 [P] [US1] Create unsafe-api-usage-001.yaml rule with incident metadata in packages/semgrep-rules/rules/unsafe-api-usage/unsafe-api-usage-001.yaml
+- [x] T048 [P] [US1] Create cascading-failure-001.yaml rule with incident metadata in packages/semgrep-rules/rules/cascading-failure/cascading-failure-001.yaml
+- [x] T049 [US1] Create rule registry JSON mapping rule IDs to incident IDs and revisions in packages/semgrep-rules/metadata/registry.json
+- [x] T050 [US1] Create Semgrep test runner script (semgrep --test) in packages/semgrep-rules/tests/run_tests.sh
+- [x] T051 [US1] Create pre-commit hook configuration (.pre-commit-config.yaml) that runs Semgrep on staged files in .pre-commit-config.yaml
+- [x] T052 [US1] Create GitHub Action workflow for Semgrep scan + SARIF upload to Security Tab in .github/workflows/semgrep-scan.yml
+- [x] T053 [US1] Verify all 10 rule tests pass via run_tests.sh in packages/semgrep-rules/tests/run_tests.sh
 
 **Checkpoint**: 10 Semgrep rules with tests, pre-commit hook blocks anti-patterns in <2s, GitHub Action produces SARIF. Layer 1 MVP delivered — zero GCP dependency.
 
@@ -126,44 +126,44 @@
 
 ### API Entry Point (required by all subsequent phases)
 
-- [ ] T054 Create FastAPI app entry point with DI container, middleware stack, and route registration in apps/api/src/main.py
+- [x] T054 Create FastAPI app entry point with DI container, middleware stack, and route registration in apps/api/src/main.py
 
 ### Tests for User Story 2
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T055 [P] [US2] Write unit tests for Incident domain service (create, update with optimistic locking, soft delete, link rule blocking) in packages/core/tests/test_incident_service.py
-- [ ] T056 [P] [US2] Write integration test for PostgreSQL incident repository (CRUD + optimistic locking + soft delete) in packages/db/tests/integration/test_pg_incident_repo.py
-- [ ] T057 [P] [US2] Write integration test for embedding generation on incident create/update in packages/core/tests/integration/test_embedding_service.py
-- [ ] T058 [P] [US2] Write integration test for pgvector similarity search in packages/db/tests/integration/test_vector_search.py
-- [ ] T059 [P] [US2] Write unit tests for audit log recording on all mutation operations in packages/db/tests/test_audit_log.py
-- [ ] T060 [US2] Write integration test for CLI ingestion (--url, --file, --auto-approve, --dry-run) in scripts/tests/test_seed_cli.py
+- [x] T055 [P] [US2] Write unit tests for Incident domain service (create, update with optimistic locking, soft delete, link rule blocking) in packages/core/tests/test_incident_service.py
+- [x] T056 [P] [US2] Write integration test for PostgreSQL incident repository (CRUD + optimistic locking + soft delete) in packages/db/tests/integration/test_pg_incident_repo.py
+- [x] T057 [P] [US2] Write integration test for embedding generation on incident create/update in packages/core/tests/integration/test_embedding_service.py
+- [x] T058 [P] [US2] Write integration test for pgvector similarity search in packages/db/tests/integration/test_vector_search.py
+- [x] T059 [P] [US2] Write unit tests for audit log recording on all mutation operations in packages/db/tests/test_audit_log.py
+- [x] T060 [US2] Write integration test for CLI ingestion (--url, --file, --auto-approve, --dry-run) in scripts/tests/test_seed_cli.py
 
 ### Implementation for User Story 2
 
-- [ ] T061 [US2] Create SQLAlchemy base model with RLS-aware session management in packages/db/src/models/base.py
-- [ ] T062 [US2] Create asyncpg session factory with tenant context (SET LOCAL "app.tenant_id") in packages/db/src/session.py
-- [ ] T063 [P] [US2] Create Tenant SQLAlchemy model in packages/db/src/models/tenant.py
-- [ ] T064 [P] [US2] Create User SQLAlchemy model with role enum in packages/db/src/models/user.py
-- [ ] T065 [US2] Create Incident SQLAlchemy model with all fields, version column, soft delete, HNSW index in packages/db/src/models/incident.py
-- [ ] T066 [P] [US2] Create SemgrepRule SQLAlchemy model with category-prefixed ID, revision, approved_by invariant in packages/db/src/models/rule.py
-- [ ] T067 [P] [US2] Create Finding SQLAlchemy model in packages/db/src/models/finding.py
-- [ ] T068 [P] [US2] Create Scan SQLAlchemy model with risk_score CHECK constraint in packages/db/src/models/scan.py
-- [ ] T069 [P] [US2] Create Advisory SQLAlchemy model with nullable file_path/start_line for anchoring in packages/db/src/models/advisory.py
-- [ ] T070 [P] [US2] Create AuditLogEntry SQLAlchemy model (INSERT only, immutable) in packages/db/src/models/audit_log.py
-- [ ] T071 [P] [US2] Create SynthesisCandidate SQLAlchemy model with failure_reason, failure_count in packages/db/src/models/synthesis_candidate.py
-- [ ] T072 [US2] Create initial Alembic migration with all tables, RLS policies, indexes, and CHECK constraints in packages/db/src/migrations/versions/001_initial_schema.py
-- [ ] T073 [US2] Implement PostgreSQL IncidentRepo adapter (CRUD + optimistic locking + soft/hard delete + linked rule check) in packages/core/src/adapters/pg_incident_repo.py
-- [ ] T074 [US2] Implement PostgreSQL RuleRepo adapter in packages/core/src/adapters/pg_rule_repo.py
-- [ ] T075 [US2] Implement Vertex AI Embedding adapter (text-embedding-005, 768 dims) in packages/core/src/adapters/vertex_embedding.py
-- [ ] T076 [US2] Implement PostgreSQL VectorSearch adapter (cosine distance, HNSW) in packages/core/src/adapters/pg_vector_search.py
-- [ ] T077 [US2] Implement Incident domain service (create with embedding, update with re-embed, delete with rule check, search) in packages/core/src/domain/incidents/service.py
-- [ ] T078 [US2] Implement audit log service (record mutations with before/after diffs) in packages/core/src/domain/incidents/audit.py
-- [ ] T079 [US2] Create seed-knowledge-base.py CLI script (ingest danluu/post-mortems + VOID, --url, --file, --auto-approve, --dry-run) in scripts/seed-knowledge-base.py
-- [ ] T080 [US2] Create incidents.jsonl seed file with 50+ incidents from public post-mortem databases in scripts/data/incidents.jsonl
-- [ ] T081 [US2] Create REST API routes for incident CRUD (POST /incidents, GET /incidents, GET /incidents/:id, PUT /incidents/:id, DELETE /incidents/:id) in apps/api/src/routes/incidents.py
-- [ ] T082 [US2] Create REST API route for URL ingestion (POST /incidents/ingest-url) with LLM extraction draft in apps/api/src/routes/incidents.py
-- [ ] T083 [US2] Create REST API routes for incident search (GET /incidents?q=&semantic=true) in apps/api/src/routes/incidents.py
+- [x] T061 [US2] Create SQLAlchemy base model with RLS-aware session management in packages/db/src/models/base.py
+- [x] T062 [US2] Create asyncpg session factory with tenant context (SET LOCAL "app.tenant_id") in packages/db/src/session.py
+- [x] T063 [P] [US2] Create Tenant SQLAlchemy model in packages/db/src/models/tenant.py
+- [x] T064 [P] [US2] Create User SQLAlchemy model with role enum in packages/db/src/models/user.py
+- [x] T065 [US2] Create Incident SQLAlchemy model with all fields, version column, soft delete, HNSW index in packages/db/src/models/incident.py
+- [x] T066 [P] [US2] Create SemgrepRule SQLAlchemy model with category-prefixed ID, revision, approved_by invariant in packages/db/src/models/rule.py
+- [x] T067 [P] [US2] Create Finding SQLAlchemy model in packages/db/src/models/finding.py
+- [x] T068 [P] [US2] Create Scan SQLAlchemy model with risk_score CHECK constraint in packages/db/src/models/scan.py
+- [x] T069 [P] [US2] Create Advisory SQLAlchemy model with nullable file_path/start_line for anchoring in packages/db/src/models/advisory.py
+- [x] T070 [P] [US2] Create AuditLogEntry SQLAlchemy model (INSERT only, immutable) in packages/db/src/models/audit_log.py
+- [x] T071 [P] [US2] Create SynthesisCandidate SQLAlchemy model with failure_reason, failure_count in packages/db/src/models/synthesis_candidate.py
+- [x] T072 [US2] Create initial Alembic migration with all tables, RLS policies, indexes, and CHECK constraints in packages/db/src/migrations/versions/001_initial_schema.py
+- [x] T073 [US2] Implement PostgreSQL IncidentRepo adapter (CRUD + optimistic locking + soft/hard delete + linked rule check) in packages/core/src/adapters/pg_incident_repo.py
+- [x] T074 [US2] Implement PostgreSQL RuleRepo adapter in packages/core/src/adapters/pg_rule_repo.py
+- [x] T075 [US2] Implement Vertex AI Embedding adapter (text-embedding-005, 768 dims) in packages/core/src/adapters/vertex_embedding.py
+- [x] T076 [US2] Implement PostgreSQL VectorSearch adapter (cosine distance, HNSW) in packages/core/src/adapters/pg_vector_search.py
+- [x] T077 [US2] Implement Incident domain service (create with embedding, update with re-embed, delete with rule check, search) in packages/core/src/domain/incidents/service.py
+- [x] T078 [US2] Implement audit log service (record mutations with before/after diffs) in packages/core/src/domain/incidents/audit.py
+- [x] T079 [US2] Create seed-knowledge-base.py CLI script (ingest danluu/post-mortems + VOID, --url, --file, --auto-approve, --dry-run) in scripts/seed-knowledge-base.py
+- [x] T080 [US2] Create incidents.jsonl seed file with 50+ incidents from public post-mortem databases in scripts/data/incidents.jsonl
+- [x] T081 [US2] Create REST API routes for incident CRUD (POST /incidents, GET /incidents, GET /incidents/:id, PUT /incidents/:id, DELETE /incidents/:id) in apps/api/src/routes/incidents.py
+- [x] T082 [US2] Create REST API route for URL ingestion (POST /incidents/ingest-url) with LLM extraction draft in apps/api/src/routes/incidents.py
+- [x] T083 [US2] Create REST API routes for incident search (GET /incidents?q=&semantic=true) in apps/api/src/routes/incidents.py
 
 **Checkpoint**: PostgreSQL schema deployed, 50+ incidents seeded, CRUD works via API, embedding-based search returns relevant results, audit log records all mutations, optimistic locking rejects concurrent edits.
 
