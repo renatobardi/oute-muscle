@@ -1,0 +1,31 @@
+rules:
+  - id: deployment-error-001
+    message: >
+      Hardcoded database connection string detected in source code. Credentials
+      embedded in source are exposed to everyone with repository access and remain
+      in git history permanently even after deletion. Rotate credentials immediately
+      and move to a secrets manager.
+    severity: ERROR
+    languages: [python]
+    metadata:
+      incident_id: "550e8400-e29b-41d4-a716-446655440007"
+      incident_url: "https://www.learnfromincidents.com/"
+      severity: "critical"
+      category: "deployment-error"
+      remediation: >
+        Store secrets in GCP Secret Manager, AWS Secrets Manager, or HashiCorp Vault.
+        Use environment variables as an intermediate layer.
+        Run 'git filter-repo' to purge from history after rotation.
+      oute_muscle_version: "1.0.0"
+    pattern-either:
+      - pattern: $VAR = "postgresql://$USER:$PASS@$HOST/..."
+      - pattern: $VAR = "mysql://$USER:$PASS@$HOST/..."
+      - pattern: $VAR = "redis://:$PASS@$HOST/..."
+      - patterns:
+          - pattern: $VAR = "$VALUE"
+          - metavariable-regex:
+              metavariable: $VAR
+              regex: '(?i)(password|passwd|secret|db_pass|api_key|apikey)'
+          - metavariable-regex:
+              metavariable: $VALUE
+              regex: '^(?!.*os\.(environ|getenv)|get_secret).{8,}$'

@@ -1,0 +1,29 @@
+rules:
+  - id: unsafe-regex-001
+    message: >
+      Potentially catastrophic backtracking regex detected. Patterns with nested
+      quantifiers like (a+)+, (\w+\s?)+, or (a|aa)+ can cause ReDoS (Regular
+      Expression Denial of Service) when matched against adversarial input.
+      This pattern caused a 27-minute global outage at Cloudflare in July 2019.
+    severity: ERROR
+    languages: [python]
+    metadata:
+      incident_id: "550e8400-e29b-41d4-a716-446655440001"
+      incident_url: "https://blog.cloudflare.com/details-of-the-cloudflare-outage-on-july-2-2019/"
+      severity: "critical"
+      category: "unsafe-regex"
+      remediation: >
+        Rewrite regex to avoid nested quantifiers. Use atomic groups with the
+        'regex' library, add input length limits, or use 're2' for linear-time
+        matching. Test regex patterns with tools like regex101 ReDoS checker.
+      oute_muscle_version: "1.0.0"
+    patterns:
+      - pattern-either:
+          - pattern: re.compile($REGEX, ...)
+          - pattern: re.match($REGEX, ...)
+          - pattern: re.search($REGEX, ...)
+          - pattern: re.findall($REGEX, ...)
+          - pattern: re.fullmatch($REGEX, ...)
+      - metavariable-regex:
+          metavariable: $REGEX
+          regex: '.*\([^)]*[+*][^)]*\)[+*?{].*|.*\([^)]*\|[^)]*\)[+*{].*'

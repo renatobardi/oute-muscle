@@ -1,0 +1,25 @@
+rules:
+  - id: unsafe-api-usage-001
+    message: >
+      Unsafe deserialization of potentially untrusted data. pickle.loads() and
+      yaml.load() without SafeLoader can execute arbitrary code when deserializing
+      attacker-controlled input. This vulnerability class has led to critical RCE
+      (Remote Code Execution) incidents in production systems.
+    severity: ERROR
+    languages: [python]
+    metadata:
+      incident_id: "550e8400-e29b-41d4-a716-446655440009"
+      incident_url: "https://owasp.org/www-community/vulnerabilities/Deserialization_of_untrusted_data"
+      severity: "critical"
+      category: "unsafe-api-usage"
+      remediation: >
+        For YAML: always use yaml.safe_load() instead of yaml.load().
+        For pickle: avoid entirely for untrusted data; use JSON or MessagePack.
+        If pickle is necessary for trusted internal data, verify HMAC integrity.
+      oute_muscle_version: "1.0.0"
+    pattern-either:
+      - pattern: pickle.loads(...)
+      - pattern: pickle.load(...)
+      - pattern: yaml.load($DATA)
+      - pattern: yaml.load($DATA, Loader=yaml.Loader)
+      - pattern: yaml.load($DATA, Loader=yaml.FullLoader)

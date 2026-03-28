@@ -1,0 +1,34 @@
+rules:
+  - id: cascading-failure-001
+    message: >
+      Retry loop with fixed delay — thundering herd risk. Fixed-delay retries
+      cause all instances to retry simultaneously after a failure, overwhelming
+      the recovering service. This pattern triggered cascading failures and
+      extended outages at multiple distributed systems. Use exponential backoff
+      with jitter.
+    severity: ERROR
+    languages: [python]
+    metadata:
+      incident_id: "550e8400-e29b-41d4-a716-446655440010"
+      incident_url: "https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/"
+      severity: "high"
+      category: "cascading-failure"
+      remediation: >
+        Use exponential backoff with jitter:
+        wait = min(cap, base * 2**attempt) + random.uniform(0, 1).
+        Use a library: tenacity, backoff, or stamina.
+        Never use fixed time.sleep() in retry loops serving production traffic.
+      oute_muscle_version: "1.0.0"
+    patterns:
+      - pattern: |
+          for $I in range(...):
+              try:
+                  ...
+              except ...:
+                  time.sleep($N)
+      - pattern-not: |
+          for $I in range(...):
+              try:
+                  ...
+              except ...:
+                  time.sleep(2 ** $I)

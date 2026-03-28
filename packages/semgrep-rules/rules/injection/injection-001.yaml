@@ -1,0 +1,23 @@
+rules:
+  - id: injection-001
+    message: >
+      SQL injection vulnerability: query constructed with string formatting.
+      Using f-strings, %-formatting, or .format() to build SQL queries allows
+      attackers to inject malicious SQL and access or destroy the database.
+      Use parameterized queries instead.
+    severity: ERROR
+    languages: [python]
+    metadata:
+      incident_id: "550e8400-e29b-41d4-a716-446655440004"
+      incident_url: "https://owasp.org/www-community/attacks/SQL_Injection"
+      severity: "critical"
+      category: "injection"
+      remediation: >
+        Use parameterized queries: cursor.execute(sql, (param,)) or
+        cursor.execute(sql, {"name": value}). Never interpolate variables
+        directly into SQL strings using f-strings or % formatting.
+      oute_muscle_version: "1.0.0"
+    pattern-either:
+      - pattern: $CURSOR.execute(f"...")
+      - pattern: $CURSOR.execute("..." % ...)
+      - pattern: $CURSOR.execute("...".format(...))

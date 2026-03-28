@@ -1,0 +1,28 @@
+rules:
+  - id: missing-safety-check-001
+    message: >
+      Result of dict.get() used without None check. dict.get() returns None when
+      the key is absent. Calling methods or accessing attributes on the result
+      without a None guard causes AttributeError crashes in production when
+      expected keys are missing from incoming data.
+    severity: WARNING
+    languages: [python]
+    metadata:
+      incident_id: "550e8400-e29b-41d4-a716-446655440006"
+      incident_url: "https://www.learnfromincidents.com/"
+      severity: "medium"
+      category: "missing-safety-check"
+      remediation: >
+        Provide a default: dict.get(key, default_value). Or check for None:
+        value = d.get(key); if value is not None: use(value).
+        Or use walrus: if value := d.get(key): use(value).
+      oute_muscle_version: "1.0.0"
+    patterns:
+      - pattern: |
+          $VALUE = $DICT.get($KEY)
+          ...
+          $VALUE.$METHOD(...)
+      - pattern-not: |
+          $VALUE = $DICT.get($KEY, ...)
+          ...
+          $VALUE.$METHOD(...)

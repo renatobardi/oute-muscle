@@ -1,0 +1,35 @@
+rules:
+  - id: missing-error-handling-001
+    message: >
+      Exception silently swallowed with bare 'pass'. Swallowing exceptions hides
+      failures, makes debugging impossible, and can cause silent data loss or
+      inconsistent state. This anti-pattern has caused multiple production incidents
+      where failures went undetected for hours.
+    severity: ERROR
+    languages: [python]
+    metadata:
+      incident_id: "550e8400-e29b-41d4-a716-446655440003"
+      incident_url: "https://www.learnfromincidents.com/"
+      severity: "high"
+      category: "missing-error-handling"
+      remediation: >
+        Always handle exceptions explicitly: log with context, re-raise, or
+        return a meaningful error response. Use 'raise ... from e' to preserve
+        the exception chain. Never use bare 'pass' in an except block.
+      oute_muscle_version: "1.0.0"
+    pattern-either:
+      - pattern: |
+          try:
+              ...
+          except:
+              pass
+      - pattern: |
+          try:
+              ...
+          except Exception:
+              pass
+      - pattern: |
+          try:
+              ...
+          except Exception as $E:
+              pass

@@ -1,0 +1,22 @@
+rules:
+  - id: race-condition-001
+    message: >
+      TOCTOU (Time-of-Check-Time-of-Use) race condition detected. Checking
+      os.path.exists() before performing a file operation creates a window where
+      another process can modify the filesystem between the check and the action,
+      leading to data corruption or security vulnerabilities.
+    severity: ERROR
+    languages: [python]
+    metadata:
+      incident_id: "550e8400-e29b-41d4-a716-446655440002"
+      incident_url: "https://cwe.mitre.org/data/definitions/367.html"
+      severity: "high"
+      category: "race-condition"
+      remediation: >
+        Use atomic operations instead of check-then-act. For directories:
+        os.makedirs(path, exist_ok=True). For files: use O_CREAT|O_EXCL flags.
+        For locks: use fcntl.flock() or the portalocker library.
+      oute_muscle_version: "1.0.0"
+    pattern: |
+      if os.path.exists($PATH):
+          ...

@@ -1,0 +1,31 @@
+rules:
+  - id: resource-exhaustion-001
+    message: >
+      HTTP request without timeout. Calls to requests.get/post/put/delete/patch
+      without a timeout can hang indefinitely, exhausting thread pools and
+      causing cascading failures. This pattern caused a 4-hour outage when
+      a downstream service became unresponsive.
+    severity: ERROR
+    languages: [python]
+    metadata:
+      incident_id: "550e8400-e29b-41d4-a716-446655440005"
+      incident_url: "https://requests.readthedocs.io/en/latest/user/quickstart/#timeouts"
+      severity: "high"
+      category: "resource-exhaustion"
+      remediation: >
+        Always specify a timeout: requests.get(url, timeout=30).
+        Use a tuple for connect and read: timeout=(3.05, 27).
+        Set a session-level default or use a wrapper that enforces timeouts.
+      oute_muscle_version: "1.0.0"
+    patterns:
+      - pattern-either:
+          - pattern: requests.get($URL)
+          - pattern: requests.post($URL)
+          - pattern: requests.put($URL)
+          - pattern: requests.delete($URL)
+          - pattern: requests.patch($URL)
+          - pattern: requests.head($URL)
+          - pattern: requests.get($URL, $KWARGS)
+          - pattern: requests.post($URL, $KWARGS)
+      - pattern-not:
+          pattern: requests.$METHOD($URL, ..., timeout=..., ...)

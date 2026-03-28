@@ -1,0 +1,30 @@
+rules:
+  - id: data-consistency-001
+    message: >
+      Multiple SQLAlchemy session.add() calls committed outside an explicit
+      transaction. Without a transaction, a failure between the first and second
+      add() leaves the database in an inconsistent state. This caused data
+      corruption incidents where users were created without their associated
+      records.
+    severity: ERROR
+    languages: [python]
+    metadata:
+      incident_id: "550e8400-e29b-41d4-a716-446655440008"
+      incident_url: "https://www.learnfromincidents.com/"
+      severity: "high"
+      category: "data-consistency"
+      remediation: >
+        Wrap multiple writes in an explicit transaction:
+        'with session.begin(): session.add(a); session.add(b)'.
+        Or use 'async with session.begin()' for async SQLAlchemy.
+      oute_muscle_version: "1.0.0"
+    patterns:
+      - pattern: |
+          $SESSION.add($A)
+          ...
+          $SESSION.add($B)
+          ...
+          $SESSION.commit()
+      - pattern-not-inside: |
+          with $SESSION.begin():
+              ...
