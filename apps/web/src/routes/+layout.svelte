@@ -14,7 +14,7 @@
 
   let { children } = $props();
 
-  const PUBLIC_PATHS = ['/auth/login', '/auth/callback', '/auth/register'];
+  const PUBLIC_PATHS = ['/', '/auth/login', '/auth/callback', '/auth/register'];
 
   onMount(() => {
     const unsubscribe = isAuthenticated.subscribe(async (authed) => {

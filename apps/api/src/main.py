@@ -97,6 +97,11 @@ def create_app() -> FastAPI:
 
     # Phase 5+: rules, advisory routes added as phases complete
 
+    # Waitlist (landing page beta signup — public endpoint, no auth required)
+    from apps.api.src.routes.waitlist import router as waitlist_router
+
+    app.include_router(waitlist_router, prefix="/v1")
+
     return app
 
 
