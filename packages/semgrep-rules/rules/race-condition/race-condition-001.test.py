@@ -14,9 +14,9 @@ if os.path.exists(config_file):
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
-# ok: atomic makedirs avoids TOCTOU
+# ok
 os.makedirs(output_dir, exist_ok=True)
 
-# ok: direct open without prior existence check
+# ok
 with open("file.txt", "w") as f:
     f.write("data")

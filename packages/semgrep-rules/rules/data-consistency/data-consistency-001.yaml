@@ -21,10 +21,7 @@ rules:
     patterns:
       - pattern: |
           $SESSION.add($A)
-          ...
           $SESSION.add($B)
-          ...
-          $SESSION.commit()
       - pattern-not-inside: |
           with $SESSION.begin():
               ...

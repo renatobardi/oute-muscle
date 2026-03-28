@@ -1,0 +1,106 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-03-28",
+  "rules": [
+    {
+      "rule_id": "unsafe-regex-001",
+      "category": "unsafe-regex",
+      "incident_id": "550e8400-e29b-41d4-a716-446655440001",
+      "revision": 1,
+      "severity": "critical",
+      "languages": ["python"],
+      "enabled": true,
+      "source": "manual"
+    },
+    {
+      "rule_id": "race-condition-001",
+      "category": "race-condition",
+      "incident_id": "550e8400-e29b-41d4-a716-446655440002",
+      "revision": 1,
+      "severity": "high",
+      "languages": ["python"],
+      "enabled": true,
+      "source": "manual"
+    },
+    {
+      "rule_id": "missing-error-handling-001",
+      "category": "missing-error-handling",
+      "incident_id": "550e8400-e29b-41d4-a716-446655440003",
+      "revision": 1,
+      "severity": "high",
+      "languages": ["python"],
+      "enabled": true,
+      "source": "manual"
+    },
+    {
+      "rule_id": "injection-001",
+      "category": "injection",
+      "incident_id": "550e8400-e29b-41d4-a716-446655440004",
+      "revision": 1,
+      "severity": "critical",
+      "languages": ["python"],
+      "enabled": true,
+      "source": "manual"
+    },
+    {
+      "rule_id": "resource-exhaustion-001",
+      "category": "resource-exhaustion",
+      "incident_id": "550e8400-e29b-41d4-a716-446655440005",
+      "revision": 1,
+      "severity": "high",
+      "languages": ["python"],
+      "enabled": true,
+      "source": "manual"
+    },
+    {
+      "rule_id": "missing-safety-check-001",
+      "category": "missing-safety-check",
+      "incident_id": "550e8400-e29b-41d4-a716-446655440006",
+      "revision": 1,
+      "severity": "high",
+      "languages": ["python"],
+      "enabled": true,
+      "source": "manual"
+    },
+    {
+      "rule_id": "deployment-error-001",
+      "category": "deployment-error",
+      "incident_id": "550e8400-e29b-41d4-a716-446655440007",
+      "revision": 1,
+      "severity": "medium",
+      "languages": ["python"],
+      "enabled": true,
+      "source": "manual"
+    },
+    {
+      "rule_id": "data-consistency-001",
+      "category": "data-consistency",
+      "incident_id": "550e8400-e29b-41d4-a716-446655440008",
+      "revision": 1,
+      "severity": "high",
+      "languages": ["python"],
+      "enabled": true,
+      "source": "manual"
+    },
+    {
+      "rule_id": "unsafe-api-usage-001",
+      "category": "unsafe-api-usage",
+      "incident_id": "550e8400-e29b-41d4-a716-446655440009",
+      "revision": 1,
+      "severity": "high",
+      "languages": ["python"],
+      "enabled": true,
+      "source": "manual"
+    },
+    {
+      "rule_id": "cascading-failure-001",
+      "category": "cascading-failure",
+      "incident_id": "550e8400-e29b-41d4-a716-446655440010",
+      "revision": 1,
+      "severity": "critical",
+      "languages": ["python"],
+      "enabled": true,
+      "source": "manual"
+    }
+  ]
+}

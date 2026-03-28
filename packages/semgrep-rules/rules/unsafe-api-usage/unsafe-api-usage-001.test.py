@@ -11,9 +11,9 @@ config = yaml.load(request.body)
 # ruleid: unsafe-api-usage-001
 data = pickle.loads(redis_client.get(key))
 
-# ok: yaml.safe_load is safe
+# ok
 config = yaml.safe_load(request.body)
 
-# ok: json is safe
+# ok
 import json
 data = json.loads(request.body)

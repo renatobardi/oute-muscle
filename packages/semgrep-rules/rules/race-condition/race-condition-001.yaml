@@ -17,6 +17,10 @@ rules:
         os.makedirs(path, exist_ok=True). For files: use O_CREAT|O_EXCL flags.
         For locks: use fcntl.flock() or the portalocker library.
       oute_muscle_version: "1.0.0"
-    pattern: |
-      if os.path.exists($PATH):
-          ...
+    pattern-either:
+      - pattern: |
+          if os.path.exists($PATH):
+              ...
+      - pattern: |
+          if not os.path.exists($PATH):
+              ...

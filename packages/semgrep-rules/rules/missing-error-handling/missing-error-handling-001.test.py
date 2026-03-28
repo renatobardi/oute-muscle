@@ -18,20 +18,20 @@ try:
 except Exception as e:
     pass
 
-# ok: exception is logged and re-raised
+# ok
 try:
     risky_operation()
 except Exception as e:
     logger.error("Operation failed: %s", e)
     raise
 
-# ok: exception re-raised as domain error
+# ok
 try:
     connect_to_db()
 except ConnectionError as e:
     raise RuntimeError("DB unavailable") from e
 
-# ok: intentional KeyError default
+# ok
 try:
     value = cache[key]
 except KeyError:

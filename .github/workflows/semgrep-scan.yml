@@ -1,0 +1,69 @@
+name: semgrep-scan
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**.py"
+      - "packages/semgrep-rules/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "**.py"
+      - "packages/semgrep-rules/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write  # required for SARIF upload to Security tab
+
+jobs:
+  semgrep:
+    name: Semgrep scan + SARIF upload
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep:latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep rules (oute-muscle)
+        run: |
+          semgrep \
+            --config packages/semgrep-rules/rules/ \
+            --sarif \
+            --output semgrep-results.sarif \
+            --quiet \
+            .
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+      - name: Upload SARIF to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()  # upload even when findings exist (they become security alerts)
+        with:
+          sarif_file: semgrep-results.sarif
+          category: oute-muscle-rules
+
+      - name: Fail on ERROR-severity findings
+        run: |
+          semgrep \
+            --config packages/semgrep-rules/rules/ \
+            --error \
+            --severity ERROR \
+            --quiet \
+            .
+
+  semgrep-rule-tests:
+    name: Semgrep rule unit tests
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep:latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run rule tests
+        run: semgrep --test packages/semgrep-rules/rules/

@@ -17,7 +17,7 @@ for i in range(5):
     except requests.RequestException:
         time.sleep(0.5)
 
-# ok: exponential backoff
+# ok
 for attempt in range(5):
     try:
         result = call_service()
@@ -26,7 +26,7 @@ for attempt in range(5):
         wait = 2 ** attempt
         time.sleep(wait)
 
-# ok: tenacity with exponential backoff
+# ok
 from tenacity import retry, wait_exponential
 @retry(wait=wait_exponential(multiplier=1, min=1, max=10))
 def call_with_retry():

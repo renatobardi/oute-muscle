@@ -10,12 +10,12 @@ data = requests.post(api_url, json=payload)
 # ruleid: resource-exhaustion-001
 result = requests.put(endpoint, data=body)
 
-# ok: timeout specified
+# ok
 response = requests.get(url, timeout=30)
 
-# ok: connect + read timeout tuple
+# ok
 response = requests.get(url, timeout=(3.05, 27))
 
-# ok: session with timeout
+# ok
 session = requests.Session()
 response = session.get(url, timeout=10)

@@ -9,11 +9,11 @@ REDIS_URL = "redis://:mypassword@cache.internal:6379/0"
 # ruleid: deployment-error-001
 db_password = "P@ssw0rd_prod_2024"
 
-# ok: reads from environment variable
+# ok
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
-# ok: reads from secret manager
+# ok
 db_password = get_secret("DB_PASSWORD")
 
-# ok: empty string default
+# ok
 API_KEY = os.getenv("API_KEY", "")

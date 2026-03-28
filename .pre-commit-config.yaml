@@ -1,0 +1,44 @@
+repos:
+  # ── Python linting and formatting ──────────────────────────────────────────
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.0
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  # ── Python type checking ────────────────────────────────────────────────────
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.10.0
+    hooks:
+      - id: mypy
+        additional_dependencies: [pydantic>=2.7.0]
+        args: [--strict]
+        files: ^packages/core/
+
+  # ── Semgrep static analysis on staged files ─────────────────────────────────
+  - repo: https://github.com/returntocorp/semgrep
+    rev: v1.72.0
+    hooks:
+      - id: semgrep
+        name: semgrep (oute-muscle rules)
+        args:
+          - --config=packages/semgrep-rules/rules/
+          - --error
+          - --quiet
+        types: [python]
+
+  # ── General file hygiene ────────────────────────────────────────────────────
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: \.md$
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: mixed-line-ending
+        args: [--fix=lf]

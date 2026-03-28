@@ -8,15 +8,15 @@ parts = token.split(" ")
 value = config.get("timeout")
 time.sleep(value)
 
-# ok: default value provided to get()
+# ok
 timeout = config.get("timeout", 30)
 time.sleep(timeout)
 
-# ok: None check before use
+# ok
 token = headers.get("Authorization")
 if token is not None:
     parts = token.split(" ")
 
-# ok: walrus operator check
+# ok
 if token := headers.get("Authorization"):
     parts = token.split(" ")

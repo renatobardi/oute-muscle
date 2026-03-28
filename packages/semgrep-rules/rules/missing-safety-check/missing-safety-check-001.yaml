@@ -17,12 +17,18 @@ rules:
         value = d.get(key); if value is not None: use(value).
         Or use walrus: if value := d.get(key): use(value).
       oute_muscle_version: "1.0.0"
-    patterns:
-      - pattern: |
-          $VALUE = $DICT.get($KEY)
-          ...
-          $VALUE.$METHOD(...)
-      - pattern-not: |
-          $VALUE = $DICT.get($KEY, ...)
-          ...
-          $VALUE.$METHOD(...)
+    pattern-either:
+      - patterns:
+          - pattern: |
+              $VALUE = $DICT.get($KEY)
+              $VALUE.$METHOD(...)
+          - pattern-not: |
+              $VALUE = $DICT.get($KEY, $DEFAULT)
+              $VALUE.$METHOD(...)
+      - patterns:
+          - pattern: |
+              $VALUE = $DICT.get($KEY)
+              $FUNC($VALUE)
+          - pattern-not: |
+              $VALUE = $DICT.get($KEY, $DEFAULT)
+              $FUNC($VALUE)

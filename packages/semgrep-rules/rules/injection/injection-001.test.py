@@ -9,11 +9,11 @@ cursor.execute("SELECT * FROM %s WHERE name = '%s'" % (table, name))
 # ruleid: injection-001
 cursor.execute("UPDATE users SET role = '{}' WHERE id = {}".format(role, uid))
 
-# ok: parameterized query with tuple
+# ok
 cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
 
-# ok: parameterized query with named params
+# ok
 cursor.execute("SELECT * FROM users WHERE name = :name", {"name": name})
 
-# ok: ORM filter
+# ok
 User.objects.filter(id=user_id).first()

@@ -18,9 +18,11 @@ rules:
         Run 'git filter-repo' to purge from history after rotation.
       oute_muscle_version: "1.0.0"
     pattern-either:
-      - pattern: $VAR = "postgresql://$USER:$PASS@$HOST/..."
-      - pattern: $VAR = "mysql://$USER:$PASS@$HOST/..."
-      - pattern: $VAR = "redis://:$PASS@$HOST/..."
+      - patterns:
+          - pattern: $VAR = "$CONN_STR"
+          - metavariable-regex:
+              metavariable: $CONN_STR
+              regex: '^(postgresql|mysql|redis)://[^@]*:[^@]*@'
       - patterns:
           - pattern: $VAR = "$VALUE"
           - metavariable-regex:

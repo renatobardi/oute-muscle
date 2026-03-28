@@ -1,4 +1,4 @@
-"""Test cases for data-consistency-001: multiple DB writes without transaction."""
+"""Test cases for data-consistency-001: consecutive session.add() outside transaction."""
 
 # ruleid: data-consistency-001
 session.add(user)
@@ -7,15 +7,16 @@ session.commit()
 
 # ruleid: data-consistency-001
 session.add(order)
+# ruleid: data-consistency-001
 session.add(payment)
 session.add(audit_log)
 session.commit()
 
-# ok: wrapped in begin() context manager
+# ok
 with session.begin():
     session.add(user)
     session.add(profile)
 
-# ok: single write is fine
+# ok
 session.add(user)
 session.commit()
