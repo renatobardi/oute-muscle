@@ -6,9 +6,8 @@ PR review comment posting (skip if GITHUB_APP_ID not set).
 from __future__ import annotations
 
 import os
-import sys
 import uuid
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -16,8 +15,8 @@ import pytest
 # (Python 3.10 compatibility issue with StrEnum)
 pytest.importorskip("packages.core.src.domain.scanning.entities")
 
-from packages.core.src.domain.scanning.entities import Advisory  # noqa: E402
-from packages.core.src.domain.incidents.enums import RiskLevel  # noqa: E402
+from packages.core.src.domain.incidents.enums import RiskLevel
+from packages.core.src.domain.scanning.entities import Advisory
 
 
 @pytest.fixture
@@ -38,19 +37,6 @@ class TestPRCommentPosting:
         from packages.core.src.adapters.github_adapter import GitHubAdapter
 
         adapter = GitHubAdapter()
-
-        advisory = Advisory(
-            scan_id=uuid.uuid4(),
-            tenant_id=uuid.uuid4(),
-            incident_id=uuid.uuid4(),
-            confidence_score=0.85,
-            risk_level=RiskLevel.HIGH,
-            matched_anti_pattern="Unsafe regex pattern",
-            analysis_text="This code is vulnerable to ReDoS attacks.",
-            llm_model_used="gemini-2.5-flash",
-            file_path="src/parser.py",
-            start_line=123,
-        )
 
         with patch("github.Github") as mock_github_class:
             mock_github = MagicMock()
@@ -83,19 +69,6 @@ class TestPRCommentPosting:
         from packages.core.src.adapters.github_adapter import GitHubAdapter
 
         adapter = GitHubAdapter()
-
-        advisory = Advisory(
-            scan_id=uuid.uuid4(),
-            tenant_id=uuid.uuid4(),
-            incident_id=uuid.uuid4(),
-            confidence_score=0.75,
-            risk_level=RiskLevel.MEDIUM,
-            matched_anti_pattern="Unsafe input handling",
-            analysis_text="This PR contains general security concerns.",
-            llm_model_used="gemini-2.5-flash",
-            file_path=None,
-            start_line=None,
-        )
 
         with patch("github.Github") as mock_github_class:
             mock_github = MagicMock()
