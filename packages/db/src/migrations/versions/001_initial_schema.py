@@ -2,7 +2,16 @@
 
 Creates all tables, enums, indexes, RLS policies, and constraints.
 Constitution VI: Row-Level Security policies enforce tenant isolation.
+
+Revision ID: 001
+Revises:
+Create Date: 2026-03-28
 """
+
+revision = "001"
+down_revision = None
+branch_labels = None
+depends_on = None
 
 from alembic import op
 import sqlalchemy as sa
