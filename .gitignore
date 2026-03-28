@@ -94,3 +94,4 @@ packages/db/src/migrations/versions/*.py
 # Logs
 *.log
 logs/
+.claude/worktrees/
