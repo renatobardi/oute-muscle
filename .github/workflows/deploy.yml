@@ -115,9 +115,11 @@ jobs:
           service_account: ${{ vars.GH_ACTIONS_SA }}
 
       - name: Set up Cloud SQL Auth Proxy
-        uses: google-github-actions/setup-cloud-sql-proxy@v1
-        with:
-          instances: ${{ vars.CLOUD_SQL_INSTANCE }}
+        run: |
+          curl -sSL https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.15.2/cloud-sql-proxy.linux.amd64 -o cloud-sql-proxy
+          chmod +x cloud-sql-proxy
+          ./cloud-sql-proxy ${{ vars.CLOUD_SQL_INSTANCE }} &
+          sleep 2
 
       - name: Set up Python
         uses: actions/setup-python@v6
