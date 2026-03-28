@@ -1,4 +1,5 @@
 """Alembic migration environment."""
+import asyncio
 from logging.config import fileConfig
 
 from alembic import context
@@ -38,8 +39,6 @@ async def run_migrations_online() -> None:
         async with connection.begin():
             await connection.run_sync(lambda _: context.run_migrations())
 
-
-import asyncio
 
 if context.is_offline_mode():
     run_migrations_offline()
