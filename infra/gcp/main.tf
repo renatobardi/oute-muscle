@@ -61,15 +61,16 @@ module "artifact_registry" {
 module "cloud_sql" {
   source = "./modules/cloud-sql"
 
-  project_id       = var.project_id
-  region           = var.region
-  name_prefix      = local.name_prefix
-  environment      = var.environment
-  labels           = local.labels
+  project_id              = var.project_id
+  region                  = var.region
+  name_prefix             = local.name_prefix
+  environment             = var.environment
+  labels                  = local.labels
 
-  db_tier          = var.db_tier
-  db_name          = var.db_name
-  db_user          = var.db_user
+  existing_instance_name  = var.existing_cloud_sql_instance
+  db_tier                 = var.db_tier
+  db_name                 = var.db_name
+  db_user                 = var.db_user
 }
 
 module "secret_manager" {

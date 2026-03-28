@@ -72,39 +72,9 @@ resource "google_cloud_run_v2_service" "api" {
         mount_path = "/cloudsql"
       }
 
-      # Liveness / readiness / startup probes
-      liveness_probe {
-        http_get {
-          path = "/health/live"
-          port = 8000
-        }
-        initial_delay_seconds = 10
-        period_seconds        = 30
-        timeout_seconds       = 5
-        failure_threshold     = 3
-      }
-
-      readiness_probe {
-        http_get {
-          path = "/health/ready"
-          port = 8000
-        }
-        initial_delay_seconds = 5
-        period_seconds        = 10
-        timeout_seconds       = 5
-        failure_threshold     = 3
-      }
-
-      startup_probe {
-        http_get {
-          path = "/health/startup"
-          port = 8000
-        }
-        initial_delay_seconds = 5
-        period_seconds        = 5
-        timeout_seconds       = 3
-        failure_threshold     = 12  # 60s total startup budget
-      }
+      # Health probes are intentionally omitted here.
+      # Cloud Run manages container health natively; probes are configured
+      # per-revision by the CI/CD deploy workflow once the real image is live.
     }
   }
 

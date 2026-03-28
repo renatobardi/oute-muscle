@@ -34,8 +34,14 @@ variable "api_image" {
 }
 
 # Cloud SQL
+variable "existing_cloud_sql_instance" {
+  description = "Name of an existing Cloud SQL instance to reuse (e.g. 'oute-postgres'). Leave empty to create a dedicated instance per environment."
+  type        = string
+  default     = ""
+}
+
 variable "db_tier" {
-  description = "Cloud SQL instance tier"
+  description = "Cloud SQL instance tier (only used when existing_cloud_sql_instance is empty)"
   type        = string
   default     = "db-custom-2-7680"
 }
