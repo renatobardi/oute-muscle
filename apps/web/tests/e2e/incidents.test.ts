@@ -13,7 +13,7 @@ test.describe('Incident CRUD flow', () => {
       localStorage.setItem('auth_token', 'test-jwt-token');
       localStorage.setItem(
         'auth_user',
-        JSON.stringify({ id: 'user-1', email: 'admin@acme.com', role: 'admin' }),
+        JSON.stringify({ id: 'user-1', email: 'admin@acme.com', role: 'admin' })
       );
     });
   });
@@ -55,7 +55,7 @@ test.describe('Incident CRUD flow', () => {
           page: 1,
           per_page: 20,
         }),
-      }),
+      })
     );
 
     await page.goto('/incidents');
@@ -231,7 +231,7 @@ test.describe('Incident CRUD flow', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({ items: [], total: 0, page: 1, per_page: 20 }),
-      }),
+      })
     );
 
     await page.goto('/incidents/inc-1');
@@ -301,16 +301,19 @@ test.describe('Incident CRUD flow', () => {
             remediation: 'Use RE2',
             affected_languages: ['python'],
             static_rule_possible: true,
-            source_url: 'https://blog.cloudflare.com/details-of-the-cloudflare-outage-on-july-2-2019',
+            source_url:
+              'https://blog.cloudflare.com/details-of-the-cloudflare-outage-on-july-2-2019',
             organization: 'Cloudflare',
           },
         }),
-      }),
+      })
     );
 
     await page.goto('/incidents/ingest');
 
-    await page.getByLabel(/url/i).fill('https://blog.cloudflare.com/details-of-the-cloudflare-outage-on-july-2-2019');
+    await page
+      .getByLabel(/url/i)
+      .fill('https://blog.cloudflare.com/details-of-the-cloudflare-outage-on-july-2-2019');
     await page.getByRole('button', { name: /extract/i }).click();
 
     await expect(page.getByText('Cloudflare regex outage')).toBeVisible();

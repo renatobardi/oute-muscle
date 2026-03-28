@@ -2,7 +2,7 @@
   /**
    * T147: Billing & usage page — plan limits, usage, upgrade prompts.
    */
-  import { tenantStore, currentPlan, isTeamOrAbove, isEnterprise } from '$lib/stores/tenant';
+  import { tenantStore, currentPlan } from '$lib/stores/tenant';
 
   const PLANS = [
     {
@@ -46,7 +46,10 @@
 </script>
 
 <div class="mx-auto max-w-4xl">
-  <a href="/settings" class="mb-6 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900">
+  <a
+    href="/settings"
+    class="mb-6 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900"
+  >
     ← Back to settings
   </a>
 
@@ -59,11 +62,13 @@
       <div class="grid grid-cols-3 gap-6">
         <div>
           <p class="text-sm text-gray-500">Plan</p>
-          <p class="mt-1 text-xl font-bold capitalize text-gray-900">{$tenantStore.tenant.plan}</p>
+          <p class="mt-1 text-xl font-bold text-gray-900 capitalize">{$tenantStore.tenant.plan}</p>
         </div>
         <div>
           <p class="text-sm text-gray-500">Contributors</p>
-          <p class="mt-1 text-xl font-bold text-gray-900">{$tenantStore.tenant.contributor_count}</p>
+          <p class="mt-1 text-xl font-bold text-gray-900">
+            {$tenantStore.tenant.contributor_count}
+          </p>
         </div>
         <div>
           <p class="text-sm text-gray-500">Repositories</p>
@@ -83,7 +88,9 @@
           : 'border-gray-200 bg-white'}"
       >
         {#if isCurrent}
-          <span class="absolute right-4 top-4 rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700">
+          <span
+            class="absolute top-4 right-4 rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700"
+          >
             Current plan
           </span>
         {/if}

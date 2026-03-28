@@ -7,7 +7,6 @@ Run: pytest packages/semgrep-rules/tests/ -v
 from __future__ import annotations
 
 import json
-import os
 import subprocess
 from pathlib import Path
 
@@ -56,7 +55,8 @@ def test_unsafe_regex_rule_fires(vulnerable_py: Path) -> None:
     result = subprocess.run(
         [
             "semgrep",
-            "--config", str(RULES_DIR / "unsafe-regex"),
+            "--config",
+            str(RULES_DIR / "unsafe-regex"),
             "--json",
             str(vulnerable_py),
         ],

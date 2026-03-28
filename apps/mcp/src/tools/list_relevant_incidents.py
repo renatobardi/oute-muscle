@@ -56,9 +56,7 @@ async def list_relevant_incidents(
     }
 
 
-async def _vector_search(
-    query: str, tenant_id: str, max_results: int
-) -> list[dict[str, Any]]:
+async def _vector_search(query: str, tenant_id: str, max_results: int) -> list[dict[str, Any]]:
     """Vector search for similar incidents.
 
     Args:

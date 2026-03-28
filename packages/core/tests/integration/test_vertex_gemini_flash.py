@@ -47,8 +47,6 @@ async def test_flash_timeout_respected() -> None:
     adapter = VertexGeminiFlash()
 
     # Mock the actual API call to simulate timeout
-    with patch.object(
-        adapter, "generate", side_effect=LLMTimeoutError("timeout")
-    ):
+    with patch.object(adapter, "generate", side_effect=LLMTimeoutError("timeout")):
         with pytest.raises(LLMTimeoutError):
             await adapter.generate("prompt")

@@ -14,7 +14,6 @@ Cloud Run configuration:
 from __future__ import annotations
 
 import time
-from typing import Any, Optional
 
 from fastapi import APIRouter, Request, status
 from fastapi.responses import JSONResponse
@@ -29,15 +28,16 @@ _START_TIME = time.monotonic()
 # Response schema
 # ---------------------------------------------------------------------------
 
+
 class CheckResult(BaseModel):
     name: str
-    status: str      # "ok" | "degraded" | "error"
-    latency_ms: Optional[float] = None
-    detail: Optional[str] = None
+    status: str  # "ok" | "degraded" | "error"
+    latency_ms: float | None = None
+    detail: str | None = None
 
 
 class HealthResponse(BaseModel):
-    status: str      # "ok" | "degraded" | "error"
+    status: str  # "ok" | "degraded" | "error"
     version: str
     uptime_seconds: float
     checks: list[CheckResult] = []
@@ -47,13 +47,16 @@ class HealthResponse(BaseModel):
 # Dependency check helpers
 # ---------------------------------------------------------------------------
 
+
 async def _check_database(request: Request) -> CheckResult:
     """Ping the database by executing SELECT 1."""
     t0 = time.monotonic()
     try:
         session_factory = getattr(request.app.state, "session_factory", None)
         if session_factory is None:
-            return CheckResult(name="database", status="error", detail="session_factory not configured")
+            return CheckResult(
+                name="database", status="error", detail="session_factory not configured"
+            )
 
         async with session_factory() as session:
             await session.execute("SELECT 1")
@@ -81,7 +84,9 @@ async def _check_llm_router(request: Request) -> CheckResult:
     try:
         llm_router = getattr(request.app.state, "llm_router", None)
         if llm_router is None:
-            return CheckResult(name="llm_router", status="error", detail="llm_router not configured")
+            return CheckResult(
+                name="llm_router", status="error", detail="llm_router not configured"
+            )
         # A real implementation might ping Vertex AI metadata endpoint
         return CheckResult(
             name="llm_router",
@@ -109,6 +114,7 @@ def _is_ready(request: Request) -> bool:
 # ---------------------------------------------------------------------------
 # Routes
 # ---------------------------------------------------------------------------
+
 
 @router.get(
     "/live",

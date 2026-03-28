@@ -28,9 +28,7 @@ class GitHubAdapter:
         self.private_key: str | None = os.environ.get("GITHUB_APP_PRIVATE_KEY")
 
         if not self.app_id or not self.private_key:
-            logger.warning(
-                "GitHub App credentials not configured; adapter will fail gracefully"
-            )
+            logger.warning("GitHub App credentials not configured; adapter will fail gracefully")
 
     def _get_client(self) -> Any:
         """Get authenticated GitHub client.
@@ -47,9 +45,7 @@ class GitHubAdapter:
             from github import Github
             from github.GithubIntegration import GithubIntegration  # noqa: F401
         except ImportError as e:
-            raise GitHubError(
-                "PyGithub not installed. Install with: pip install PyGithub"
-            ) from e
+            raise GitHubError("PyGithub not installed. Install with: pip install PyGithub") from e
 
         # TODO: Get installation ID from webhook payload
         # For now, return a base client

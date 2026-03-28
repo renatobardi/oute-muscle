@@ -24,7 +24,11 @@ select = [
 ignore = ["E501"]  # line length handled by formatter
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S101"]  # allow assert in tests
+"tests/**" = ["S101", "B017", "F841"]  # allow assert, broad exception testing, unused vars in test setup
+"**/tests/**" = ["S101", "B017", "F841"]
+"packages/semgrep-rules/**/*.test.py" = ["F821", "E402", "E722", "B007", "UP031", "PTH"]  # Semgrep test fixtures, not real Python
+"**/routes/**" = ["B008"]  # FastAPI Depends() in argument defaults is idiomatic
+"**/routers/**" = ["B008"]  # FastAPI Depends() in argument defaults is idiomatic
 
 [tool.ruff.format]
 quote-style = "double"

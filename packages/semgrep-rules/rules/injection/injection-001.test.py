@@ -7,7 +7,7 @@ cursor.execute(f"SELECT * FROM users WHERE id = {user_id}")
 cursor.execute("SELECT * FROM %s WHERE name = '%s'" % (table, name))
 
 # ruleid: injection-001
-cursor.execute("UPDATE users SET role = '{}' WHERE id = {}".format(role, uid))
+cursor.execute(f"UPDATE users SET role = '{role}' WHERE id = {uid}")
 
 # ok
 cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))

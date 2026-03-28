@@ -20,9 +20,7 @@ from apps.api.src.middleware.webhook_auth import (
 
 def create_webhook_signature(body: bytes, secret: str) -> str:
     """Create valid GitHub webhook signature."""
-    signature = hmac.new(
-        secret.encode(), body, hashlib.sha256
-    ).hexdigest()
+    signature = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
     return f"sha256={signature}"
 
 
@@ -127,9 +125,7 @@ class TestWebhookEventProcessing:
 class TestWebhookSignatureProcessing:
     """Tests for webhook signature verification processing."""
 
-    def test_pull_request_signature_verification(
-        self, webhook_secret: str
-    ) -> None:
+    def test_pull_request_signature_verification(self, webhook_secret: str) -> None:
         """Signature verification works for pull_request events."""
         payload = {
             "action": "opened",
@@ -154,9 +150,7 @@ class TestWebhookSignatureProcessing:
 
         verify_webhook_signature(body, signature, webhook_secret)
 
-    def test_installation_signature_verification(
-        self, webhook_secret: str
-    ) -> None:
+    def test_installation_signature_verification(self, webhook_secret: str) -> None:
         """Signature verification works for installation events."""
         payload = {"action": "created", "installation": {"id": 99999}}
         body = json.dumps(payload).encode()
@@ -164,9 +158,7 @@ class TestWebhookSignatureProcessing:
 
         verify_webhook_signature(body, signature, webhook_secret)
 
-    def test_invalid_signature_rejected(
-        self, webhook_secret: str
-    ) -> None:
+    def test_invalid_signature_rejected(self, webhook_secret: str) -> None:
         """Invalid signature is rejected."""
         payload = {"action": "opened"}
         body = json.dumps(payload).encode()
@@ -183,15 +175,11 @@ class TestWebhookSignatureProcessing:
         delivery_id = "12345-67890"
 
         # First call succeeds
-        verify_webhook_signature(
-            body, signature, webhook_secret, delivery_id=delivery_id
-        )
+        verify_webhook_signature(body, signature, webhook_secret, delivery_id=delivery_id)
 
         # Second call with same delivery_id fails
         with pytest.raises(WebhookReplayError):
-            verify_webhook_signature(
-                body, signature, webhook_secret, delivery_id=delivery_id
-            )
+            verify_webhook_signature(body, signature, webhook_secret, delivery_id=delivery_id)
 
     def test_different_delivery_ids_allowed(self, webhook_secret: str) -> None:
         """Different delivery IDs are allowed."""
@@ -203,9 +191,5 @@ class TestWebhookSignatureProcessing:
         delivery_id_2 = "12345-67891"
 
         # Both should succeed
-        verify_webhook_signature(
-            body, signature, webhook_secret, delivery_id=delivery_id_1
-        )
-        verify_webhook_signature(
-            body, signature, webhook_secret, delivery_id=delivery_id_2
-        )
+        verify_webhook_signature(body, signature, webhook_secret, delivery_id=delivery_id_1)
+        verify_webhook_signature(body, signature, webhook_secret, delivery_id=delivery_id_2)

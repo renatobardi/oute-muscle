@@ -14,17 +14,15 @@ Access control:
 
 from __future__ import annotations
 
-from typing import Any, Optional, Protocol
-from dataclasses import dataclass, field
-from enum import Enum
+from typing import Any, Protocol
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field
 
 from packages.core.src.domain.rules.synthesis_candidate import CandidateStatus
 from packages.core.src.domain.rules.synthesis_service import (
+    SynthesisCandidateNotFoundError,
     SynthesisService,
-    SynthesisCandidateNotFound,
     SynthesisTransitionError,
 )
 
@@ -35,8 +33,9 @@ router = APIRouter(prefix="/synthesis", tags=["synthesis"])
 # Request / Response schemas
 # ---------------------------------------------------------------------------
 
+
 class ApproveRequest(BaseModel):
-    approved_by: Optional[str] = Field(
+    approved_by: str | None = Field(
         default=None,
         description="User identifier of the approver. Defaults to the authenticated user.",
     )
@@ -48,8 +47,8 @@ class CandidateResponse(BaseModel):
     advisory_count: int
     status: str
     failure_count: int
-    failure_reason: Optional[str] = None
-    rule_id: Optional[str] = None
+    failure_reason: str | None = None
+    rule_id: str | None = None
     created_at: str
     updated_at: str
 
@@ -74,6 +73,7 @@ class MessageResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # Auth/plan dependency helpers (thin wrappers — real impl in middleware)
 # ---------------------------------------------------------------------------
+
 
 def require_enterprise(request: Request) -> None:
     """Raise 403 if the tenant is not on the Enterprise plan."""
@@ -117,16 +117,17 @@ def get_user_id(request: Request) -> str:
 # Repository port (injected via FastAPI dependency)
 # ---------------------------------------------------------------------------
 
+
 class SynthesisCandidateQueryRepo(Protocol):
     async def list_by_tenant(
         self,
         tenant_id: str,
-        status_filter: Optional[CandidateStatus],
+        status_filter: CandidateStatus | None,
         page: int,
         page_size: int,
     ) -> tuple[list[Any], int]: ...
 
-    async def get(self, candidate_id: str) -> Optional[Any]: ...
+    async def get(self, candidate_id: str) -> Any | None: ...
 
     async def create(self, candidate: Any) -> Any: ...
 
@@ -134,7 +135,7 @@ class SynthesisCandidateQueryRepo(Protocol):
         self,
         candidate_id: str,
         status: CandidateStatus,
-        failure_reason: Optional[str] = None,
+        failure_reason: str | None = None,
         increment_failure_count: bool = False,
     ) -> None: ...
 
@@ -160,6 +161,7 @@ def get_rule_repo(request: Request):  # type: ignore[return]
 # Routes
 # ---------------------------------------------------------------------------
 
+
 @router.get(
     "/candidates",
     response_model=CandidateListResponse,
@@ -167,22 +169,22 @@ def get_rule_repo(request: Request):  # type: ignore[return]
 )
 async def list_candidates(
     request: Request,
-    status_filter: Optional[str] = Query(default=None, alias="status"),
+    status_filter: str | None = Query(default=None, alias="status"),
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
     _enterprise: None = Depends(require_enterprise),
     tenant_id: str = Depends(get_tenant_id),
     repo: SynthesisCandidateQueryRepo = Depends(get_candidate_repo),
 ) -> CandidateListResponse:
-    parsed_status: Optional[CandidateStatus] = None
+    parsed_status: CandidateStatus | None = None
     if status_filter:
         try:
             parsed_status = CandidateStatus(status_filter)
-        except ValueError:
+        except ValueError as exc:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail=f"Invalid status '{status_filter}'. Valid values: {[s.value for s in CandidateStatus]}",
-            )
+            ) from exc
 
     items, total = await repo.list_by_tenant(
         tenant_id=tenant_id,
@@ -219,10 +221,12 @@ async def approve_candidate(
     approved_by = body.approved_by or user_id
     try:
         rule_id = await service.approve(candidate_id, approved_by=approved_by)
-    except SynthesisCandidateNotFound:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Candidate not found")
+    except SynthesisCandidateNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Candidate not found"
+        ) from exc
     except SynthesisTransitionError as exc:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
 
     return ApproveResponse(rule_id=rule_id, candidate_id=candidate_id)
 
@@ -244,10 +248,12 @@ async def reject_candidate(
     service = SynthesisService(candidate_repo=repo, rule_repo=rule_repo)
     try:
         await service.reject(candidate_id)
-    except SynthesisCandidateNotFound:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Candidate not found")
+    except SynthesisCandidateNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Candidate not found"
+        ) from exc
     except SynthesisTransitionError as exc:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
 
     return MessageResponse(message="Candidate rejected", candidate_id=candidate_id)
 
@@ -269,10 +275,12 @@ async def retry_candidate(
     service = SynthesisService(candidate_repo=repo, rule_repo=rule_repo)
     try:
         await service.retry(candidate_id)
-    except SynthesisCandidateNotFound:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Candidate not found")
+    except SynthesisCandidateNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Candidate not found"
+        ) from exc
     except SynthesisTransitionError as exc:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
 
     return MessageResponse(message="Candidate queued for retry", candidate_id=candidate_id)
 
@@ -281,12 +289,15 @@ async def retry_candidate(
 # Helper
 # ---------------------------------------------------------------------------
 
+
 def _to_response(candidate: Any) -> CandidateResponse:
     return CandidateResponse(
         id=candidate.id,
         anti_pattern_hash=candidate.anti_pattern_hash,
         advisory_count=candidate.advisory_count,
-        status=candidate.status.value if hasattr(candidate.status, "value") else str(candidate.status),
+        status=candidate.status.value
+        if hasattr(candidate.status, "value")
+        else str(candidate.status),
         failure_count=candidate.failure_count,
         failure_reason=candidate.failure_reason,
         rule_id=getattr(candidate, "rule_id", None),

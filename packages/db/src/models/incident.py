@@ -36,7 +36,9 @@ class Incident(Base):
     date: Any = Column("date", type_=None, nullable=True)
     source_url: Any = Column(String(2048), nullable=True, unique=True, index=True)
     organization: Any = Column(String(255), nullable=True)
-    category: Any = Column(String(50), nullable=False, index=True)  # unsafe-regex, race-condition, etc.
+    category: Any = Column(
+        String(50), nullable=False, index=True
+    )  # unsafe-regex, race-condition, etc.
     subcategory: Any = Column(String(100), nullable=True)
     failure_mode: Any = Column(Text, nullable=True)
     severity: Any = Column(String(50), nullable=False, index=True)  # critical, high, medium, low
@@ -50,7 +52,9 @@ class Incident(Base):
     embedding: Any = Column(Vector(768), nullable=True, index=True)
 
     # Rule linkage
-    static_rule_possible: Any = Column("static_rule_possible", type_=None, default=False, nullable=False)
+    static_rule_possible: Any = Column(
+        "static_rule_possible", type_=None, default=False, nullable=False
+    )
     semgrep_rule_id: Any = Column(String(50), nullable=True, index=True)
 
     # Version control for optimistic locking

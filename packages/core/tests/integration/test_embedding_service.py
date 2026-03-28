@@ -57,8 +57,6 @@ class TestEmbeddingService:
         """Test that embedding works with long incident descriptions."""
         pytest.skip("Vertex AI embedding adapter not yet implemented")
 
-    async def test_embedding_consistency_for_same_input(
-        self, sample_incident: Incident
-    ) -> None:
+    async def test_embedding_consistency_for_same_input(self, sample_incident: Incident) -> None:
         """Test that same incident text always produces same embedding."""
         pytest.skip("Vertex AI embedding adapter not yet implemented")

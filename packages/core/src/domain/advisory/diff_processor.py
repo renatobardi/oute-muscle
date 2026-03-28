@@ -25,10 +25,7 @@ def truncate_diff(diff: str, max_lines: int = 3000) -> tuple[str, bool]:
 
     # Truncate and add warning
     truncated_lines = lines[:max_lines]
-    warning = (
-        "# [oute-muscle] Diff truncated at 3000 lines. "
-        "Full analysis may be incomplete."
-    )
+    warning = "# [oute-muscle] Diff truncated at 3000 lines. Full analysis may be incomplete."
     truncated_lines.append(warning)
     processed_diff = "\n".join(truncated_lines)
 

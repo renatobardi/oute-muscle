@@ -21,13 +21,10 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from pathlib import Path
-from typing import Optional
 
 import yaml  # PyYAML
-
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -42,6 +39,7 @@ REQUIRED_RULE_FIELDS = {"id", "message", "severity", "languages", "pattern"}
 # ---------------------------------------------------------------------------
 # Rule loading and validation
 # ---------------------------------------------------------------------------
+
 
 def load_rules(rules_dir: Path) -> list[dict]:
     """
@@ -86,6 +84,7 @@ def load_rules(rules_dir: Path) -> list[dict]:
 # Targets
 # ---------------------------------------------------------------------------
 
+
 def target_stdout(rules: list[dict]) -> None:
     """Print merged YAML to stdout."""
     merged = {"rules": rules}
@@ -100,7 +99,10 @@ def target_api(rules: list[dict], api_url: str, api_key: str) -> None:
     try:
         import httpx
     except ImportError:
-        print("ERROR: httpx is required for --target api. Install with: pip install httpx", file=sys.stderr)
+        print(
+            "ERROR: httpx is required for --target api. Install with: pip install httpx",
+            file=sys.stderr,
+        )
         sys.exit(2)
 
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
@@ -139,7 +141,10 @@ def target_api(rules: list[dict], api_url: str, api_key: str) -> None:
                 else:
                     updated += 1
             else:
-                print(f"  ✗ {action} failed for {rule_id}: {resp.status_code} {resp.text}", file=sys.stderr)
+                print(
+                    f"  ✗ {action} failed for {rule_id}: {resp.status_code} {resp.text}",
+                    file=sys.stderr,
+                )
                 failed += 1
 
     print(f"\nSync complete: {created} created, {updated} updated, {failed} failed")
@@ -155,7 +160,10 @@ def target_github(rules: list[dict], repo: str, token: str, branch: str = "main"
     try:
         import httpx
     except ImportError:
-        print("ERROR: httpx is required for --target github. Install with: pip install httpx", file=sys.stderr)
+        print(
+            "ERROR: httpx is required for --target github. Install with: pip install httpx",
+            file=sys.stderr,
+        )
         sys.exit(2)
 
     import base64
@@ -174,7 +182,7 @@ def target_github(rules: list[dict], repo: str, token: str, branch: str = "main"
     with httpx.Client(headers=headers, timeout=30) as client:
         # Check if file already exists to get its SHA
         get_resp = client.get(api_url, params={"ref": branch})
-        sha: Optional[str] = None
+        sha: str | None = None
         if get_resp.status_code == 200:
             sha = get_resp.json()["sha"]
 
@@ -204,6 +212,7 @@ def _infer_category(rule_id: str) -> str:
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(

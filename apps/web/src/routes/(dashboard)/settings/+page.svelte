@@ -4,7 +4,7 @@
    */
   import { onMount } from 'svelte';
   import { apiClient, type TenantUser, type Role, ApiError } from '$lib/api';
-  import { tenantStore, currentPlan } from '$lib/stores/tenant';
+  import { tenantStore } from '$lib/stores/tenant';
   import { isAdmin } from '$lib/stores/auth';
 
   let users = $state<TenantUser[]>([]);
@@ -89,7 +89,9 @@
         <div>
           <dt class="text-gray-500">Plan</dt>
           <dd>
-            <span class="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium capitalize text-indigo-700">
+            <span
+              class="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700 capitalize"
+            >
               {$tenantStore.tenant.plan}
             </span>
           </dd>
@@ -135,7 +137,9 @@
 
     {#if loadingUsers}
       <div class="flex justify-center py-8">
-        <span class="h-5 w-5 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"></span>
+        <span
+          class="h-5 w-5 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"
+        ></span>
       </div>
     {:else if usersError}
       <div class="rounded-lg bg-red-50 p-3 text-sm text-red-700">{usersError}</div>
@@ -145,7 +149,9 @@
           <li data-user-id={user.id} class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-900">{user.email}</p>
-              <p class="text-xs text-gray-400">Joined {new Date(user.joined_at).toLocaleDateString()}</p>
+              <p class="text-xs text-gray-400">
+                Joined {new Date(user.joined_at).toLocaleDateString()}
+              </p>
             </div>
 
             <div class="flex items-center gap-2">
@@ -153,7 +159,7 @@
                 aria-label="role"
                 bind:value={pendingRoles[user.id]}
                 disabled={!$isAdmin}
-                class="rounded-lg border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:outline-none disabled:bg-gray-50 disabled:cursor-not-allowed"
+                class="rounded-lg border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-50"
               >
                 {#each roles as r}
                   <option value={r}>{r}</option>
@@ -165,7 +171,8 @@
                   onclick={() => handleSaveRole(user)}
                   disabled={savingRole[user.id]}
                   class="rounded-lg bg-indigo-600 px-2 py-1 text-xs font-medium text-white hover:bg-indigo-500 disabled:opacity-60"
-                >Save</button>
+                  >Save</button
+                >
               {/if}
             </div>
           </li>
@@ -193,7 +200,7 @@
             type="email"
             bind:value={inviteEmail}
             required
-            class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
             placeholder="colleague@company.com"
           />
         </div>
@@ -203,7 +210,7 @@
           <select
             id="invite-role"
             bind:value={inviteRole}
-            class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
           >
             {#each roles as r}
               <option value={r}>{r}</option>
@@ -214,9 +221,13 @@
 
       <div class="mt-5 flex justify-end gap-3">
         <button
-          onclick={() => { showInviteModal = false; inviteError = null; }}
+          onclick={() => {
+            showInviteModal = false;
+            inviteError = null;
+          }}
           class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-        >Cancel</button>
+          >Cancel</button
+        >
         <button
           onclick={handleInvite}
           disabled={inviting || !inviteEmail}

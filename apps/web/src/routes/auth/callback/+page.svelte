@@ -16,7 +16,8 @@
     try {
       const params = new URLSearchParams(window.location.search);
       const code = params.get('code');
-      const returnedState = params.get('state');
+      // state parameter reserved for CSRF validation in future
+      const _returnedState = params.get('state');
 
       if (!code) throw new Error('Missing authorization code');
 
@@ -65,13 +66,15 @@
 </script>
 
 <div class="flex min-h-screen items-center justify-center bg-gray-50">
-  <div class="w-full max-w-sm rounded-xl bg-white p-8 shadow-sm ring-1 ring-gray-200 text-center">
+  <div class="w-full max-w-sm rounded-xl bg-white p-8 text-center shadow-sm ring-1 ring-gray-200">
     {#if error}
       <div class="mb-4 rounded-lg bg-red-50 p-4 text-left text-sm text-red-700">{error}</div>
       <a href="/auth/login" class="text-sm text-indigo-600 hover:underline">Back to login</a>
     {:else}
       <div class="mb-4 flex justify-center">
-        <span class="h-8 w-8 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"></span>
+        <span
+          class="h-8 w-8 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"
+        ></span>
       </div>
       <p class="text-sm text-gray-600">{status}</p>
     {/if}

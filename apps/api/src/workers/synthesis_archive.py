@@ -21,16 +21,18 @@ Returns a JSON summary:
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timezone
-from typing import Any, Optional, Protocol
+from datetime import UTC, datetime
+from typing import Any, Protocol
 
 import structlog
+from fastapi import APIRouter, HTTPException, Request
+from pydantic import BaseModel
 
-from packages.core.src.domain.rules.synthesis_service import SynthesisService
 from packages.core.src.domain.rules.synthesis_candidate import (
-    CandidateStatus,
     AUTO_ARCHIVE_DAYS,
+    CandidateStatus,
 )
+from packages.core.src.domain.rules.synthesis_service import SynthesisService
 
 log = structlog.get_logger(__name__)
 
@@ -39,14 +41,15 @@ log = structlog.get_logger(__name__)
 # Repository port
 # ---------------------------------------------------------------------------
 
+
 class ArchiveCandidateRepo(Protocol):
-    async def get(self, candidate_id: str) -> Optional[Any]: ...
+    async def get(self, candidate_id: str) -> Any | None: ...
     async def create(self, candidate: Any) -> Any: ...
     async def update_status(
         self,
         candidate_id: str,
         status: CandidateStatus,
-        failure_reason: Optional[str] = None,
+        failure_reason: str | None = None,
         increment_failure_count: bool = False,
     ) -> None: ...
     async def list_stale_pending(self, older_than_days: int) -> list[Any]: ...
@@ -59,6 +62,7 @@ class ArchiveRuleRepo(Protocol):
 # ---------------------------------------------------------------------------
 # Job
 # ---------------------------------------------------------------------------
+
 
 async def run_archive_job(
     candidate_repo: ArchiveCandidateRepo,
@@ -73,7 +77,7 @@ async def run_archive_job(
         rule_repo=rule_repo,
     )
 
-    run_at = datetime.now(timezone.utc)
+    run_at = datetime.now(UTC)
 
     log.info("synthesis_archive_job_start", auto_archive_days=AUTO_ARCHIVE_DAYS)
 
@@ -94,9 +98,6 @@ async def run_archive_job(
 # ---------------------------------------------------------------------------
 # FastAPI route (mounted by the app factory)
 # ---------------------------------------------------------------------------
-
-from fastapi import APIRouter, Request, HTTPException
-from pydantic import BaseModel
 
 archive_router = APIRouter(prefix="/jobs", tags=["jobs"])
 
@@ -135,6 +136,7 @@ async def synthesis_archive_job(request: Request) -> ArchiveJobResponse:
 # CLI entry point (Cloud Run Job)
 # ---------------------------------------------------------------------------
 
+
 async def _cli_main() -> None:
     """
     Standalone runner for Cloud Run Job execution.
@@ -145,10 +147,13 @@ async def _cli_main() -> None:
     """
     import os
 
+    from apps.api.src.adapters.db.rule_repo import SQLRuleRepo  # type: ignore[import]
+    from apps.api.src.adapters.db.synthesis_repo import (
+        SQLSynthesisCandidateRepo,  # type: ignore[import]
+    )
+
     # Deferred DB setup
     from packages.db.src.session import get_async_session_factory  # type: ignore[import]
-    from apps.api.src.adapters.db.synthesis_repo import SQLSynthesisCandidateRepo  # type: ignore[import]
-    from apps.api.src.adapters.db.rule_repo import SQLRuleRepo  # type: ignore[import]
 
     database_url = os.environ.get("DATABASE_URL")
     if not database_url:

@@ -7,13 +7,12 @@ import uuid
 from datetime import datetime
 
 import pytest
-
 from src.domain.incidents.entity import Incident
 from src.domain.incidents.enums import (
     IncidentCategory,
     IncidentSeverity,
-    RuleSource,
     RuleSeverity,
+    RuleSource,
 )
 from src.domain.rules.entity import SemgrepRule
 

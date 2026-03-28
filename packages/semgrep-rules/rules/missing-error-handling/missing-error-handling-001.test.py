@@ -15,7 +15,7 @@ except:
 # ruleid: missing-error-handling-001
 try:
     parse_config()
-except Exception as e:
+except Exception:
     pass
 
 # ok

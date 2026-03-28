@@ -14,7 +14,7 @@ import base64
 import hashlib
 import secrets
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import jwt
 from cryptography.hazmat.primitives import serialization
@@ -53,18 +53,20 @@ class OAuthProvider:
     def __init__(self) -> None:
         """Initialize OAuth provider with RSA key pair."""
         # Generate RSA key pair for JWT signing (RS256)
-        self._private_key_obj = rsa.generate_private_key(
-            public_exponent=65537, key_size=2048
-        )
+        self._private_key_obj = rsa.generate_private_key(public_exponent=65537, key_size=2048)
         self._private_key = self._private_key_obj.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.PKCS8,
             encryption_algorithm=serialization.NoEncryption(),
         ).decode()
-        self._public_key = self._private_key_obj.public_key().public_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PublicFormat.SubjectPublicKeyInfo,
-        ).decode()
+        self._public_key = (
+            self._private_key_obj.public_key()
+            .public_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PublicFormat.SubjectPublicKeyInfo,
+            )
+            .decode()
+        )
 
         # In-memory storage
         self._auth_codes: dict[str, dict] = {}
@@ -120,9 +122,11 @@ class OAuthProvider:
 
         # Verify PKCE
         if auth_entry["code_challenge_method"] == "S256":
-            computed_challenge = base64.urlsafe_b64encode(
-                hashlib.sha256(code_verifier.encode()).digest()
-            ).rstrip(b"=").decode()
+            computed_challenge = (
+                base64.urlsafe_b64encode(hashlib.sha256(code_verifier.encode()).digest())
+                .rstrip(b"=")
+                .decode()
+            )
             if computed_challenge != auth_entry["code_challenge"]:
                 raise OAuthError("PKCE verification failed")
         elif auth_entry["code_challenge_method"] == "plain":
@@ -184,9 +188,7 @@ class OAuthProvider:
             JWTInvalidError: If token signature is invalid
         """
         try:
-            claims = jwt.decode(
-                token, self._public_key, algorithms=["RS256"]
-            )
+            claims = jwt.decode(token, self._public_key, algorithms=["RS256"])
             return claims
         except jwt.ExpiredSignatureError as e:
             raise JWTExpiredError(str(e)) from e
@@ -202,7 +204,7 @@ class OAuthProvider:
         Returns:
             JWT access token
         """
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         expiry = now + timedelta(seconds=self.ACCESS_TOKEN_EXPIRY_SECONDS)
 
         payload = {

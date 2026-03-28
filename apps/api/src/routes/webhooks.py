@@ -95,9 +95,7 @@ async def handle_github_webhook(
     elif x_github_event == "pull_request":
         action = payload.get("action")
         if action in ("opened", "synchronize"):
-            logger.info(
-                f"Received pull_request event (action={action}), queuing L1+L2 pipeline"
-            )
+            logger.info(f"Received pull_request event (action={action}), queuing L1+L2 pipeline")
             await _run_l1_and_l2_pipeline(payload)
             return WebhookResponse(status="queued", delivery_id=x_github_delivery)
         else:
@@ -148,9 +146,7 @@ async def _run_l1_and_l2_pipeline(payload: dict[str, Any]) -> None:
     pr_number = payload.get("pull_request", {}).get("number")
     commit_sha = payload.get("pull_request", {}).get("head", {}).get("sha")
 
-    logger.info(
-        f"L1+L2 pipeline queued for {repository}#{pr_number} (commit={commit_sha})"
-    )
+    logger.info(f"L1+L2 pipeline queued for {repository}#{pr_number} (commit={commit_sha})")
     # TODO: Implement actual pipeline
     # 1. Get PR diff
     # 2. Run L1 scan (Semgrep)

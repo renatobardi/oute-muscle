@@ -9,7 +9,7 @@ Each finding dict: { rule_id, message, severity, line, incident_id | null }
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from apps.mcp.src.metering import MeteringService, QuotaExceededError
 
@@ -54,7 +54,7 @@ async def scan_code(
     findings = run_semgrep(code, language)
 
     scan_id = str(uuid.uuid4())
-    scanned_at = datetime.now(timezone.utc).isoformat()
+    scanned_at = datetime.now(UTC).isoformat()
 
     return {
         "findings": findings,

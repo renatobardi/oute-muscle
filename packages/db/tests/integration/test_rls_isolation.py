@@ -8,11 +8,12 @@ Requires a running PostgreSQL instance with RLS policies applied
 
 import os
 import uuid
+
 import pytest
 import pytest_asyncio
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
 
 # Skip entire module if no database URL provided
 pytestmark = pytest.mark.skipif(
@@ -27,10 +28,11 @@ DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://localhost/oute_te
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 async def set_tenant_context(session: AsyncSession, tenant_id: str) -> None:
     """Simulate what the RLS middleware does: set the tenant context variable."""
     await session.execute(
-        text("SET LOCAL \"app.tenant_id\" = :tenant_id"),
+        text('SET LOCAL "app.tenant_id" = :tenant_id'),
         {"tenant_id": tenant_id},
     )
 
@@ -48,9 +50,7 @@ async def create_tenant(session: AsyncSession, name: str) -> str:
     return tenant_id
 
 
-async def create_incident(
-    session: AsyncSession, tenant_id: str, title: str
-) -> str:
+async def create_incident(session: AsyncSession, tenant_id: str, title: str) -> str:
     """Insert an incident belonging to a specific tenant and return its ID."""
     incident_id = str(uuid.uuid4())
     await session.execute(
@@ -70,6 +70,7 @@ async def create_incident(
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest_asyncio.fixture
 async def db_session():
     engine = create_async_engine(DATABASE_URL, echo=False)
@@ -87,6 +88,7 @@ async def db_session():
 # ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
+
 
 class TestRlsTenantIsolation:
     """Tenant A must not be able to see or modify Tenant B's data."""
@@ -109,9 +111,7 @@ class TestRlsTenantIsolation:
         )
         rows = result.fetchall()
 
-        assert len(rows) == 0, (
-            f"Tenant A should not see Tenant B's incident {inc_b}"
-        )
+        assert len(rows) == 0, f"Tenant A should not see Tenant B's incident {inc_b}"
 
     @pytest.mark.asyncio
     async def test_tenant_can_read_own_incidents(self, db_session):
@@ -142,10 +142,7 @@ class TestRlsTenantIsolation:
         # Attempt update as tenant A
         await set_tenant_context(db_session, tenant_a)
         result = await db_session.execute(
-            text(
-                "UPDATE incidents SET title = 'HACKED' "
-                "WHERE id = :id RETURNING id"
-            ),
+            text("UPDATE incidents SET title = 'HACKED' WHERE id = :id RETURNING id"),
             {"id": inc_b},
         )
         updated = result.fetchall()

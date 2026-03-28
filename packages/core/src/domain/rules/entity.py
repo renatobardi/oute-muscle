@@ -79,9 +79,7 @@ class SemgrepRule(BaseModel):
     @model_validator(mode="after")
     def validate_auto_disable_threshold(self) -> SemgrepRule:
         if self.false_positive_count >= 3 and not self.auto_disabled:
-            raise ValueError(
-                "Rule with false_positive_count >= 3 must have auto_disabled=True."
-            )
+            raise ValueError("Rule with false_positive_count >= 3 must have auto_disabled=True.")
         return self
 
     @property

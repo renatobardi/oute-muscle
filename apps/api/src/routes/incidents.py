@@ -12,8 +12,7 @@ Endpoints:
 
 from __future__ import annotations
 
-from datetime import date, datetime
-from typing import Optional
+import datetime as dt
 
 from fastapi import APIRouter, Query
 from pydantic import BaseModel, Field
@@ -29,7 +28,7 @@ class IncidentCreateRequest(BaseModel):
     severity: str = Field(...)  # critical, high, medium, low
     anti_pattern: str = Field(..., min_length=1)
     remediation: str = Field(..., min_length=1)
-    date: Optional[date] = None
+    date: dt.date | None = None
     organization: str | None = Field(None, max_length=255)
     source_url: str | None = Field(None, max_length=2048)
     affected_languages: list[str] = Field(default_factory=list)
@@ -48,7 +47,7 @@ class IncidentUpdateRequest(BaseModel):
     severity: str | None = None
     anti_pattern: str | None = Field(None, min_length=1)
     remediation: str | None = Field(None, min_length=1)
-    date: Optional[date] = None
+    date: dt.date | None = None
     organization: str | None = Field(None, max_length=255)
     affected_languages: list[str] | None = None
     code_example: str | None = None
@@ -67,7 +66,7 @@ class IncidentResponse(BaseModel):
     severity: str
     anti_pattern: str
     remediation: str
-    date: date | None
+    date: dt.date | None
     organization: str | None
     source_url: str | None
     affected_languages: list[str]
@@ -76,10 +75,10 @@ class IncidentResponse(BaseModel):
     static_rule_possible: bool
     semgrep_rule_id: str | None
     version: int
-    deleted_at: datetime | None
+    deleted_at: dt.datetime | None
     created_by: str | None
-    created_at: datetime
-    updated_at: datetime
+    created_at: dt.datetime
+    updated_at: dt.datetime
 
     class Config:
         from_attributes = True
@@ -179,9 +178,7 @@ async def get_incident(incident_id: str) -> IncidentResponse:
 
 
 @router.put("/{incident_id}", response_model=IncidentResponse)
-async def update_incident(
-    incident_id: str, request: IncidentUpdateRequest
-) -> IncidentResponse:
+async def update_incident(incident_id: str, request: IncidentUpdateRequest) -> IncidentResponse:
     """Update incident (optimistic locking).
 
     PUT /incidents/{incident_id}

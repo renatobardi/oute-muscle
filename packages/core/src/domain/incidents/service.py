@@ -29,9 +29,7 @@ class IncidentService:
         self.embedding_adapter = embedding_adapter
         self.vector_search = vector_search
 
-    async def create_incident(
-        self, incident: Incident
-    ) -> Incident:
+    async def create_incident(self, incident: Incident) -> Incident:
         """Create a new incident with embedding generation.
 
         Args:
@@ -51,9 +49,7 @@ class IncidentService:
         incident_with_embedding = incident.with_embedding(embedding)
         return await self.incident_repo.create(incident_with_embedding)
 
-    async def update_incident(
-        self, incident: Incident, *, expected_version: int
-    ) -> Incident:
+    async def update_incident(self, incident: Incident, *, expected_version: int) -> Incident:
         """Update an incident with optimistic locking and re-embedding.
 
         Args:
@@ -75,9 +71,7 @@ class IncidentService:
             incident_with_embedding, expected_version=expected_version
         )
 
-    async def soft_delete_incident(
-        self, incident_id: uuid.UUID, *, tenant_id: uuid.UUID
-    ) -> None:
+    async def soft_delete_incident(self, incident_id: uuid.UUID, *, tenant_id: uuid.UUID) -> None:
         """Soft-delete an incident (sets deleted_at).
 
         Fails if incident has an active semgrep_rule_id.
@@ -91,9 +85,7 @@ class IncidentService:
         """
         await self.incident_repo.soft_delete(incident_id, tenant_id=tenant_id)
 
-    async def hard_delete_incident(
-        self, incident_id: uuid.UUID, *, tenant_id: uuid.UUID
-    ) -> None:
+    async def hard_delete_incident(self, incident_id: uuid.UUID, *, tenant_id: uuid.UUID) -> None:
         """Permanently delete an incident (CLI only).
 
         Args:
@@ -148,6 +140,4 @@ class IncidentService:
             )
         else:
             # Full-text search
-            return await self.incident_repo.search(
-                query, tenant_id=tenant_id, limit=limit
-            )
+            return await self.incident_repo.search(query, tenant_id=tenant_id, limit=limit)

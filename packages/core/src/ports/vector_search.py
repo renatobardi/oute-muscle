@@ -15,7 +15,7 @@ class VectorSearchResult:
 
     incident: Incident
     similarity_score: float  # cosine similarity 0.0-1.0 (higher = more similar)
-    distance: float          # cosine distance 0.0-2.0 (lower = more similar)
+    distance: float  # cosine distance 0.0-2.0 (lower = more similar)
 
 
 @runtime_checkable

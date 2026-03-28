@@ -169,7 +169,7 @@ export class ApiError extends Error {
     public readonly status: number,
     public readonly code: string,
     message: string,
-    public readonly details?: Record<string, unknown>,
+    public readonly details?: Record<string, unknown>
   ) {
     super(message);
     this.name = 'ApiError';
@@ -215,7 +215,7 @@ export class ApiClient {
       params?: Record<string, string | number | boolean | undefined>;
       body?: unknown;
       accept?: string;
-    } = {},
+    } = {}
   ): Promise<T> {
     const url = new URL(`${this._baseUrl}${path}`);
     if (options.params) {
@@ -254,7 +254,7 @@ export class ApiClient {
         response.status,
         data.code ?? 'UNKNOWN',
         data.error ?? `HTTP ${response.status}`,
-        data.details,
+        data.details
       );
     }
 
@@ -273,20 +273,19 @@ export class ApiClient {
       severity?: string;
       page?: number;
       per_page?: number;
-    }): Promise<PaginatedResponse<Incident>> =>
-      this.request('GET', '/incidents', { params }),
+    }): Promise<PaginatedResponse<Incident>> => this.request('GET', '/incidents', { params }),
 
-    get: (id: string): Promise<Incident> =>
-      this.request('GET', `/incidents/${id}`),
+    get: (id: string): Promise<Incident> => this.request('GET', `/incidents/${id}`),
 
     create: (payload: Omit<IncidentDraft, never>): Promise<Incident> =>
       this.request('POST', '/incidents', { body: payload }),
 
-    update: (id: string, payload: Partial<IncidentDraft> & { version: number }): Promise<Incident> =>
-      this.request('PUT', `/incidents/${id}`, { body: payload }),
+    update: (
+      id: string,
+      payload: Partial<IncidentDraft> & { version: number }
+    ): Promise<Incident> => this.request('PUT', `/incidents/${id}`, { body: payload }),
 
-    delete: (id: string): Promise<void> =>
-      this.request('DELETE', `/incidents/${id}`),
+    delete: (id: string): Promise<void> => this.request('DELETE', `/incidents/${id}`),
 
     ingestUrl: (url: string): Promise<{ draft: IncidentDraft }> =>
       this.request('POST', '/incidents/ingest-url', { body: { url } }),
@@ -303,11 +302,9 @@ export class ApiClient {
       source?: RuleSource;
       page?: number;
       per_page?: number;
-    }): Promise<PaginatedResponse<Rule>> =>
-      this.request('GET', '/rules', { params }),
+    }): Promise<PaginatedResponse<Rule>> => this.request('GET', '/rules', { params }),
 
-    get: (id: string): Promise<Rule> =>
-      this.request('GET', `/rules/${id}`),
+    get: (id: string): Promise<Rule> => this.request('GET', `/rules/${id}`),
 
     toggle: (id: string, enabled: boolean): Promise<Rule> =>
       this.request('PATCH', `/rules/${id}`, { body: { enabled } }),
@@ -325,19 +322,16 @@ export class ApiClient {
       to?: string;
       page?: number;
       per_page?: number;
-    }): Promise<PaginatedResponse<Scan>> =>
-      this.request('GET', '/scans', { params }),
+    }): Promise<PaginatedResponse<Scan>> => this.request('GET', '/scans', { params }),
 
-    get: (id: string): Promise<Scan> =>
-      this.request('GET', `/scans/${id}`),
+    get: (id: string): Promise<Scan> => this.request('GET', `/scans/${id}`),
 
     trigger: (payload: {
       diff: string;
       repository: string;
       commit_sha: string;
       pr_number?: number;
-    }): Promise<Scan> =>
-      this.request('POST', '/scans', { body: payload }),
+    }): Promise<Scan> => this.request('POST', '/scans', { body: payload }),
   };
 
   // -------------------------------------------------------------------------
@@ -354,11 +348,9 @@ export class ApiClient {
   // -------------------------------------------------------------------------
 
   readonly tenants = {
-    me: (): Promise<Tenant> =>
-      this.request('GET', '/tenants/me'),
+    me: (): Promise<Tenant> => this.request('GET', '/tenants/me'),
 
-    users: (): Promise<TenantUser[]> =>
-      this.request('GET', '/tenants/me/users'),
+    users: (): Promise<TenantUser[]> => this.request('GET', '/tenants/me/users'),
 
     invite: (payload: { email: string; role: Role }): Promise<{ message: string }> =>
       this.request('POST', '/tenants/me/users/invite', { body: payload }),
@@ -379,8 +371,7 @@ export class ApiClient {
       to?: string;
       page?: number;
       per_page?: number;
-    }): Promise<PaginatedResponse<AuditLogEntry>> =>
-      this.request('GET', '/audit-log', { params }),
+    }): Promise<PaginatedResponse<AuditLogEntry>> => this.request('GET', '/audit-log', { params }),
   };
 
   // -------------------------------------------------------------------------
@@ -388,7 +379,10 @@ export class ApiClient {
   // -------------------------------------------------------------------------
 
   readonly synthesis = {
-    listCandidates: (params?: { page?: number; per_page?: number }): Promise<PaginatedResponse<SynthesisCandidate>> =>
+    listCandidates: (params?: {
+      page?: number;
+      per_page?: number;
+    }): Promise<PaginatedResponse<SynthesisCandidate>> =>
       this.request('GET', '/synthesis/candidates', { params }),
 
     approve: (id: string): Promise<{ rule_id: string }> =>

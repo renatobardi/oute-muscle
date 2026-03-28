@@ -10,15 +10,14 @@ Requires Enterprise plan; returns 403 for Free/Team tenants.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from packages.db.src.session import get_session
 from packages.core.src.domain.tenants.plan_limits import Plan
+from packages.db.src.session import get_session
 
 router = APIRouter(prefix="/audit-log", tags=["audit"])
 
@@ -27,6 +26,7 @@ router = APIRouter(prefix="/audit-log", tags=["audit"])
 # Response schema
 # ---------------------------------------------------------------------------
 
+
 class AuditLogEntryResponse(BaseModel):
     id: str
     entity_type: str
@@ -34,8 +34,8 @@ class AuditLogEntryResponse(BaseModel):
     action: str
     actor_id: str
     actor_email: str
-    before: Optional[dict] = None
-    after: Optional[dict] = None
+    before: dict | None = None
+    after: dict | None = None
     created_at: str
 
 
@@ -49,6 +49,7 @@ class PaginatedAuditLog(BaseModel):
 # ---------------------------------------------------------------------------
 # Dependencies
 # ---------------------------------------------------------------------------
+
 
 def get_tenant_id(request: Request) -> str:
     return request.state.tenant_id
@@ -70,13 +71,14 @@ def require_enterprise(request: Request) -> None:
 # Route
 # ---------------------------------------------------------------------------
 
+
 @router.get("", response_model=PaginatedAuditLog)
 async def list_audit_log(
     request: Request,
-    entity_type: Optional[str] = Query(None),
-    action: Optional[str] = Query(None),
-    from_: Optional[str] = Query(None, alias="from"),
-    to: Optional[str] = Query(None),
+    entity_type: str | None = Query(None),
+    action: str | None = Query(None),
+    from_: str | None = Query(None, alias="from"),
+    to: str | None = Query(None),
     page: int = Query(1, ge=1),
     per_page: int = Query(50, ge=1, le=200),
     tenant_id: str = Depends(get_tenant_id),

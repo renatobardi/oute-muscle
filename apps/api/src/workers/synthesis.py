@@ -26,24 +26,21 @@ can schedule accordingly.
 
 from __future__ import annotations
 
-import logging
 from dataclasses import dataclass
-from typing import Optional, Protocol
+from typing import Protocol
 
 import structlog
 
-from packages.core.src.domain.rules.pattern_detector import PatternDetector, PatternDetectorRepo
-from packages.core.src.domain.rules.synthesizer import RuleSynthesizer, SynthesisError
-from packages.core.src.domain.rules.test_validator import CandidateTestValidator
+from packages.core.src.domain.rules.synthesis_candidate import (
+    CandidateStatus,
+    SynthesisCandidate,
+)
 from packages.core.src.domain.rules.synthesis_service import (
     SynthesisService,
-    SynthesisCandidateNotFound,
     SynthesisTransitionError,
 )
-from packages.core.src.domain.rules.synthesis_candidate import (
-    SynthesisCandidate,
-    CandidateStatus,
-)
+from packages.core.src.domain.rules.synthesizer import RuleSynthesizer, SynthesisError
+from packages.core.src.domain.rules.test_validator import CandidateTestValidator
 
 log = structlog.get_logger(__name__)
 
@@ -52,10 +49,10 @@ log = structlog.get_logger(__name__)
 # ---------------------------------------------------------------------------
 
 RETRY_DELAYS_SECONDS: list[int] = [
-    0,      # attempt 1 — immediate
-    60,     # attempt 2 — 1 min
-    300,    # attempt 3 — 5 min
-    900,    # attempt 4+ — 15 min
+    0,  # attempt 1 — immediate
+    60,  # attempt 2 — 1 min
+    300,  # attempt 3 — 5 min
+    900,  # attempt 4+ — 15 min
 ]
 
 
@@ -71,9 +68,11 @@ def retry_delay_for_attempt(attempt: int) -> int:
 # DTOs
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class WorkerPayload:
     """Payload delivered by Cloud Tasks HTTP request body."""
+
     candidate_id: str
     attempt: int = 1  # Cloud Tasks X-CloudTasks-TaskRetryCount + 1
 
@@ -81,13 +80,14 @@ class WorkerPayload:
 @dataclass
 class WorkerResult:
     """Result returned to the Cloud Tasks handler."""
+
     success: bool
     candidate_id: str
-    rule_id: Optional[str] = None
-    failure_reason: Optional[str] = None
+    rule_id: str | None = None
+    failure_reason: str | None = None
     # When success=False and retry is possible, set this to signal the caller
     # to re-enqueue with the appropriate delay.
-    retry_delay_seconds: Optional[int] = None
+    retry_delay_seconds: int | None = None
     archived: bool = False
 
 
@@ -95,18 +95,19 @@ class WorkerResult:
 # Repository and service ports
 # ---------------------------------------------------------------------------
 
+
 class IncidentRepo(Protocol):
-    async def get(self, incident_id: str) -> Optional[dict]: ...
+    async def get(self, incident_id: str) -> dict | None: ...
 
 
 class CandidateWriteRepo(Protocol):
-    async def get(self, candidate_id: str) -> Optional[SynthesisCandidate]: ...
+    async def get(self, candidate_id: str) -> SynthesisCandidate | None: ...
     async def create(self, candidate: SynthesisCandidate) -> SynthesisCandidate: ...
     async def update_status(
         self,
         candidate_id: str,
         status: CandidateStatus,
-        failure_reason: Optional[str] = None,
+        failure_reason: str | None = None,
         increment_failure_count: bool = False,
     ) -> None: ...
     async def list_stale_pending(self, older_than_days: int) -> list[SynthesisCandidate]: ...
@@ -119,6 +120,7 @@ class RuleWriteRepo(Protocol):
 # ---------------------------------------------------------------------------
 # Worker
 # ---------------------------------------------------------------------------
+
 
 class SynthesisWorker:
     """
@@ -252,7 +254,7 @@ class SynthesisWorker:
         self,
         candidate: SynthesisCandidate,
         bound_log: structlog.BoundLogger,
-    ) -> Optional[dict]:
+    ) -> dict | None:
         """Load the incident that seeded this candidate (via sample_incident_id if stored)."""
         # Candidates created by the trigger worker carry the incident reference
         # in their anti_pattern_hash; however the simplest approach is to look up
@@ -292,6 +294,7 @@ class SynthesisWorker:
         """Build a WorkerResult for a failed attempt, computing retry delay if applicable."""
         new_failure_count = candidate.failure_count + 1
         from packages.core.src.domain.rules.synthesis_candidate import MAX_FAILURE_COUNT
+
         archived = new_failure_count >= MAX_FAILURE_COUNT
         retry_delay = None if archived else retry_delay_for_attempt(attempt + 1)
         return WorkerResult(
@@ -306,6 +309,7 @@ class SynthesisWorker:
 # ---------------------------------------------------------------------------
 # Cloud Tasks HTTP handler (thin adapter)
 # ---------------------------------------------------------------------------
+
 
 async def handle_cloud_tasks_request(
     payload: WorkerPayload,

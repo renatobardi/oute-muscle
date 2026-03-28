@@ -14,7 +14,10 @@ export default [
       globals: { ...globals.browser, ...globals.node },
     },
     rules: {
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
       '@typescript-eslint/no-explicit-any': 'error',
     },
   },
@@ -31,16 +34,13 @@ export default [
     },
     rules: {
       ...svelte.configs.recommended.rules,
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
     },
   },
   {
-    ignores: [
-      '.svelte-kit/**',
-      'build/**',
-      'dist/**',
-      'node_modules/**',
-      '**/*.d.ts',
-    ],
+    ignores: ['.svelte-kit/**', 'build/**', 'dist/**', 'node_modules/**', '**/*.d.ts'],
   },
 ];

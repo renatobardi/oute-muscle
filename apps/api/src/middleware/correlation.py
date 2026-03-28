@@ -38,9 +38,7 @@ class CorrelationMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self._header_name = header_name
 
-    async def dispatch(
-        self, request: Request, call_next: RequestResponseEndpoint
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         cid = request.headers.get(self._header_name) or str(uuid.uuid4())
 
         # Store in request state (accessible in route handlers via request.state)

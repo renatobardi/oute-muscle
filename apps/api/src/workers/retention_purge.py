@@ -17,19 +17,20 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import text
 
-from packages.core.src.domain.tenants.plan_limits import PlanLimits, Plan
+from packages.core.src.domain.tenants.plan_limits import Plan, PlanLimits
 
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Core purge function (testable)
 # ---------------------------------------------------------------------------
+
 
 async def purge_expired_findings(session: AsyncSession) -> int:
     """
@@ -43,7 +44,7 @@ async def purge_expired_findings(session: AsyncSession) -> int:
 
     for plan in (Plan.FREE, Plan.TEAM, Plan.ENTERPRISE):
         retention_days = PlanLimits.retention_days(plan)
-        cutoff = datetime.now(timezone.utc) - timedelta(days=retention_days)
+        cutoff = datetime.now(UTC) - timedelta(days=retention_days)
 
         result = await session.execute(
             text(
@@ -75,6 +76,7 @@ async def purge_expired_findings(session: AsyncSession) -> int:
 # ---------------------------------------------------------------------------
 # Standalone runner (Cloud Run Job entry point)
 # ---------------------------------------------------------------------------
+
 
 async def _run() -> None:
     database_url = os.environ["DATABASE_URL"]

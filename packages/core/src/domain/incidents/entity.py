@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+import datetime as dt
 import uuid
-from datetime import date, datetime
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -24,7 +24,7 @@ class Incident(BaseModel):
 
     # Core content
     title: str = Field(min_length=1, max_length=500)
-    date: date | None = None
+    date: dt.date | None = None
     source_url: str | None = Field(default=None, max_length=2048)
     organization: str | None = Field(default=None, max_length=255)
     category: IncidentCategory
@@ -47,16 +47,14 @@ class Incident(BaseModel):
     # Metadata
     tags: list[str] = Field(default_factory=list)
     version: int = Field(default=1, ge=1)
-    deleted_at: datetime | None = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    deleted_at: dt.datetime | None = None
+    created_at: dt.datetime = Field(default_factory=dt.datetime.utcnow)
+    updated_at: dt.datetime = Field(default_factory=dt.datetime.utcnow)
     created_by: uuid.UUID
 
     @field_validator("embedding")
     @classmethod
-    def validate_embedding_dimensions(
-        cls, v: list[float] | None
-    ) -> list[float] | None:
+    def validate_embedding_dimensions(cls, v: list[float] | None) -> list[float] | None:
         if v is not None and len(v) != 768:
             raise ValueError(f"Embedding must have 768 dimensions, got {len(v)}")
         return v

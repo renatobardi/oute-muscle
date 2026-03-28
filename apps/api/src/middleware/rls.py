@@ -13,14 +13,13 @@ Context enrichment written to request.state:
 from __future__ import annotations
 
 import logging
-from typing import Callable
 
 import jwt
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
 from apps.api.src.config import settings
 
@@ -46,6 +45,7 @@ _PUBLIC_PATHS = frozenset(
 # Middleware
 # ---------------------------------------------------------------------------
 
+
 class RLSMiddleware(BaseHTTPMiddleware):
     """
     1. Extract tenant + user from Bearer JWT or X-API-Key.
@@ -60,9 +60,7 @@ class RLSMiddleware(BaseHTTPMiddleware):
     can read it.
     """
 
-    async def dispatch(
-        self, request: Request, call_next: RequestResponseEndpoint
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         path = request.url.path
 
         # Public paths bypass auth entirely
@@ -78,7 +76,7 @@ class RLSMiddleware(BaseHTTPMiddleware):
         api_key = request.headers.get("X-API-Key", "")
 
         if auth_header.startswith("Bearer "):
-            token = auth_header[len("Bearer "):]
+            token = auth_header[len("Bearer ") :]
             result = _decode_jwt(token)
             if result is None:
                 return JSONResponse(
@@ -120,6 +118,7 @@ class RLSMiddleware(BaseHTTPMiddleware):
 # JWT decoding
 # ---------------------------------------------------------------------------
 
+
 def _decode_jwt(
     token: str,
 ) -> tuple[str, str, str, str] | None:
@@ -147,14 +146,14 @@ def _decode_jwt(
         logger.debug("Invalid JWT: %s", exc)
         return None
 
-    TENANT_CLAIM = "https://outemuscle.com/tenant_id"
-    PLAN_CLAIM = "https://outemuscle.com/plan"
-    ROLE_CLAIM = "https://outemuscle.com/role"
+    tenant_claim = "https://outemuscle.com/tenant_id"
+    plan_claim = "https://outemuscle.com/plan"
+    role_claim = "https://outemuscle.com/role"
 
-    tenant_id = payload.get(TENANT_CLAIM)
+    tenant_id = payload.get(tenant_claim)
     user_id = payload.get("sub")
-    plan = payload.get(PLAN_CLAIM, "free")
-    role = payload.get(ROLE_CLAIM, "viewer")
+    plan = payload.get(plan_claim, "free")
+    role = payload.get(role_claim, "viewer")
 
     if not tenant_id or not user_id:
         logger.debug("JWT missing required claims: tenant_id=%s user_id=%s", tenant_id, user_id)
@@ -166,6 +165,7 @@ def _decode_jwt(
 # ---------------------------------------------------------------------------
 # API key resolution (delegated to DB lookup)
 # ---------------------------------------------------------------------------
+
 
 async def _resolve_api_key(
     api_key: str,
@@ -207,6 +207,7 @@ async def _resolve_api_key(
 # ---------------------------------------------------------------------------
 # Session-level helper — called by the DB session factory
 # ---------------------------------------------------------------------------
+
 
 async def apply_tenant_context(session: AsyncSession, tenant_id: str) -> None:
     """

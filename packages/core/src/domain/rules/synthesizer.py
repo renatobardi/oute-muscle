@@ -11,17 +11,16 @@ structurally correct (YAML parses, has 'rules' key, test annotations present).
 
 from __future__ import annotations
 
-import re
 import textwrap
 from dataclasses import dataclass
-from typing import Any, Protocol
+from typing import Protocol
 
 import yaml
-
 
 # ---------------------------------------------------------------------------
 # Result / error types
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class SynthesisResult:
@@ -38,9 +37,9 @@ class SynthesisError(Exception):
 # LLM Port (injected)
 # ---------------------------------------------------------------------------
 
+
 class LLMPort(Protocol):
-    async def generate_structured(self, prompt: str, schema: dict) -> dict:
-        ...
+    async def generate_structured(self, prompt: str, schema: dict) -> dict: ...
 
 
 # ---------------------------------------------------------------------------
@@ -93,6 +92,7 @@ _SYNTHESIS_RESPONSE_SCHEMA = {
 # ---------------------------------------------------------------------------
 # Synthesizer service
 # ---------------------------------------------------------------------------
+
 
 class RuleSynthesizer:
     def __init__(self, llm: LLMPort) -> None:
@@ -147,9 +147,7 @@ class RuleSynthesizer:
             raise SynthesisError(f"Invalid YAML returned by LLM: {exc}") from exc
 
         if not isinstance(parsed, dict) or "rules" not in parsed:
-            raise SynthesisError(
-                "Invalid Semgrep YAML: missing top-level 'rules' key."
-            )
+            raise SynthesisError("Invalid Semgrep YAML: missing top-level 'rules' key.")
 
         rules = parsed["rules"]
         if not isinstance(rules, list) or len(rules) == 0:
@@ -171,10 +169,6 @@ class RuleSynthesizer:
         ok_pattern = f"# ok: {rule_id}"
 
         if ruleid_pattern not in test_file:
-            raise SynthesisError(
-                f"Test file missing '# ruleid: {rule_id}' annotation."
-            )
+            raise SynthesisError(f"Test file missing '# ruleid: {rule_id}' annotation.")
         if ok_pattern not in test_file:
-            raise SynthesisError(
-                f"Test file missing '# ok: {rule_id}' annotation."
-            )
+            raise SynthesisError(f"Test file missing '# ok: {rule_id}' annotation.")

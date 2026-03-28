@@ -23,9 +23,7 @@ class InvalidTokenError(AuthMiddlewareError):
     pass
 
 
-def extract_claims(
-    authorization_header: str | None, provider: OAuthProvider
-) -> dict:
+def extract_claims(authorization_header: str | None, provider: OAuthProvider) -> dict:
     """Extract and validate JWT claims from Authorization header.
 
     Args:

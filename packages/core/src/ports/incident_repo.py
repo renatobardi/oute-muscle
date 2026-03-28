@@ -59,9 +59,7 @@ class IncidentRepoPort(Protocol):
         """
         ...
 
-    async def soft_delete(
-        self, incident_id: uuid.UUID, *, tenant_id: uuid.UUID
-    ) -> None:
+    async def soft_delete(self, incident_id: uuid.UUID, *, tenant_id: uuid.UUID) -> None:
         """Soft-delete an incident (sets deleted_at).
 
         Raises:
@@ -70,9 +68,7 @@ class IncidentRepoPort(Protocol):
         """
         ...
 
-    async def hard_delete(
-        self, incident_id: uuid.UUID, *, tenant_id: uuid.UUID
-    ) -> None:
+    async def hard_delete(self, incident_id: uuid.UUID, *, tenant_id: uuid.UUID) -> None:
         """Permanently delete an incident (CLI --hard-delete only)."""
         ...
 

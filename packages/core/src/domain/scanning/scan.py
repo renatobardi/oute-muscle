@@ -61,9 +61,7 @@ class Scan(BaseModel):
         if self.status == ScanStatus.COMPLETED and self.completed_at is None:
             raise ValueError("completed_at must be set when status is COMPLETED.")
         if self.status in (ScanStatus.FAILED, ScanStatus.TIMEOUT) and self.error_message is None:
-            raise ValueError(
-                f"error_message must be set when status is {self.status}."
-            )
+            raise ValueError(f"error_message must be set when status is {self.status}.")
         return self
 
     @property

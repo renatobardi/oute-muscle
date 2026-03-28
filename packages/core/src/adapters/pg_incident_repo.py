@@ -32,15 +32,11 @@ class PostgreSQLIncidentRepo(IncidentRepoPort):
         """Update an incident with optimistic locking."""
         raise NotImplementedError("PostgreSQL adapter implementation pending")
 
-    async def soft_delete(
-        self, incident_id: uuid.UUID, *, tenant_id: uuid.UUID
-    ) -> None:
+    async def soft_delete(self, incident_id: uuid.UUID, *, tenant_id: uuid.UUID) -> None:
         """Soft-delete an incident (sets deleted_at)."""
         raise NotImplementedError("PostgreSQL adapter implementation pending")
 
-    async def hard_delete(
-        self, incident_id: uuid.UUID, *, tenant_id: uuid.UUID
-    ) -> None:
+    async def hard_delete(self, incident_id: uuid.UUID, *, tenant_id: uuid.UUID) -> None:
         """Permanently delete an incident (CLI --hard-delete only)."""
         raise NotImplementedError("PostgreSQL adapter implementation pending")
 

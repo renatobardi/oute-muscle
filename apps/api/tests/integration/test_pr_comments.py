@@ -30,9 +30,7 @@ class TestPRCommentPosting:
     """Tests for posting advisory comments to pull requests."""
 
     @pytest.mark.asyncio
-    async def test_inline_comment_posted_when_file_known(
-        self, skip_if_no_github_app: None
-    ) -> None:
+    async def test_inline_comment_posted_when_file_known(self, skip_if_no_github_app: None) -> None:
         """Inline PR comment is posted when advisory has file_path and start_line."""
         from packages.core.src.adapters.github_adapter import GitHubAdapter
 
@@ -62,9 +60,7 @@ class TestPRCommentPosting:
             mock_pr.create_review_comment.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_top_level_comment_when_no_file(
-        self, skip_if_no_github_app: None
-    ) -> None:
+    async def test_top_level_comment_when_no_file(self, skip_if_no_github_app: None) -> None:
         """Top-level PR comment is posted when advisory has no file_path."""
         from packages.core.src.adapters.github_adapter import GitHubAdapter
 
@@ -94,9 +90,7 @@ class TestPRCommentPosting:
             mock_pr.create_issue_comment.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_comment_contains_risk_badge(
-        self, skip_if_no_github_app: None
-    ) -> None:
+    async def test_comment_contains_risk_badge(self, skip_if_no_github_app: None) -> None:
         """Posted comment includes risk level badge."""
         from packages.core.src.adapters.github_adapter import GitHubAdapter
 

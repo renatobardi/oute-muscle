@@ -38,8 +38,7 @@ class AuditLogEntry:
 
     def __repr__(self) -> str:
         return (
-            f"<AuditLogEntry(id={self.id}, action={self.action}, "
-            f"entity_type={self.entity_type})>"
+            f"<AuditLogEntry(id={self.id}, action={self.action}, entity_type={self.entity_type})>"
         )
 
 
@@ -86,9 +85,7 @@ class AuditLogService:
         )
 
     @staticmethod
-    def compute_diff(
-        before_dict: dict[str, Any], after_dict: dict[str, Any]
-    ) -> dict[str, Any]:
+    def compute_diff(before_dict: dict[str, Any], after_dict: dict[str, Any]) -> dict[str, Any]:
         """Compute what changed between before and after dicts.
 
         Returns:

@@ -12,12 +12,10 @@ No external dependencies — tests use mock repo.
 
 from __future__ import annotations
 
-import json
 import uuid
 from datetime import datetime
 
 import pytest
-
 from src.domain.incidents.enums import AuditAction
 
 
@@ -271,9 +269,7 @@ class TestAuditLogQuerying:
         )
 
         # Act: query as tenant_id_1
-        results = await mock_audit_log_repo.list_for_incident(
-            incident_id, tenant_id=tenant_id_1
-        )
+        results = await mock_audit_log_repo.list_for_incident(incident_id, tenant_id=tenant_id_1)
 
         # Assert: only see tenant_id_1's entry
         assert len(results) == 1

@@ -18,8 +18,9 @@ Scenarios validated:
 from __future__ import annotations
 
 import os
-import pytest
+
 import httpx
+import pytest
 
 SKIP_ACCEPTANCE = os.getenv("SKIP_ACCEPTANCE", "1") == "1"
 API_BASE_URL = os.getenv("ACCEPTANCE_API_URL", "http://localhost:8000")
@@ -38,18 +39,24 @@ def api_client():
 def auth_token(api_client):
     """Register a tenant and return a valid Bearer token."""
     # S1: Register
-    resp = api_client.post("/tenants/register", json={
-        "name": "Acceptance Test Tenant",
-        "email": "acceptance@oute-test.invalid",
-        "password": "test-password-123",
-    })
+    resp = api_client.post(
+        "/tenants/register",
+        json={
+            "name": "Acceptance Test Tenant",
+            "email": "acceptance@oute-test.invalid",
+            "password": "test-password-123",
+        },
+    )
     assert resp.status_code in (200, 201, 409), f"Register failed: {resp.text}"
 
     # Exchange credentials for token (simplified password grant for tests)
-    token_resp = api_client.post("/auth/token", json={
-        "email": "acceptance@oute-test.invalid",
-        "password": "test-password-123",
-    })
+    token_resp = api_client.post(
+        "/auth/token",
+        json={
+            "email": "acceptance@oute-test.invalid",
+            "password": "test-password-123",
+        },
+    )
     assert token_resp.status_code == 200, f"Token failed: {token_resp.text}"
     return token_resp.json()["access_token"]
 
@@ -67,35 +74,47 @@ def authed_client(auth_token):
 
 # ─── S1: Register + auth ──────────────────────────────────────────────────
 
+
 def test_s1_register_and_auth(api_client):
     """S1: Register a new tenant and obtain a valid auth token."""
-    resp = api_client.post("/tenants/register", json={
-        "name": "S1 Test Tenant",
-        "email": "s1@oute-test.invalid",
-        "password": "s1-password-123",
-    })
+    resp = api_client.post(
+        "/tenants/register",
+        json={
+            "name": "S1 Test Tenant",
+            "email": "s1@oute-test.invalid",
+            "password": "s1-password-123",
+        },
+    )
     assert resp.status_code in (200, 201, 409)
 
-    token_resp = api_client.post("/auth/token", json={
-        "email": "s1@oute-test.invalid",
-        "password": "s1-password-123",
-    })
+    token_resp = api_client.post(
+        "/auth/token",
+        json={
+            "email": "s1@oute-test.invalid",
+            "password": "s1-password-123",
+        },
+    )
     assert token_resp.status_code == 200
     assert "access_token" in token_resp.json()
 
 
 # ─── S2: Create incident from URL ─────────────────────────────────────────
 
+
 def test_s2_ingest_incident_from_url(authed_client):
     """S2: POST /incidents/ingest-url → 202 and returns extracted draft."""
-    resp = authed_client.post("/incidents/ingest-url", json={
-        "url": "https://www.learnfromincidents.com/posts/database-connection-pool-exhaustion",
-    })
+    resp = authed_client.post(
+        "/incidents/ingest-url",
+        json={
+            "url": "https://www.learnfromincidents.com/posts/database-connection-pool-exhaustion",
+        },
+    )
     # Accept 202 (async) or 200 (sync) or 422 if URL unreachable in test env
     assert resp.status_code in (200, 201, 202, 422), f"Unexpected: {resp.text}"
 
 
 # ─── S3: List rules ────────────────────────────────────────────────────────
+
 
 def test_s3_list_semgrep_rules(authed_client):
     """S3: GET /rules returns a paginated list of Semgrep rules."""
@@ -108,16 +127,21 @@ def test_s3_list_semgrep_rules(authed_client):
 
 # ─── S4: Trigger scan ─────────────────────────────────────────────────────
 
+
 def test_s4_trigger_scan(authed_client):
     """S4: POST /scans triggers a scan and returns a scan ID."""
-    resp = authed_client.post("/scans", json={
-        "repository": "oute-me/sample-app",
-        "ref": "main",
-    })
+    resp = authed_client.post(
+        "/scans",
+        json={
+            "repository": "oute-me/sample-app",
+            "ref": "main",
+        },
+    )
     assert resp.status_code in (200, 201, 202, 422), f"Unexpected: {resp.text}"
 
 
 # ─── S5: List findings ────────────────────────────────────────────────────
+
 
 def test_s5_list_findings(authed_client):
     """S5: GET /findings returns paginated findings list."""
@@ -129,6 +153,7 @@ def test_s5_list_findings(authed_client):
 
 # ─── S6: Get advisory ─────────────────────────────────────────────────────
 
+
 def test_s6_advisory_endpoint_exists(authed_client):
     """S6: GET /advisories/{scan_id} returns advisory list (may be empty)."""
     # Use a fake scan_id — expect 404 or 200 with empty list, not 500
@@ -138,6 +163,7 @@ def test_s6_advisory_endpoint_exists(authed_client):
 
 # ─── S7: Report false positive ────────────────────────────────────────────
 
+
 def test_s7_false_positive_endpoint_exists(authed_client):
     """S7: POST /findings/{id}/false-positive returns 404 for unknown ID (not 500)."""
     resp = authed_client.post("/findings/nonexistent-finding/false-positive")
@@ -145,6 +171,7 @@ def test_s7_false_positive_endpoint_exists(authed_client):
 
 
 # ─── S8: Synthesis candidates (Enterprise guard) ──────────────────────────
+
 
 def test_s8_synthesis_candidates_requires_enterprise(authed_client):
     """S8: GET /synthesis/candidates returns 403 for non-Enterprise tenants."""
