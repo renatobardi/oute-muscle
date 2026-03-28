@@ -121,7 +121,7 @@ async def join_waitlist(payload: WaitlistRequest, request: Request) -> JSONRespo
             },
         )
 
-    except Exception as exc:
+    except Exception:
         logger.exception("Failed to insert waitlist entry", extra={"email": payload.email})
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
