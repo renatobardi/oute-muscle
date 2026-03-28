@@ -236,26 +236,26 @@
 
 ### Tests for User Story 5
 
-- [ ] T109 [P] [US5] Write unit tests for OAuth 2.1 Authorization Code + PKCE flow (authorize, token exchange, refresh, JWT validation) in apps/mcp/tests/test_oauth.py
-- [ ] T110 [P] [US5] Write unit tests for MCP metering (50 free/month, quota check, quota reset) in apps/mcp/tests/test_metering.py
-- [ ] T111 [P] [US5] Write unit tests for scan_code tool in apps/mcp/tests/test_tool_scan_code.py
-- [ ] T112 [P] [US5] Write unit tests for get_incident_advisory tool in apps/mcp/tests/test_tool_advisory.py
-- [ ] T113 [P] [US5] Write unit tests for list_relevant_incidents tool in apps/mcp/tests/test_tool_list_incidents.py
-- [ ] T114 [P] [US5] Write unit tests for synthesize_rules tool (Enterprise-only guard) in apps/mcp/tests/test_tool_synthesize.py
-- [ ] T115 [P] [US5] Write unit tests for validate_fix tool in apps/mcp/tests/test_tool_validate_fix.py
+- [x] T109 [P] [US5] Write unit tests for OAuth 2.1 Authorization Code + PKCE flow (authorize, token exchange, refresh, JWT validation) in apps/mcp/tests/test_oauth.py
+- [x] T110 [P] [US5] Write unit tests for MCP metering (50 free/month, quota check, quota reset) in apps/mcp/tests/test_metering.py
+- [x] T111 [P] [US5] Write unit tests for scan_code tool in apps/mcp/tests/test_tool_scan_code.py
+- [x] T112 [P] [US5] Write unit tests for get_incident_advisory tool in apps/mcp/tests/test_tool_advisory.py
+- [x] T113 [P] [US5] Write unit tests for list_relevant_incidents tool in apps/mcp/tests/test_tool_list_incidents.py
+- [x] T114 [P] [US5] Write unit tests for synthesize_rules tool (Enterprise-only guard) in apps/mcp/tests/test_tool_synthesize.py
+- [x] T115 [P] [US5] Write unit tests for validate_fix tool in apps/mcp/tests/test_tool_validate_fix.py
 
 ### Implementation for User Story 5
 
-- [ ] T116 [US5] Implement OAuth 2.1 provider (authorization endpoint, token endpoint, PKCE verification, RS256 JWT signing) in apps/mcp/src/auth/provider.py
-- [ ] T117 [US5] Implement OAuth 2.1 auth middleware (JWT validation, tenant/user extraction from claims) in apps/mcp/src/auth/middleware.py
-- [ ] T118 [US5] Implement MCP metering service (track calls per user per month, check quota, quota reset) in apps/mcp/src/metering.py
-- [ ] T119 [US5] Implement scan_code MCP tool (run Semgrep on snippet, return findings with incident refs) in apps/mcp/src/tools/scan_code.py
-- [ ] T120 [US5] Implement get_incident_advisory MCP tool (embed code → vector search → LLM advisory) in apps/mcp/src/tools/get_incident_advisory.py
-- [ ] T121 [US5] Implement list_relevant_incidents MCP tool (text + semantic search, max_results) in apps/mcp/src/tools/list_relevant_incidents.py
-- [ ] T122 [US5] Implement synthesize_rules MCP tool (Enterprise guard, create SynthesisCandidate) in apps/mcp/src/tools/synthesize_rules.py
-- [ ] T123 [US5] Implement validate_fix MCP tool (re-scan fixed code against original rule) in apps/mcp/src/tools/validate_fix.py
-- [ ] T124 [US5] Create MCP server entry point with Streamable HTTP transport and tool registration in apps/mcp/src/main.py
-- [ ] T125 [US5] Create MCP server Dockerfile in apps/mcp/Dockerfile
+- [x] T116 [US5] Implement OAuth 2.1 provider (authorization endpoint, token endpoint, PKCE verification, RS256 JWT signing) in apps/mcp/src/auth/provider.py
+- [x] T117 [US5] Implement OAuth 2.1 auth middleware (JWT validation, tenant/user extraction from claims) in apps/mcp/src/auth/middleware.py
+- [x] T118 [US5] Implement MCP metering service (track calls per user per month, check quota, quota reset) in apps/mcp/src/metering.py
+- [x] T119 [US5] Implement scan_code MCP tool (run Semgrep on snippet, return findings with incident refs) in apps/mcp/src/tools/scan_code.py
+- [x] T120 [US5] Implement get_incident_advisory MCP tool (embed code → vector search → LLM advisory) in apps/mcp/src/tools/get_incident_advisory.py
+- [x] T121 [US5] Implement list_relevant_incidents MCP tool (text + semantic search, max_results) in apps/mcp/src/tools/list_relevant_incidents.py
+- [x] T122 [US5] Implement synthesize_rules MCP tool (Enterprise guard, create SynthesisCandidate) in apps/mcp/src/tools/synthesize_rules.py
+- [x] T123 [US5] Implement validate_fix MCP tool (re-scan fixed code against original rule) in apps/mcp/src/tools/validate_fix.py
+- [x] T124 [US5] Create MCP server entry point with Streamable HTTP transport and tool registration in apps/mcp/src/main.py
+- [x] T125 [US5] Create MCP server Dockerfile in apps/mcp/Dockerfile
 
 **Checkpoint**: MCP Server authenticates via OAuth 2.1, all 5 tools return correct results, metering enforces 50 free/month quota, Enterprise-only tools guard correctly.
 
