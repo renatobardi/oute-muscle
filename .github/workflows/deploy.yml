@@ -118,8 +118,24 @@ jobs:
         run: |
           curl -sSL https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.15.2/cloud-sql-proxy.linux.amd64 -o cloud-sql-proxy
           chmod +x cloud-sql-proxy
-          ./cloud-sql-proxy ${{ vars.CLOUD_SQL_INSTANCE }} &
-          sleep 2
+          ./cloud-sql-proxy "${{ vars.CLOUD_SQL_INSTANCE }}" --port 5432 > /tmp/proxy.log 2>&1 &
+          PROXY_PID=$!
+          for i in $(seq 1 15); do
+            if ! kill -0 $PROXY_PID 2>/dev/null; then
+              echo "Cloud SQL Proxy crashed. Logs:"
+              cat /tmp/proxy.log
+              exit 1
+            fi
+            if pg_isready -h 127.0.0.1 -p 5432 2>/dev/null; then
+              echo "Cloud SQL Proxy ready"
+              exit 0
+            fi
+            echo "Waiting for proxy... attempt $i"
+            sleep 2
+          done
+          echo "Cloud SQL Proxy did not become ready. Logs:"
+          cat /tmp/proxy.log
+          exit 1
 
       - name: Set up Python
         uses: actions/setup-python@v6
