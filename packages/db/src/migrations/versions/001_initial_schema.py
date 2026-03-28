@@ -21,6 +21,9 @@ from pgvector.sqlalchemy import Vector
 
 def upgrade() -> None:
     """Apply migration."""
+    # Enable pgvector extension
+    op.execute("CREATE EXTENSION IF NOT EXISTS vector")
+
     # Create enum types
     incident_category = postgresql.ENUM(
         "unsafe-regex",
