@@ -84,7 +84,12 @@ def create_app() -> FastAPI:
     from apps.api.src.routes.incidents import router as incidents_router
 
     app.include_router(incidents_router, prefix="/v1")
-    # Phase 5+: rules, scans, advisory routes added as phases complete
+
+    # Phase 5: scans and advisory routes
+    from apps.api.src.routes.scans import router as scans_router
+
+    app.include_router(scans_router, prefix="/v1")
+    # Phase 5+: rules, advisory routes added as phases complete
 
     return app
 
