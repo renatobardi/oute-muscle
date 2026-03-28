@@ -3,18 +3,7 @@
 All enums use StrEnum so values serialize to plain strings in JSON/DB.
 """
 
-import sys
-
-if sys.version_info >= (3, 11):
-    from enum import StrEnum
-else:
-    # Python 3.10 compatibility
-    from enum import Enum
-
-    class StrEnum(str, Enum):  # type: ignore[misc]
-        """Enum that inherits from str for JSON/DB serialization."""
-
-        pass
+from enum import StrEnum
 
 
 class IncidentCategory(StrEnum):
