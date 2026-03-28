@@ -145,7 +145,7 @@ jobs:
 
       - name: Install migration deps
         run: |
-          pip install alembic asyncpg sqlalchemy python-dotenv
+          pip install alembic asyncpg sqlalchemy pgvector python-dotenv
 
       - name: Run migrations
         env:
