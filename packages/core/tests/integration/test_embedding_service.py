@@ -12,10 +12,7 @@ Requires: GOOGLE_CLOUD_PROJECT and Vertex AI credentials for embedding calls.
 from __future__ import annotations
 
 import pytest
-
 from src.domain.incidents.entity import Incident
-from src.domain.incidents.enums import IncidentCategory, IncidentSeverity
-
 
 pytestmark = pytest.mark.integration
 
