@@ -14,14 +14,13 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, EmailStr
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.api.src.dependencies import DbSession
 from packages.core.src.domain.tenants.plan_limits import (
     Plan,
     PlanLimitError,
     PlanLimits,
 )
-from packages.db.src.session import get_session
 
 router = APIRouter(prefix="/tenants", tags=["tenants"])
 
@@ -80,7 +79,7 @@ def require_admin(request: Request) -> None:
 @router.get("/me", response_model=TenantResponse)
 async def get_current_tenant(
     tenant_id: str = Depends(get_tenant_id),
-    session: AsyncSession = Depends(get_session),
+    session: DbSession = None,  # type: ignore[assignment]
 ) -> TenantResponse:
     result = await session.execute(
         text(
@@ -111,7 +110,7 @@ async def get_current_tenant(
 @router.get("/me/users", response_model=list[TenantUserResponse])
 async def list_tenant_users(
     tenant_id: str = Depends(get_tenant_id),
-    session: AsyncSession = Depends(get_session),
+    session: DbSession = None,  # type: ignore[assignment]
 ) -> list[TenantUserResponse]:
     result = await session.execute(
         text(
@@ -141,7 +140,7 @@ async def invite_user(
     body: InviteRequest,
     request: Request,
     tenant_id: str = Depends(get_tenant_id),
-    session: AsyncSession = Depends(get_session),
+    session: DbSession = None,  # type: ignore[assignment]
 ) -> dict:
     require_admin(request)
 
@@ -207,7 +206,7 @@ async def update_user_role(
     body: UpdateRoleRequest,
     request: Request,
     tenant_id: str = Depends(get_tenant_id),
-    session: AsyncSession = Depends(get_session),
+    session: DbSession = None,  # type: ignore[assignment]
 ) -> TenantUserResponse:
     require_admin(request)
 
