@@ -6,9 +6,8 @@ Check Run creation integration test (skip if GITHUB_APP_ID not set).
 from __future__ import annotations
 
 import os
-import sys
 import uuid
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -16,8 +15,8 @@ import pytest
 # (Python 3.10 compatibility issue with StrEnum)
 pytest.importorskip("packages.core.src.domain.scanning.entities")
 
-from packages.core.src.domain.scanning.entities import Finding  # noqa: E402
-from packages.core.src.domain.incidents.enums import IncidentSeverity  # noqa: E402
+from packages.core.src.domain.incidents.enums import IncidentSeverity
+from packages.core.src.domain.scanning.entities import Finding
 
 
 @pytest.fixture
