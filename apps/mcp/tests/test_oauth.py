@@ -39,9 +39,11 @@ def test_token_exchange_valid_pkce():
 
     # Generate a valid code_verifier and code_challenge
     code_verifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
-    code_challenge = base64.urlsafe_b64encode(
-        hashlib.sha256(code_verifier.encode()).digest()
-    ).rstrip(b"=").decode()
+    code_challenge = (
+        base64.urlsafe_b64encode(hashlib.sha256(code_verifier.encode()).digest())
+        .rstrip(b"=")
+        .decode()
+    )
 
     auth_code = provider.generate_auth_code(
         user_id=user_id,
@@ -66,9 +68,11 @@ def test_token_exchange_wrong_verifier_fails():
     user_id = str(uuid.uuid4())
 
     code_verifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
-    code_challenge = base64.urlsafe_b64encode(
-        hashlib.sha256(code_verifier.encode()).digest()
-    ).rstrip(b"=").decode()
+    code_challenge = (
+        base64.urlsafe_b64encode(hashlib.sha256(code_verifier.encode()).digest())
+        .rstrip(b"=")
+        .decode()
+    )
 
     auth_code = provider.generate_auth_code(
         user_id=user_id,
@@ -88,9 +92,11 @@ def test_token_exchange_expired_code_fails():
     user_id = str(uuid.uuid4())
 
     code_verifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
-    code_challenge = base64.urlsafe_b64encode(
-        hashlib.sha256(code_verifier.encode()).digest()
-    ).rstrip(b"=").decode()
+    code_challenge = (
+        base64.urlsafe_b64encode(hashlib.sha256(code_verifier.encode()).digest())
+        .rstrip(b"=")
+        .decode()
+    )
 
     auth_code = provider.generate_auth_code(
         user_id=user_id,
@@ -112,9 +118,11 @@ def test_refresh_token_returns_new_access_token():
     user_id = str(uuid.uuid4())
 
     code_verifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
-    code_challenge = base64.urlsafe_b64encode(
-        hashlib.sha256(code_verifier.encode()).digest()
-    ).rstrip(b"=").decode()
+    code_challenge = (
+        base64.urlsafe_b64encode(hashlib.sha256(code_verifier.encode()).digest())
+        .rstrip(b"=")
+        .decode()
+    )
 
     auth_code = provider.generate_auth_code(
         user_id=user_id,
@@ -122,9 +130,7 @@ def test_refresh_token_returns_new_access_token():
         code_challenge_method="S256",
     )
 
-    _, refresh_token = provider.exchange_code(
-        code=auth_code, code_verifier=code_verifier
-    )
+    _, refresh_token = provider.exchange_code(code=auth_code, code_verifier=code_verifier)
 
     new_access_token = provider.refresh_access_token(refresh_token)
 
@@ -149,9 +155,11 @@ def test_jwt_validation_valid_token():
     user_id = str(uuid.uuid4())
 
     code_verifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
-    code_challenge = base64.urlsafe_b64encode(
-        hashlib.sha256(code_verifier.encode()).digest()
-    ).rstrip(b"=").decode()
+    code_challenge = (
+        base64.urlsafe_b64encode(hashlib.sha256(code_verifier.encode()).digest())
+        .rstrip(b"=")
+        .decode()
+    )
 
     auth_code = provider.generate_auth_code(
         user_id=user_id,
@@ -159,9 +167,7 @@ def test_jwt_validation_valid_token():
         code_challenge_method="S256",
     )
 
-    access_token, _ = provider.exchange_code(
-        code=auth_code, code_verifier=code_verifier
-    )
+    access_token, _ = provider.exchange_code(code=auth_code, code_verifier=code_verifier)
 
     claims = provider.validate_jwt(access_token)
 
@@ -178,9 +184,11 @@ def test_jwt_validation_expired_fails():
     user_id = str(uuid.uuid4())
 
     code_verifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
-    code_challenge = base64.urlsafe_b64encode(
-        hashlib.sha256(code_verifier.encode()).digest()
-    ).rstrip(b"=").decode()
+    code_challenge = (
+        base64.urlsafe_b64encode(hashlib.sha256(code_verifier.encode()).digest())
+        .rstrip(b"=")
+        .decode()
+    )
 
     auth_code = provider.generate_auth_code(
         user_id=user_id,
@@ -188,16 +196,13 @@ def test_jwt_validation_expired_fails():
         code_challenge_method="S256",
     )
 
-    _, _ = provider.exchange_code(
-        code=auth_code, code_verifier=code_verifier
-    )
+    _, _ = provider.exchange_code(code=auth_code, code_verifier=code_verifier)
 
     # Manually create an expired token
     import jwt
+
     expired_payload = {"sub": user_id, "exp": int(time.time()) - 100}
-    expired_token = jwt.encode(
-        expired_payload, provider._private_key, algorithm="RS256"
-    )
+    expired_token = jwt.encode(expired_payload, provider._private_key, algorithm="RS256")
 
     with pytest.raises(JWTExpiredError):
         provider.validate_jwt(expired_token)
@@ -207,7 +212,9 @@ def test_jwt_validation_invalid_signature_fails():
     """tampered token → raises JWTInvalidError."""
     provider = OAuthProvider()
 
-    tampered_token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyX2lkIn0.invalid_signature"
+    tampered_token = (
+        "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyX2lkIn0.invalid_signature"
+    )
 
     with pytest.raises((JWTInvalidError, OAuthError)):
         provider.validate_jwt(tampered_token)
@@ -220,9 +227,11 @@ def test_pkce_s256_challenge_verified():
 
     code_verifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
     # Manually compute expected challenge
-    expected_challenge = base64.urlsafe_b64encode(
-        hashlib.sha256(code_verifier.encode()).digest()
-    ).rstrip(b"=").decode()
+    expected_challenge = (
+        base64.urlsafe_b64encode(hashlib.sha256(code_verifier.encode()).digest())
+        .rstrip(b"=")
+        .decode()
+    )
 
     auth_code = provider.generate_auth_code(
         user_id=user_id,

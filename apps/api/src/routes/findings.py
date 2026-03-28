@@ -13,7 +13,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel
 
-from apps.api.src.services.false_positive import FalsePositiveService, FindingNotFound
+from apps.api.src.services.false_positive import FalsePositiveService, FindingNotFoundError
 
 router = APIRouter(prefix="/findings", tags=["findings"])
 
@@ -21,6 +21,7 @@ router = APIRouter(prefix="/findings", tags=["findings"])
 # ---------------------------------------------------------------------------
 # Response schema
 # ---------------------------------------------------------------------------
+
 
 class FalsePositiveResponse(BaseModel):
     finding_id: str
@@ -32,6 +33,7 @@ class FalsePositiveResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # Auth dependency helpers
 # ---------------------------------------------------------------------------
+
 
 def require_editor(request: Request) -> None:
     """Raise 403 if the user is not at least an editor."""
@@ -65,6 +67,7 @@ def get_service(request: Request) -> FalsePositiveService:
 # Route
 # ---------------------------------------------------------------------------
 
+
 @router.post(
     "/{finding_id}/false-positive",
     response_model=FalsePositiveResponse,
@@ -87,13 +90,14 @@ async def report_false_positive(
     """
     try:
         updated = await service.report(finding_id=finding_id, reported_by=user_id)
-    except FindingNotFound:
+    except FindingNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Finding '{finding_id}' not found",
-        )
+        ) from exc
 
     from apps.api.src.services.false_positive import FALSE_POSITIVE_DISABLE_THRESHOLD
+
     rule_disabled = updated.false_positive_count >= FALSE_POSITIVE_DISABLE_THRESHOLD
 
     return FalsePositiveResponse(

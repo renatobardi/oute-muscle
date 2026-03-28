@@ -24,9 +24,7 @@ from pathlib import Path
 
 async def main() -> int:
     """Main CLI entry point."""
-    parser = argparse.ArgumentParser(
-        description="Seed incident knowledge base from post-mortems"
-    )
+    parser = argparse.ArgumentParser(description="Seed incident knowledge base from post-mortems")
     parser.add_argument("--url", type=str, help="Ingest incident from URL")
     parser.add_argument("--file", type=str, help="Ingest incidents from JSONL file")
     parser.add_argument(
@@ -54,18 +52,14 @@ async def main() -> int:
     return 0
 
 
-async def _ingest_url(
-    url: str, *, auto_approve: bool = False, dry_run: bool = False
-) -> int:
+async def _ingest_url(url: str, *, auto_approve: bool = False, dry_run: bool = False) -> int:
     """Ingest incident from URL."""
     print(f"Ingesting from URL: {url}")
     print("Feature not yet implemented: LLM-powered URL extraction")
     return 1
 
 
-async def _ingest_file(
-    file_path: str, *, auto_approve: bool = False, dry_run: bool = False
-) -> int:
+async def _ingest_file(file_path: str, *, auto_approve: bool = False, dry_run: bool = False) -> int:
     """Ingest incidents from JSONL file."""
     path = Path(file_path)
     if not path.exists():
@@ -86,7 +80,9 @@ async def _ingest_file(
                 try:
                     data = json.loads(line)
                     if dry_run:
-                        print(f"  {data.get('title', 'Untitled')} (category: {data.get('category')})")
+                        print(
+                            f"  {data.get('title', 'Untitled')} (category: {data.get('category')})"
+                        )
                     incident_count += 1
                 except json.JSONDecodeError as e:
                     print(f"Error parsing line {line_num}: {e}", file=sys.stderr)

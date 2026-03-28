@@ -1,4 +1,5 @@
 """Test cases for race-condition-001: TOCTOU file race condition."""
+
 import os
 
 # ruleid: race-condition-001

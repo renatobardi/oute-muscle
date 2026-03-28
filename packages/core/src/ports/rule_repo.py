@@ -35,9 +35,7 @@ class RuleRepoPort(Protocol):
         """List all enabled (non-auto-disabled) rules."""
         ...
 
-    async def toggle(
-        self, rule_id: str, *, enabled: bool, tenant_id: uuid.UUID
-    ) -> SemgrepRule:
+    async def toggle(self, rule_id: str, *, enabled: bool, tenant_id: uuid.UUID) -> SemgrepRule:
         """Enable or disable a rule.
 
         Raises:
@@ -54,9 +52,7 @@ class RuleRepoPort(Protocol):
         """
         ...
 
-    async def increment_false_positive(
-        self, rule_id: str, *, tenant_id: uuid.UUID
-    ) -> SemgrepRule:
+    async def increment_false_positive(self, rule_id: str, *, tenant_id: uuid.UUID) -> SemgrepRule:
         """Increment false_positive_count; auto-disable at threshold 3."""
         ...
 

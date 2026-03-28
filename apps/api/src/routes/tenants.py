@@ -10,19 +10,18 @@ T159: REST API routes for tenant management.
 from __future__ import annotations
 
 import uuid
-from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, EmailStr
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from packages.db.src.session import get_session
 from packages.core.src.domain.tenants.plan_limits import (
-    PlanLimits,
     Plan,
     PlanLimitError,
+    PlanLimits,
 )
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import text
+from packages.db.src.session import get_session
 
 router = APIRouter(prefix="/tenants", tags=["tenants"])
 
@@ -30,6 +29,7 @@ router = APIRouter(prefix="/tenants", tags=["tenants"])
 # ---------------------------------------------------------------------------
 # Response / request schemas
 # ---------------------------------------------------------------------------
+
 
 class TenantResponse(BaseModel):
     id: str
@@ -60,18 +60,22 @@ class UpdateRoleRequest(BaseModel):
 # Dependency: current tenant from request.state
 # ---------------------------------------------------------------------------
 
+
 def get_tenant_id(request: Request) -> str:
     return request.state.tenant_id
 
 
 def require_admin(request: Request) -> None:
     if getattr(request.state, "role", None) != "admin":
-        raise HTTPException(status_code=403, detail={"error": "Admin role required", "code": "FORBIDDEN"})
+        raise HTTPException(
+            status_code=403, detail={"error": "Admin role required", "code": "FORBIDDEN"}
+        )
 
 
 # ---------------------------------------------------------------------------
 # Routes
 # ---------------------------------------------------------------------------
+
 
 @router.get("/me", response_model=TenantResponse)
 async def get_current_tenant(
@@ -90,7 +94,9 @@ async def get_current_tenant(
     )
     row = result.fetchone()
     if row is None:
-        raise HTTPException(status_code=404, detail={"error": "Tenant not found", "code": "NOT_FOUND"})
+        raise HTTPException(
+            status_code=404, detail={"error": "Tenant not found", "code": "NOT_FOUND"}
+        )
 
     return TenantResponse(
         id=row.id,
@@ -167,11 +173,13 @@ async def invite_user(
         raise HTTPException(
             status_code=403,
             detail={"error": str(exc), "code": exc.code},
-        )
+        ) from exc
 
     # Check for duplicate email
     existing = await session.execute(
-        text("SELECT id FROM users WHERE tenant_id = :tid AND email = :email AND deleted_at IS NULL"),
+        text(
+            "SELECT id FROM users WHERE tenant_id = :tid AND email = :email AND deleted_at IS NULL"
+        ),
         {"tid": tenant_id, "email": body.email},
     )
     if existing.fetchone():

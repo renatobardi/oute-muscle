@@ -27,9 +27,7 @@ class TestWebhookSignatureVerification:
         body = b'{"action": "opened"}'
 
         # Compute valid signature
-        signature = hmac.new(
-            secret.encode(), body, hashlib.sha256
-        ).hexdigest()
+        signature = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
         header = f"sha256={signature}"
 
         # Should not raise
@@ -57,9 +55,7 @@ class TestWebhookSignatureVerification:
         """Digest must start with 'sha256=' prefix."""
         secret = "test-secret"
         body = b'{"action": "opened"}'
-        signature = hmac.new(
-            secret.encode(), body, hashlib.sha256
-        ).hexdigest()
+        signature = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
         bad_header = signature  # Missing "sha256=" prefix
 
         with pytest.raises(WebhookSignatureError):
@@ -73,9 +69,7 @@ class TestReplayProtection:
         """Same delivery UUID seen before raises WebhookReplayError."""
         secret = "test-secret"
         body = b'{"action": "opened"}'
-        signature = hmac.new(
-            secret.encode(), body, hashlib.sha256
-        ).hexdigest()
+        signature = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
         header = f"sha256={signature}"
         delivery_id = "12345-67890"
 
@@ -90,9 +84,7 @@ class TestReplayProtection:
         """Different delivery UUIDs pass replay check."""
         secret = "test-secret"
         body = b'{"action": "opened"}'
-        signature = hmac.new(
-            secret.encode(), body, hashlib.sha256
-        ).hexdigest()
+        signature = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
         header = f"sha256={signature}"
 
         delivery_id_1 = str(uuid.uuid4())
@@ -106,9 +98,7 @@ class TestReplayProtection:
         """Old delivery IDs are expired after ~5 minutes (deque-based)."""
         secret = "test-secret"
         body = b'{"action": "opened"}'
-        signature = hmac.new(
-            secret.encode(), body, hashlib.sha256
-        ).hexdigest()
+        signature = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
         header = f"sha256={signature}"
         delivery_id = str(uuid.uuid4())
 
@@ -124,9 +114,7 @@ class TestReplayProtection:
         """If delivery_id is None, replay protection is skipped."""
         secret = "test-secret"
         body = b'{"action": "opened"}'
-        signature = hmac.new(
-            secret.encode(), body, hashlib.sha256
-        ).hexdigest()
+        signature = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
         header = f"sha256={signature}"
 
         # Multiple calls with delivery_id=None should succeed

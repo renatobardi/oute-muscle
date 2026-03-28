@@ -1,4 +1,5 @@
 """Test cases for unsafe-regex-001: catastrophic backtracking detection."""
+
 import re
 
 # ruleid: unsafe-regex-001

@@ -59,7 +59,7 @@
           bind:value={companyName}
           required
           class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm
-                 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
           placeholder="Acme Corp"
         />
       </div>
@@ -72,7 +72,7 @@
           bind:value={email}
           required
           class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm
-                 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
           placeholder="you@company.com"
         />
       </div>

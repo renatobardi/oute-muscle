@@ -5,7 +5,7 @@
    */
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
-  import { auth, currentUser, isAdmin, isEnterprise } from '$lib/stores/auth';
+  import { auth, currentUser } from '$lib/stores/auth';
   import { isEnterprise as isPlanEnterprise } from '$lib/stores/tenant';
 
   let { children } = $props();
@@ -38,7 +38,9 @@
     <!-- Logo -->
     <div class="flex h-16 items-center border-b border-gray-200 px-6">
       <span class="text-lg font-bold text-gray-900">Oute Muscle</span>
-      <span class="ml-2 rounded bg-indigo-100 px-1.5 py-0.5 text-xs font-medium text-indigo-700">β</span>
+      <span class="ml-2 rounded bg-indigo-100 px-1.5 py-0.5 text-xs font-medium text-indigo-700"
+        >β</span
+      >
     </div>
 
     <!-- Navigation -->
@@ -50,8 +52,8 @@
               href={item.href}
               class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors
                 {isActive(item.href)
-                  ? 'bg-indigo-50 text-indigo-700'
-                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}"
+                ? 'bg-indigo-50 text-indigo-700'
+                : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}"
             >
               <span>{item.icon}</span>
               {item.label}
@@ -61,7 +63,7 @@
 
         {#if $isPlanEnterprise}
           <li class="pt-4">
-            <p class="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-400">
+            <p class="px-3 pb-1 text-xs font-semibold tracking-wider text-gray-400 uppercase">
               Enterprise
             </p>
           </li>
@@ -71,8 +73,8 @@
                 href={item.href}
                 class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors
                   {isActive(item.href)
-                    ? 'bg-indigo-50 text-indigo-700'
-                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}"
+                  ? 'bg-indigo-50 text-indigo-700'
+                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}"
               >
                 <span>{item.icon}</span>
                 {item.label}
@@ -88,12 +90,13 @@
       <div class="flex items-center justify-between">
         <div class="min-w-0">
           <p class="truncate text-sm font-medium text-gray-900">{$currentUser?.email ?? ''}</p>
-          <p class="text-xs capitalize text-gray-500">{$currentUser?.role ?? ''}</p>
+          <p class="text-xs text-gray-500 capitalize">{$currentUser?.role ?? ''}</p>
         </div>
         <button
           onclick={handleLogout}
           class="ml-2 rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
           title="Sign out"
+          aria-label="Sign out"
         >
           ↪
         </button>

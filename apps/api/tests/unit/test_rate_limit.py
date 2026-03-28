@@ -4,18 +4,17 @@ Tests: per-tier limits, burst allowance, headers, 429 response.
 """
 
 import time
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from fastapi import Request
-from fastapi.testclient import TestClient
-from fastapi import FastAPI
+
+import pytest
+from fastapi import FastAPI, Request
 
 from apps.api.src.middleware.rate_limit import RateLimitMiddleware, TierLimits
-
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def make_request(tenant_id: str = "t-1", plan: str = "free") -> MagicMock:
     req = MagicMock(spec=Request)
@@ -41,11 +40,12 @@ def make_app_with_middleware(plan: str = "free") -> FastAPI:
 # TierLimits unit tests
 # ---------------------------------------------------------------------------
 
+
 class TestTierLimits:
     def test_free_tier_limits(self):
         limits = TierLimits.for_plan("free")
         assert limits.requests_per_minute == 30
-        assert limits.burst_limit == 60   # 2x per 10s
+        assert limits.burst_limit == 60  # 2x per 10s
         assert limits.burst_window_seconds == 10
 
     def test_team_tier_limits(self):
@@ -70,6 +70,7 @@ class TestTierLimits:
 # ---------------------------------------------------------------------------
 # Middleware behavior tests (with mocked Redis/in-memory store)
 # ---------------------------------------------------------------------------
+
 
 class TestRateLimitMiddleware:
     """Tests assume the middleware uses an in-memory or mocked counter store."""
@@ -113,7 +114,7 @@ class TestRateLimitMiddleware:
 
             # Simulate 30 requests already counted
             for _ in range(30):
-                mock_store.increment(f"rl:t-throttled:minute", 60)
+                mock_store.increment("rl:t-throttled:minute", 60)
 
             call_next = AsyncMock(return_value=MagicMock(status_code=200))
             response = await middleware.dispatch(req, call_next)
@@ -129,7 +130,7 @@ class TestRateLimitMiddleware:
 
             # Simulate 60 requests in 10s burst window
             for _ in range(60):
-                mock_store.increment(f"rl:t-burst:burst", 10)
+                mock_store.increment("rl:t-burst:burst", 10)
 
             call_next = AsyncMock(return_value=MagicMock(status_code=200))
             response = await middleware.dispatch(req, call_next)

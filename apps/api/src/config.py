@@ -18,7 +18,10 @@ from __future__ import annotations
 import logging
 import sys
 from contextvars import ContextVar
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from opentelemetry.sdk.trace import TracerProvider
 
 import structlog
 from pydantic_settings import BaseSettings
@@ -33,6 +36,7 @@ user_id_ctx: ContextVar[str] = ContextVar("user_id", default="")
 # ---------------------------------------------------------------------------
 # Settings
 # ---------------------------------------------------------------------------
+
 
 class Settings(BaseSettings):
     # Database
@@ -70,9 +74,8 @@ settings = Settings()
 # structlog configuration
 # ---------------------------------------------------------------------------
 
-def _add_request_context(
-    logger: Any, method_name: str, event_dict: dict
-) -> dict:
+
+def _add_request_context(logger: Any, method_name: str, event_dict: dict) -> dict:
     """Inject per-request context vars into every log event."""
     cid = correlation_id_ctx.get("")
     if cid:
@@ -115,7 +118,8 @@ def configure_logging() -> None:
         renderer = structlog.dev.ConsoleRenderer()
 
     structlog.configure(
-        processors=shared_processors + [
+        processors=[
+            *shared_processors,
             structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
         ],
         logger_factory=structlog.stdlib.LoggerFactory(),
@@ -144,6 +148,7 @@ def configure_logging() -> None:
 # T181: OpenTelemetry tracing configuration
 # ---------------------------------------------------------------------------
 
+
 def configure_tracing() -> None:
     """
     Configure OpenTelemetry tracing with the GCP Cloud Trace exporter.
@@ -162,12 +167,12 @@ def configure_tracing() -> None:
 
     try:
         from opentelemetry import trace
+        from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+        from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
+        from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
+        from opentelemetry.sdk.resources import SERVICE_NAME, Resource
         from opentelemetry.sdk.trace import TracerProvider
         from opentelemetry.sdk.trace.sampling import ParentBased, TraceIdRatioBased
-        from opentelemetry.sdk.resources import Resource, SERVICE_NAME
-        from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-        from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
-        from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
     except ImportError:
         logging.getLogger(__name__).warning(
             "opentelemetry packages not installed — tracing disabled"
@@ -224,13 +229,14 @@ def configure_tracing() -> None:
     )
 
 
-def _add_console_exporter(provider: "TracerProvider") -> None:
+def _add_console_exporter(provider: TracerProvider) -> None:
     from opentelemetry.sdk.trace.export import SimpleSpanProcessor
     from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
     # In dev/test: print spans to stdout
     try:
         from opentelemetry.exporter.console import ConsoleSpanExporter
+
         provider.add_span_processor(SimpleSpanProcessor(ConsoleSpanExporter()))
     except ImportError:
         provider.add_span_processor(SimpleSpanProcessor(InMemorySpanExporter()))

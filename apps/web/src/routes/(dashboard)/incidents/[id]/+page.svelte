@@ -6,7 +6,7 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { apiClient, type Incident, type Category, type Severity, ApiError } from '$lib/api';
-  import { isAdmin, isEditorOrAbove } from '$lib/stores/auth';
+  import { isEditorOrAbove } from '$lib/stores/auth';
 
   const id = $derived($page.params.id);
 
@@ -32,9 +32,16 @@
   let staticRulePossible = $state(false);
 
   const categories: Category[] = [
-    'unsafe-regex', 'race-condition', 'missing-error-handling', 'injection',
-    'resource-exhaustion', 'missing-safety-check', 'deployment-error',
-    'data-consistency', 'unsafe-api-usage', 'cascading-failure',
+    'unsafe-regex',
+    'race-condition',
+    'missing-error-handling',
+    'injection',
+    'resource-exhaustion',
+    'missing-safety-check',
+    'deployment-error',
+    'data-consistency',
+    'unsafe-api-usage',
+    'cascading-failure',
   ];
 
   const severities: Severity[] = ['critical', 'high', 'medium', 'low'];
@@ -84,7 +91,10 @@
         code_example: codeExample || undefined,
         source_url: sourceUrl || undefined,
         organization: organization || undefined,
-        affected_languages: affectedLanguages.split(',').map((s) => s.trim()).filter(Boolean),
+        affected_languages: affectedLanguages
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean),
         static_rule_possible: staticRulePossible,
         version: incident.version,
       });
@@ -127,13 +137,18 @@
 
 <div class="mx-auto max-w-2xl">
   <!-- Back -->
-  <a href="/incidents" class="mb-6 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900">
+  <a
+    href="/incidents"
+    class="mb-6 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900"
+  >
     ← Back to incidents
   </a>
 
   {#if loading}
     <div class="flex justify-center py-12">
-      <span class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"></span>
+      <span
+        class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"
+      ></span>
     </div>
   {:else if error && !incident}
     <div class="rounded-lg bg-red-50 p-4 text-sm text-red-700">{error}</div>
@@ -144,18 +159,17 @@
         <button
           onclick={() => (showDeleteConfirm = true)}
           class="rounded-lg border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
-        >Delete</button>
+          >Delete</button
+        >
       {/if}
     </div>
 
     <!-- Conflict error -->
     {#if conflictError}
       <div class="mb-4 rounded-lg bg-yellow-50 p-4 text-sm text-yellow-800">
-        <strong>Conflict:</strong> {conflictError}
-        <button
-          onclick={handleReload}
-          class="ml-2 underline"
-        >Reload</button>
+        <strong>Conflict:</strong>
+        {conflictError}
+        <button onclick={handleReload} class="ml-2 underline">Reload</button>
       </div>
     {/if}
 
@@ -178,7 +192,7 @@
           bind:value={title}
           required
           disabled={!$isEditorOrAbove}
-          class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:bg-gray-50"
+          class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none disabled:bg-gray-50"
         />
       </div>
 
@@ -189,7 +203,7 @@
             id="category"
             bind:value={category}
             disabled={!$isEditorOrAbove}
-            class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:bg-gray-50"
+            class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none disabled:bg-gray-50"
           >
             {#each categories as cat}
               <option value={cat}>{cat}</option>
@@ -203,7 +217,7 @@
             id="severity"
             bind:value={severity}
             disabled={!$isEditorOrAbove}
-            class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:bg-gray-50"
+            class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none disabled:bg-gray-50"
           >
             {#each severities as sev}
               <option value={sev}>{sev}</option>
@@ -213,37 +227,43 @@
       </div>
 
       <div>
-        <label for="anti-pattern" class="block text-sm font-medium text-gray-700">Anti-pattern *</label>
+        <label for="anti-pattern" class="block text-sm font-medium text-gray-700"
+          >Anti-pattern *</label
+        >
         <textarea
           id="anti-pattern"
           bind:value={antiPattern}
           required
           rows={3}
           disabled={!$isEditorOrAbove}
-          class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:bg-gray-50"
+          class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none disabled:bg-gray-50"
         ></textarea>
       </div>
 
       <div>
-        <label for="remediation" class="block text-sm font-medium text-gray-700">Remediation *</label>
+        <label for="remediation" class="block text-sm font-medium text-gray-700"
+          >Remediation *</label
+        >
         <textarea
           id="remediation"
           bind:value={remediation}
           required
           rows={3}
           disabled={!$isEditorOrAbove}
-          class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:bg-gray-50"
+          class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none disabled:bg-gray-50"
         ></textarea>
       </div>
 
       <div>
-        <label for="code-example" class="block text-sm font-medium text-gray-700">Code example</label>
+        <label for="code-example" class="block text-sm font-medium text-gray-700"
+          >Code example</label
+        >
         <textarea
           id="code-example"
           bind:value={codeExample}
           rows={4}
           disabled={!$isEditorOrAbove}
-          class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 font-mono text-xs focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:bg-gray-50"
+          class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 font-mono text-xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none disabled:bg-gray-50"
         ></textarea>
       </div>
 
@@ -255,18 +275,20 @@
             type="url"
             bind:value={sourceUrl}
             disabled={!$isEditorOrAbove}
-            class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:bg-gray-50"
+            class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none disabled:bg-gray-50"
           />
         </div>
 
         <div>
-          <label for="organization" class="block text-sm font-medium text-gray-700">Organization</label>
+          <label for="organization" class="block text-sm font-medium text-gray-700"
+            >Organization</label
+          >
           <input
             id="organization"
             type="text"
             bind:value={organization}
             disabled={!$isEditorOrAbove}
-            class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:bg-gray-50"
+            class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none disabled:bg-gray-50"
           />
         </div>
       </div>
@@ -281,7 +303,7 @@
           bind:value={affectedLanguages}
           placeholder="python, javascript, go"
           disabled={!$isEditorOrAbove}
-          class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:bg-gray-50"
+          class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none disabled:bg-gray-50"
         />
       </div>
 
@@ -321,7 +343,8 @@
     <div class="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
       <h2 class="text-lg font-semibold text-gray-900">Delete incident?</h2>
       <p class="mt-2 text-sm text-gray-500">
-        This will soft-delete the incident. If it has an active linked rule, deletion will be blocked.
+        This will soft-delete the incident. If it has an active linked rule, deletion will be
+        blocked.
       </p>
 
       {#if error}
@@ -332,7 +355,8 @@
         <button
           onclick={() => (showDeleteConfirm = false)}
           class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-        >Cancel</button>
+          >Cancel</button
+        >
         <button
           onclick={handleDelete}
           disabled={deleting}

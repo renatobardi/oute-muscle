@@ -21,9 +21,16 @@
   let debounceTimer: ReturnType<typeof setTimeout>;
 
   const categories: Category[] = [
-    'unsafe-regex', 'race-condition', 'missing-error-handling', 'injection',
-    'resource-exhaustion', 'missing-safety-check', 'deployment-error',
-    'data-consistency', 'unsafe-api-usage', 'cascading-failure',
+    'unsafe-regex',
+    'race-condition',
+    'missing-error-handling',
+    'injection',
+    'resource-exhaustion',
+    'missing-safety-check',
+    'deployment-error',
+    'data-consistency',
+    'unsafe-api-usage',
+    'cascading-failure',
   ];
 
   const severities: Severity[] = ['critical', 'high', 'medium', 'low'];
@@ -101,11 +108,10 @@
   <div class="mb-4 flex flex-wrap gap-3">
     <input
       type="search"
-      role="searchbox"
       placeholder="Search incidents…"
       bind:value={query}
       oninput={onQueryInput}
-      class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+      class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
     />
 
     <label class="flex items-center gap-2 text-sm text-gray-700">
@@ -117,7 +123,7 @@
       aria-label="category"
       bind:value={filterCategory}
       onchange={onFilterChange}
-      class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+      class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
     >
       <option value="">All categories</option>
       {#each categories as cat}
@@ -126,9 +132,10 @@
     </select>
 
     <select
+      aria-label="severity"
       bind:value={filterSeverity}
       onchange={onFilterChange}
-      class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+      class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
     >
       <option value="">All severities</option>
       {#each severities as sev}
@@ -145,10 +152,14 @@
   <!-- Table -->
   {#if loading}
     <div class="flex justify-center py-12">
-      <span class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"></span>
+      <span
+        class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"
+      ></span>
     </div>
   {:else if incidents.length === 0}
-    <div class="rounded-xl border border-dashed border-gray-300 py-12 text-center text-sm text-gray-500">
+    <div
+      class="rounded-xl border border-dashed border-gray-300 py-12 text-center text-sm text-gray-500"
+    >
       No incidents found.
     </div>
   {:else}
@@ -172,11 +183,17 @@
               <td class="px-4 py-3 font-medium text-gray-900">{incident.title}</td>
               <td class="px-4 py-3 text-gray-500">{incident.category}</td>
               <td class="px-4 py-3">
-                <span class="rounded-full px-2 py-0.5 text-xs font-medium {severityColor[incident.severity]}">
+                <span
+                  class="rounded-full px-2 py-0.5 text-xs font-medium {severityColor[
+                    incident.severity
+                  ]}"
+                >
                   {incident.severity}
                 </span>
               </td>
-              <td class="px-4 py-3 text-gray-500">{incident.affected_languages.join(', ') || '—'}</td>
+              <td class="px-4 py-3 text-gray-500"
+                >{incident.affected_languages.join(', ') || '—'}</td
+              >
               <td class="px-4 py-3">
                 {#if incident.linked_rule_id}
                   <a
@@ -203,14 +220,20 @@
         <div class="flex gap-2">
           <button
             disabled={page <= 1}
-            onclick={() => { page--; loadIncidents(); }}
-            class="rounded border border-gray-300 px-3 py-1 disabled:opacity-40"
-          >Previous</button>
+            onclick={() => {
+              page--;
+              loadIncidents();
+            }}
+            class="rounded border border-gray-300 px-3 py-1 disabled:opacity-40">Previous</button
+          >
           <button
             disabled={page >= totalPages}
-            onclick={() => { page++; loadIncidents(); }}
-            class="rounded border border-gray-300 px-3 py-1 disabled:opacity-40"
-          >Next</button>
+            onclick={() => {
+              page++;
+              loadIncidents();
+            }}
+            class="rounded border border-gray-300 px-3 py-1 disabled:opacity-40">Next</button
+          >
         </div>
       </div>
     {/if}

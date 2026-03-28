@@ -12,9 +12,16 @@
   let error = $state<string | null>(null);
 
   const categories: Category[] = [
-    'unsafe-regex', 'race-condition', 'missing-error-handling', 'injection',
-    'resource-exhaustion', 'missing-safety-check', 'deployment-error',
-    'data-consistency', 'unsafe-api-usage', 'cascading-failure',
+    'unsafe-regex',
+    'race-condition',
+    'missing-error-handling',
+    'injection',
+    'resource-exhaustion',
+    'missing-safety-check',
+    'deployment-error',
+    'data-consistency',
+    'unsafe-api-usage',
+    'cascading-failure',
   ];
 
   const severities: Severity[] = ['critical', 'high', 'medium', 'low'];
@@ -55,7 +62,10 @@
 </script>
 
 <div class="mx-auto max-w-2xl">
-  <a href="/incidents" class="mb-6 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900">
+  <a
+    href="/incidents"
+    class="mb-6 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900"
+  >
     ← Back to incidents
   </a>
 
@@ -70,7 +80,7 @@
       placeholder="https://blog.example.com/post-mortem"
       bind:value={url}
       required
-      class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+      class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
     />
     <button
       type="submit"
@@ -89,7 +99,7 @@
   {#if draft}
     <div class="rounded-xl border border-indigo-200 bg-indigo-50 p-1">
       <div class="rounded-lg bg-white p-5">
-        <p class="mb-4 text-xs font-semibold uppercase tracking-wider text-indigo-600">
+        <p class="mb-4 text-xs font-semibold tracking-wider text-indigo-600 uppercase">
           Review extracted draft
         </p>
 
@@ -100,17 +110,19 @@
               id="draft-title"
               type="text"
               bind:value={draft.title}
-              class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
             />
           </div>
 
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label for="draft-category" class="block text-sm font-medium text-gray-700">Category</label>
+              <label for="draft-category" class="block text-sm font-medium text-gray-700"
+                >Category</label
+              >
               <select
                 id="draft-category"
                 bind:value={draft.category}
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
               >
                 {#each categories as cat}
                   <option value={cat}>{cat}</option>
@@ -118,11 +130,13 @@
               </select>
             </div>
             <div>
-              <label for="draft-severity" class="block text-sm font-medium text-gray-700">Severity</label>
+              <label for="draft-severity" class="block text-sm font-medium text-gray-700"
+                >Severity</label
+              >
               <select
                 id="draft-severity"
                 bind:value={draft.severity}
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
               >
                 {#each severities as sev}
                   <option value={sev}>{sev}</option>
@@ -132,22 +146,26 @@
           </div>
 
           <div>
-            <label for="draft-anti" class="block text-sm font-medium text-gray-700">Anti-pattern</label>
+            <label for="draft-anti" class="block text-sm font-medium text-gray-700"
+              >Anti-pattern</label
+            >
             <textarea
               id="draft-anti"
               bind:value={draft.anti_pattern}
               rows={3}
-              class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
             ></textarea>
           </div>
 
           <div>
-            <label for="draft-remediation" class="block text-sm font-medium text-gray-700">Remediation</label>
+            <label for="draft-remediation" class="block text-sm font-medium text-gray-700"
+              >Remediation</label
+            >
             <textarea
               id="draft-remediation"
               bind:value={draft.remediation}
               rows={3}
-              class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
             ></textarea>
           </div>
 
@@ -162,7 +180,8 @@
           <button
             onclick={() => (draft = null)}
             class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >Discard</button>
+            >Discard</button
+          >
           <button
             onclick={handleConfirm}
             disabled={confirming}

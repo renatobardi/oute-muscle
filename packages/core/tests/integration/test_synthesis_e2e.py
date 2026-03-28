@@ -7,19 +7,21 @@ No real GCP/DB calls; all external adapters are mocked.
 """
 
 import hashlib
+from datetime import UTC
+from unittest.mock import AsyncMock, MagicMock
+
 import pytest
-import yaml
-from unittest.mock import AsyncMock, MagicMock, patch
+
 from packages.core.src.domain.rules.pattern_detector import PatternDetector, PatternMatch
+from packages.core.src.domain.rules.synthesis_candidate import CandidateStatus, SynthesisCandidate
+from packages.core.src.domain.rules.synthesis_service import SynthesisService
 from packages.core.src.domain.rules.synthesizer import RuleSynthesizer, SynthesisResult
 from packages.core.src.domain.rules.test_validator import CandidateTestValidator, ValidationResult
-from packages.core.src.domain.rules.synthesis_service import SynthesisService
-from packages.core.src.domain.rules.synthesis_candidate import SynthesisCandidate, CandidateStatus
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 def _hash(s: str) -> str:
     return hashlib.sha256(s.encode()).hexdigest()
@@ -69,6 +71,7 @@ SAMPLE_INCIDENT = {
 # ---------------------------------------------------------------------------
 # End-to-end test
 # ---------------------------------------------------------------------------
+
 
 class TestSynthesisE2E:
     @pytest.mark.asyncio
@@ -146,9 +149,7 @@ class TestSynthesisE2E:
         rule_id = await service.approve("cand-e2e-1", approved_by="user-admin")
 
         assert rule_id == "cascading-failure-002"
-        mock_candidate_repo.update_status.assert_called_with(
-            "cand-e2e-1", CandidateStatus.APPROVED
-        )
+        mock_candidate_repo.update_status.assert_called_with("cand-e2e-1", CandidateStatus.APPROVED)
 
     @pytest.mark.asyncio
     async def test_pipeline_with_test_failure_marks_candidate_failed(self):
@@ -175,8 +176,9 @@ class TestSynthesisE2E:
     @pytest.mark.asyncio
     async def test_pipeline_third_failure_archives_candidate(self):
         """After 3 failures the candidate is auto-archived, no more retries."""
+        from datetime import datetime
+
         from packages.core.src.domain.rules.synthesis_candidate import MAX_FAILURE_COUNT
-        from datetime import datetime, timezone
 
         candidate = SynthesisCandidate(
             id="cand-fail-3",
@@ -186,8 +188,8 @@ class TestSynthesisE2E:
             failure_count=MAX_FAILURE_COUNT - 1,  # 2 — one more will trigger archive
             failure_reason="prev failure",
             generated_rule_yaml=None,
-            created_at=datetime.now(timezone.utc),
-            updated_at=datetime.now(timezone.utc),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
         )
 
         mock_candidate_repo = AsyncMock()

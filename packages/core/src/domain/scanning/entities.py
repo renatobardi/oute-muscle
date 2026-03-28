@@ -40,9 +40,7 @@ class Finding(BaseModel):
     def end_line_gte_start_line(cls, v: int, info) -> int:  # type: ignore[no-untyped-def]
         """Validate that end_line >= start_line."""
         if "start_line" in info.data and v < info.data["start_line"]:
-            raise ValueError(
-                f"end_line ({v}) must be >= start_line ({info.data['start_line']})"
-            )
+            raise ValueError(f"end_line ({v}) must be >= start_line ({info.data['start_line']})")
         return v
 
 

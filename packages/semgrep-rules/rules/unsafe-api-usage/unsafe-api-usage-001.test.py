@@ -1,5 +1,7 @@
 """Test cases for unsafe-api-usage-001: unsafe deserialization."""
+
 import pickle
+
 import yaml
 
 # ruleid: unsafe-api-usage-001
@@ -16,4 +18,5 @@ config = yaml.safe_load(request.body)
 
 # ok
 import json
+
 data = json.loads(request.body)

@@ -9,19 +9,17 @@ import uuid
 from datetime import datetime
 
 import pytest
-
 from src.domain.incidents.entity import Incident
 from src.domain.incidents.enums import (
     IncidentCategory,
     IncidentSeverity,
-    RuleSource,
     RuleSeverity,
-    RiskLevel,
+    RuleSource,
     ScanStatus,
     ScanTriggerSource,
 )
 from src.domain.rules.entity import SemgrepRule
-from src.domain.scanning.entities import Advisory, Finding
+from src.domain.scanning.entities import Finding
 from src.domain.scanning.scan import Scan
 
 

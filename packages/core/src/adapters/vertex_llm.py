@@ -44,16 +44,14 @@ class VertexGeminiFlash(LLMPort):
         """
         if not os.getenv("GOOGLE_CLOUD_PROJECT"):
             raise LLMError(
-                "GOOGLE_CLOUD_PROJECT env var not set; "
-                "cannot initialize Vertex AI client"
+                "GOOGLE_CLOUD_PROJECT env var not set; cannot initialize Vertex AI client"
             )
 
         try:
             # Placeholder for actual implementation
             # In real scenario, would call google.cloud.aiplatform.generative_models
             raise NotImplementedError(
-                "Vertex AI Gemini Flash implementation pending "
-                "(requires google-cloud-aiplatform)"
+                "Vertex AI Gemini Flash implementation pending (requires google-cloud-aiplatform)"
             )
         except TimeoutError as e:
             raise LLMTimeoutError(f"Gemini Flash timeout: {e}") from e
@@ -88,9 +86,7 @@ class VertexGeminiFlash(LLMPort):
 
         try:
             # Placeholder for actual implementation
-            raise NotImplementedError(
-                "Vertex AI Gemini Flash structured output pending"
-            )
+            raise NotImplementedError("Vertex AI Gemini Flash structured output pending")
         except TimeoutError as e:
             raise LLMTimeoutError(f"Gemini Flash timeout: {e}") from e
         except Exception as e:
@@ -125,15 +121,13 @@ class VertexGeminiPro(LLMPort):
         """
         if not os.getenv("GOOGLE_CLOUD_PROJECT"):
             raise LLMError(
-                "GOOGLE_CLOUD_PROJECT env var not set; "
-                "cannot initialize Vertex AI client"
+                "GOOGLE_CLOUD_PROJECT env var not set; cannot initialize Vertex AI client"
             )
 
         try:
             # Placeholder for actual implementation
             raise NotImplementedError(
-                "Vertex AI Gemini Pro implementation pending "
-                "(requires google-cloud-aiplatform)"
+                "Vertex AI Gemini Pro implementation pending (requires google-cloud-aiplatform)"
             )
         except TimeoutError as e:
             raise LLMTimeoutError(f"Gemini Pro timeout: {e}") from e
@@ -168,9 +162,7 @@ class VertexGeminiPro(LLMPort):
 
         try:
             # Placeholder for actual implementation
-            raise NotImplementedError(
-                "Vertex AI Gemini Pro structured output pending"
-            )
+            raise NotImplementedError("Vertex AI Gemini Pro structured output pending")
         except TimeoutError as e:
             raise LLMTimeoutError(f"Gemini Pro timeout: {e}") from e
         except Exception as e:

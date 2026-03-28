@@ -4,17 +4,18 @@ Tests: contributor cap, repo cap, layer access (L1/L2/L3), all three tiers.
 """
 
 import pytest
-from packages.core.src.domain.tenants.plan_limits import (
-    PlanLimits,
-    PlanLimitError,
-    Plan,
-    Layer,
-)
 
+from packages.core.src.domain.tenants.plan_limits import (
+    Layer,
+    Plan,
+    PlanLimitError,
+    PlanLimits,
+)
 
 # ---------------------------------------------------------------------------
 # PlanLimits static config
 # ---------------------------------------------------------------------------
+
 
 class TestPlanLimitsConfig:
     def test_free_contributor_limit(self):
@@ -49,6 +50,7 @@ class TestPlanLimitsConfig:
 # Layer access
 # ---------------------------------------------------------------------------
 
+
 class TestLayerAccess:
     def test_free_has_layer1_only(self):
         assert PlanLimits.can_use_layer(Plan.FREE, Layer.L1) is True
@@ -69,6 +71,7 @@ class TestLayerAccess:
 # ---------------------------------------------------------------------------
 # Enforcement — contributor cap
 # ---------------------------------------------------------------------------
+
 
 class TestContributorEnforcement:
     def test_adding_contributor_within_limit_passes(self):
@@ -102,6 +105,7 @@ class TestContributorEnforcement:
 # Enforcement — repo cap
 # ---------------------------------------------------------------------------
 
+
 class TestRepoEnforcement:
     def test_free_allows_up_to_2_repos(self):
         PlanLimits.check_repo_limit(plan=Plan.FREE, current_count=2)
@@ -126,6 +130,7 @@ class TestRepoEnforcement:
 # ---------------------------------------------------------------------------
 # Enforcement — layer access
 # ---------------------------------------------------------------------------
+
 
 class TestLayerEnforcement:
     def test_free_requesting_l2_raises(self):
@@ -158,6 +163,7 @@ class TestLayerEnforcement:
 # ---------------------------------------------------------------------------
 # PlanLimitError fields
 # ---------------------------------------------------------------------------
+
 
 class TestPlanLimitError:
     def test_error_includes_current_and_max(self):

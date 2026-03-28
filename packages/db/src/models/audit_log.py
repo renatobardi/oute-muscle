@@ -42,4 +42,6 @@ class AuditLogEntry(Base):
     changes: Any = Column(JSONB, nullable=False)  # {before: {...}, after: {...}}
 
     def __repr__(self) -> str:
-        return f"<AuditLogEntry(id={self.id}, action={self.action}, entity_type={self.entity_type})>"
+        return (
+            f"<AuditLogEntry(id={self.id}, action={self.action}, entity_type={self.entity_type})>"
+        )

@@ -28,8 +28,8 @@
         acc[s.risk_level] = (acc[s.risk_level] ?? 0) + 1;
         return acc;
       },
-      {} as Record<string, number>,
-    ),
+      {} as Record<string, number>
+    )
   );
 
   async function load() {
@@ -75,7 +75,7 @@
   <!-- Risk summary bar -->
   {#if scans.length > 0}
     <div class="mb-6 flex gap-4">
-      {#each (['critical', 'high', 'medium', 'low'] as RiskLevel[]) as level}
+      {#each ['critical', 'high', 'medium', 'low'] as RiskLevel[] as level}
         {#if riskCounts[level]}
           <div class="rounded-lg border border-gray-200 bg-white px-4 py-3 text-center">
             <p class="text-2xl font-bold text-gray-900">{riskCounts[level]}</p>
@@ -90,14 +90,16 @@
   <div class="mb-4 flex gap-3">
     <input
       type="text"
+      aria-label="repository filter"
       placeholder="Filter by repository (e.g. org/repo)"
       bind:value={filterRepo}
-      class="w-64 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+      class="w-64 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
     />
     <button
       onclick={load}
       class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-    >Filter</button>
+      >Filter</button
+    >
   </div>
 
   {#if error}
@@ -106,10 +108,14 @@
 
   {#if loading}
     <div class="flex justify-center py-12">
-      <span class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"></span>
+      <span
+        class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"
+      ></span>
     </div>
   {:else if scans.length === 0}
-    <div class="rounded-xl border border-dashed border-gray-300 py-12 text-center text-sm text-gray-500">
+    <div
+      class="rounded-xl border border-dashed border-gray-300 py-12 text-center text-sm text-gray-500"
+    >
       No scans yet. Connect your GitHub App or push code to trigger a scan.
     </div>
   {:else}
@@ -129,15 +135,19 @@
           {#each scans as scan}
             <tr class="cursor-pointer hover:bg-gray-50" onclick={() => goto(`/scans/${scan.id}`)}>
               <td class="px-4 py-3 font-medium text-gray-900">{scan.repository}</td>
-              <td class="px-4 py-3 font-mono text-xs text-gray-500">{scan.commit_sha.slice(0, 7)}</td>
+              <td class="px-4 py-3 font-mono text-xs text-gray-500"
+                >{scan.commit_sha.slice(0, 7)}</td
+              >
               <td class="px-4 py-3">
-                <span class="rounded-full px-2 py-0.5 text-xs font-medium {riskColor[scan.risk_level]}">
+                <span
+                  class="rounded-full px-2 py-0.5 text-xs font-medium {riskColor[scan.risk_level]}"
+                >
                   {scan.risk_level}
                 </span>
               </td>
               <td class="px-4 py-3 text-gray-700">{scan.findings_count}</td>
               <td class="px-4 py-3 text-gray-500">{formatDuration(scan.duration_ms)}</td>
-              <td class="px-4 py-3 text-gray-400 text-xs">{formatDate(scan.created_at)}</td>
+              <td class="px-4 py-3 text-xs text-gray-400">{formatDate(scan.created_at)}</td>
             </tr>
           {/each}
         </tbody>
@@ -148,10 +158,22 @@
       <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
         <span>Page {page} of {totalPages}</span>
         <div class="flex gap-2">
-          <button disabled={page <= 1} onclick={() => { page--; load(); }}
-            class="rounded border border-gray-300 px-3 py-1 disabled:opacity-40">Previous</button>
-          <button disabled={page >= totalPages} onclick={() => { page++; load(); }}
-            class="rounded border border-gray-300 px-3 py-1 disabled:opacity-40">Next</button>
+          <button
+            disabled={page <= 1}
+            onclick={() => {
+              page--;
+              load();
+            }}
+            class="rounded border border-gray-300 px-3 py-1 disabled:opacity-40">Previous</button
+          >
+          <button
+            disabled={page >= totalPages}
+            onclick={() => {
+              page++;
+              load();
+            }}
+            class="rounded border border-gray-300 px-3 py-1 disabled:opacity-40">Next</button
+          >
         </div>
       </div>
     {/if}

@@ -107,9 +107,7 @@ class RAGPipeline:
 
         return advisory
 
-    def _build_prompt(
-        self, diff: str, incidents: list, was_truncated: bool
-    ) -> str:
+    def _build_prompt(self, diff: str, incidents: list, was_truncated: bool) -> str:
         """Build LLM prompt with diff and incident context.
 
         Args:
@@ -127,8 +125,7 @@ class RAGPipeline:
 
         if was_truncated:
             prompt += (
-                "[Note: This diff was truncated at 3000 lines. "
-                "The full change may be larger.]\n\n"
+                "[Note: This diff was truncated at 3000 lines. The full change may be larger.]\n\n"
             )
 
         prompt += f"Code Diff:\n```\n{diff}\n```\n\n"

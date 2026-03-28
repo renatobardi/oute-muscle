@@ -12,24 +12,24 @@ Business rules:
 
 from __future__ import annotations
 
-from typing import Any, Optional, Protocol
+from typing import Any, Protocol
 
 FALSE_POSITIVE_DISABLE_THRESHOLD: int = 3
 
 
-class FindingNotFound(Exception):
+class FindingNotFoundError(Exception):
     def __init__(self, finding_id: str):
         super().__init__(f"Finding '{finding_id}' not found")
         self.finding_id = finding_id
 
 
 class FindingRepo(Protocol):
-    async def get(self, finding_id: str) -> Optional[Any]: ...
+    async def get(self, finding_id: str) -> Any | None: ...
     async def save(self, finding: Any) -> Any: ...
 
 
 class RuleRepo(Protocol):
-    async def get(self, rule_id: str) -> Optional[Any]: ...
+    async def get(self, rule_id: str) -> Any | None: ...
     async def disable(self, rule_id: str) -> None: ...
 
 
@@ -52,11 +52,11 @@ class FalsePositiveService:
         Mark a finding as a false positive and conditionally disable its rule.
 
         Returns the updated finding object.
-        Raises FindingNotFound if the finding does not exist.
+        Raises FindingNotFoundError if the finding does not exist.
         """
         finding = await self._finding_repo.get(finding_id)
         if finding is None:
-            raise FindingNotFound(finding_id)
+            raise FindingNotFoundError(finding_id)
 
         # Update the finding
         finding.status = "false_positive"

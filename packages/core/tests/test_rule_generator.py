@@ -3,15 +3,16 @@ T164: Unit tests for rule generation service.
 The LLM produces valid Semgrep YAML + a test file.
 """
 
+from unittest.mock import AsyncMock
+
 import pytest
 import yaml
-from unittest.mock import AsyncMock, MagicMock, patch
+
 from packages.core.src.domain.rules.synthesizer import (
     RuleSynthesizer,
-    SynthesisResult,
     SynthesisError,
+    SynthesisResult,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -62,6 +63,7 @@ def fetch(url):
 # ---------------------------------------------------------------------------
 # Tests: RuleSynthesizer.synthesize
 # ---------------------------------------------------------------------------
+
 
 class TestRuleSynthesizer:
     @pytest.mark.asyncio
@@ -117,6 +119,7 @@ class TestRuleSynthesizer:
         result = await synthesizer.synthesize(incident=SAMPLE_INCIDENT)
 
         import re
+
         assert re.match(r"^[a-z-]+-\d{3}$", result.rule_id), (
             f"Rule ID '{result.rule_id}' does not match {{category}}-{{NNN}} format"
         )

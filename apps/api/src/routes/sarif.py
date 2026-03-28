@@ -28,43 +28,51 @@ def findings_to_sarif(findings: list[dict[str, Any]], scan_id: str) -> dict[str,
         rule_id = f.get("rule_id", "unknown")
         if rule_id not in seen_rules:
             seen_rules.add(rule_id)
-            rules.append({
-                "id": rule_id,
-                "name": rule_id,
-                "shortDescription": {"text": f.get("message", "")},
-                "helpUri": f.get("incident_url", ""),
-            })
-        results.append({
-            "ruleId": rule_id,
-            "level": _severity_to_sarif_level(f.get("severity", "note")),
-            "message": {"text": f.get("message", "")},
-            "locations": [{
-                "physicalLocation": {
-                    "artifactLocation": {"uri": f.get("file_path", "")},
-                    "region": {
-                        "startLine": f.get("start_line", 1),
-                        "endLine": f.get("end_line", 1),
-                    },
+            rules.append(
+                {
+                    "id": rule_id,
+                    "name": rule_id,
+                    "shortDescription": {"text": f.get("message", "")},
+                    "helpUri": f.get("incident_url", ""),
                 }
-            }],
-            "properties": {"remediation": f.get("remediation", "")},
-        })
+            )
+        results.append(
+            {
+                "ruleId": rule_id,
+                "level": _severity_to_sarif_level(f.get("severity", "note")),
+                "message": {"text": f.get("message", "")},
+                "locations": [
+                    {
+                        "physicalLocation": {
+                            "artifactLocation": {"uri": f.get("file_path", "")},
+                            "region": {
+                                "startLine": f.get("start_line", 1),
+                                "endLine": f.get("end_line", 1),
+                            },
+                        }
+                    }
+                ],
+                "properties": {"remediation": f.get("remediation", "")},
+            }
+        )
 
     return {
         "$schema": SARIF_SCHEMA,
         "version": "2.1.0",
-        "runs": [{
-            "tool": {
-                "driver": {
-                    "name": "oute-muscle",
-                    "version": "0.1.0",
-                    "informationUri": "https://outemuscle.com",
-                    "rules": rules,
-                }
-            },
-            "results": results,
-            "properties": {"scanId": scan_id},
-        }],
+        "runs": [
+            {
+                "tool": {
+                    "driver": {
+                        "name": "oute-muscle",
+                        "version": "0.1.0",
+                        "informationUri": "https://outemuscle.com",
+                        "rules": rules,
+                    }
+                },
+                "results": results,
+                "properties": {"scanId": scan_id},
+            }
+        ],
     }
 
 

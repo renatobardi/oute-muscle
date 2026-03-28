@@ -26,7 +26,9 @@ class Scan(Base):
     )
 
     # Trigger
-    trigger_source: Any = Column(String(50), nullable=False)  # github_push, github_pr, mcp, rest_api, pre_commit
+    trigger_source: Any = Column(
+        String(50), nullable=False
+    )  # github_push, github_pr, mcp, rest_api, pre_commit
     repository: Any = Column(String(1024), nullable=False)  # org/repo
     pr_number: Any = Column(Integer, nullable=True)  # NULL if not a PR
 
@@ -39,7 +41,9 @@ class Scan(Base):
     duration_ms: Any = Column(Integer, nullable=False, default=0)
 
     # Status
-    status: Any = Column(String(50), nullable=False, default="running")  # running, completed, failed, timeout
+    status: Any = Column(
+        String(50), nullable=False, default="running"
+    )  # running, completed, failed, timeout
     completed_at: Any = Column("completed_at", type_=None, nullable=True)
 
     __table_args__ = (

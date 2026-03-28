@@ -9,17 +9,16 @@ from __future__ import annotations
 
 import asyncio
 import tempfile
-import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Protocol
 
 from packages.core.src.domain.rules.synthesizer import SynthesisResult
 
-
 # ---------------------------------------------------------------------------
 # Result type
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class ValidationResult:
@@ -32,19 +31,20 @@ class ValidationResult:
 # Semgrep runner Protocol (injectable / mockable)
 # ---------------------------------------------------------------------------
 
+
 class SemgrepRunnerPort(Protocol):
     async def run_test(
         self,
         rule_yaml: str,
         test_file: str,
         rule_id: str,
-    ) -> ValidationResult:
-        ...
+    ) -> ValidationResult: ...
 
 
 # ---------------------------------------------------------------------------
 # Default runner: shells out to `semgrep --test`
 # ---------------------------------------------------------------------------
+
 
 class SubprocessSemgrepRunner:
     """Runs semgrep --test in a temp directory via asyncio subprocess."""
@@ -87,6 +87,7 @@ class SubprocessSemgrepRunner:
 # Validator service
 # ---------------------------------------------------------------------------
 
+
 class CandidateTestValidator:
     """
     Wraps the semgrep runner; used by the synthesis worker to validate a
@@ -107,13 +108,13 @@ class CandidateTestValidator:
                 test_file=result.test_file,
                 rule_id=result.rule_id,
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             return ValidationResult(
                 passed=False,
                 errors=["semgrep --test timed out after 60s"],
                 test_output="",
             )
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             return ValidationResult(
                 passed=False,
                 errors=[f"Unexpected error running semgrep: {exc}"],

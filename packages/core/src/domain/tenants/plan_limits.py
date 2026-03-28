@@ -17,28 +17,27 @@ Usage:
 
 from __future__ import annotations
 
-from enum import Enum
-from typing import Optional
-
+from enum import StrEnum
 
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
 
-class Plan(str, Enum):
+
+class Plan(StrEnum):
     FREE = "free"
     TEAM = "team"
     ENTERPRISE = "enterprise"
 
     @classmethod
-    def from_str(cls, value: str) -> "Plan":
+    def from_str(cls, value: str) -> Plan:
         try:
             return cls(value.lower())
         except ValueError:
             return cls.FREE  # graceful fallback
 
 
-class Layer(str, Enum):
+class Layer(StrEnum):
     L1 = "l1"
     L2 = "l2"
     L3 = "l3"
@@ -47,6 +46,7 @@ class Layer(str, Enum):
 # ---------------------------------------------------------------------------
 # Exception
 # ---------------------------------------------------------------------------
+
 
 class PlanLimitError(Exception):
     """Raised when a tenant attempts to exceed their plan's limits."""
@@ -57,7 +57,7 @@ class PlanLimitError(Exception):
         code: str = "PLAN_LIMIT_EXCEEDED",
         plan: Plan = Plan.FREE,
         current: int = 0,
-        maximum: Optional[int] = None,
+        maximum: int | None = None,
     ) -> None:
         super().__init__(message)
         self.code = code
@@ -70,13 +70,13 @@ class PlanLimitError(Exception):
 # Static limit tables
 # ---------------------------------------------------------------------------
 
-_MAX_CONTRIBUTORS: dict[Plan, Optional[int]] = {
+_MAX_CONTRIBUTORS: dict[Plan, int | None] = {
     Plan.FREE: 5,
     Plan.TEAM: 25,
     Plan.ENTERPRISE: None,  # unlimited
 }
 
-_MAX_REPOS: dict[Plan, Optional[int]] = {
+_MAX_REPOS: dict[Plan, int | None] = {
     Plan.FREE: 3,
     Plan.TEAM: 25,
     Plan.ENTERPRISE: None,
@@ -107,6 +107,7 @@ _UPGRADE_HINT: dict[Plan, str] = {
 # PlanLimits service
 # ---------------------------------------------------------------------------
 
+
 class PlanLimits:
     """
     Stateless service — all methods are classmethods.
@@ -118,11 +119,11 @@ class PlanLimits:
     # ------------------------------------------------------------------
 
     @classmethod
-    def max_contributors(cls, plan: Plan) -> Optional[int]:
+    def max_contributors(cls, plan: Plan) -> int | None:
         return _MAX_CONTRIBUTORS[plan]
 
     @classmethod
-    def max_repos(cls, plan: Plan) -> Optional[int]:
+    def max_repos(cls, plan: Plan) -> int | None:
         return _MAX_REPOS[plan]
 
     @classmethod
@@ -193,7 +194,7 @@ class PlanLimits:
             return
 
         # Determine the minimum plan that unlocks the layer
-        min_plan: Optional[str] = None
+        min_plan: str | None = None
         for p in (Plan.FREE, Plan.TEAM, Plan.ENTERPRISE):
             if layer in _LAYER_ACCESS[p]:
                 min_plan = p.value.capitalize()

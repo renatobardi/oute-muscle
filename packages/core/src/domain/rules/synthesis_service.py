@@ -12,21 +12,21 @@ Manages all state transitions for SynthesisCandidate:
 
 from __future__ import annotations
 
-from typing import Optional, Protocol
+from typing import Protocol
 
 from packages.core.src.domain.rules.synthesis_candidate import (
-    SynthesisCandidate,
-    CandidateStatus,
-    MAX_FAILURE_COUNT,
     AUTO_ARCHIVE_DAYS,
+    MAX_FAILURE_COUNT,
+    CandidateStatus,
+    SynthesisCandidate,
 )
-
 
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
 
-class SynthesisCandidateNotFound(Exception):
+
+class SynthesisCandidateNotFoundError(Exception):
     pass
 
 
@@ -38,17 +38,20 @@ class SynthesisTransitionError(Exception):
 # Repository Protocols
 # ---------------------------------------------------------------------------
 
+
 class SynthesisCandidateRepo(Protocol):
-    async def get(self, candidate_id: str) -> Optional[SynthesisCandidate]: ...
+    async def get(self, candidate_id: str) -> SynthesisCandidate | None: ...
     async def create(self, candidate: SynthesisCandidate) -> SynthesisCandidate: ...
     async def update_status(
         self,
         candidate_id: str,
         status: CandidateStatus,
-        failure_reason: Optional[str] = None,
+        failure_reason: str | None = None,
         increment_failure_count: bool = False,
     ) -> None: ...
-    async def list_stale_pending(self, older_than_days: int = AUTO_ARCHIVE_DAYS) -> list[SynthesisCandidate]: ...
+    async def list_stale_pending(
+        self, older_than_days: int = AUTO_ARCHIVE_DAYS
+    ) -> list[SynthesisCandidate]: ...
 
 
 class RuleRepo(Protocol):
@@ -58,6 +61,7 @@ class RuleRepo(Protocol):
 # ---------------------------------------------------------------------------
 # Service
 # ---------------------------------------------------------------------------
+
 
 class SynthesisService:
     def __init__(
@@ -86,13 +90,15 @@ class SynthesisService:
         )
 
         # Promote to L1 rule
-        promoted = await self._rules.create({
-            "id": candidate.rule_id,
-            "yaml": candidate.generated_rule_yaml,
-            "approved_by": approved_by,
-            "source": "synthesized",
-            "incident_id": None,  # set by caller if available
-        })
+        promoted = await self._rules.create(
+            {
+                "id": candidate.rule_id,
+                "yaml": candidate.generated_rule_yaml,
+                "approved_by": approved_by,
+                "source": "synthesized",
+                "incident_id": None,  # set by caller if available
+            }
+        )
 
         await self._candidates.update_status(candidate_id, CandidateStatus.APPROVED)
 
@@ -177,9 +183,7 @@ class SynthesisService:
     async def _get_or_raise(self, candidate_id: str) -> SynthesisCandidate:
         candidate = await self._candidates.get(candidate_id)
         if candidate is None:
-            raise SynthesisCandidateNotFound(
-                f"SynthesisCandidate '{candidate_id}' not found."
-            )
+            raise SynthesisCandidateNotFoundError(f"SynthesisCandidate '{candidate_id}' not found.")
         return candidate
 
 

@@ -13,13 +13,14 @@ Coverage:
 
 from __future__ import annotations
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 class FakeFinding:
     def __init__(
@@ -46,6 +47,7 @@ class FakeRule:
 # ---------------------------------------------------------------------------
 # Unit tests for the false-positive service logic
 # ---------------------------------------------------------------------------
+
 
 class TestFalsePositiveService:
     """
@@ -96,8 +98,8 @@ class TestFalsePositiveService:
     async def test_auto_disables_rule_at_threshold_3(self):
         """At false_positive_count == 3, the rule is automatically disabled."""
         from apps.api.src.services.false_positive import (
-            FalsePositiveService,
             FALSE_POSITIVE_DISABLE_THRESHOLD,
+            FalsePositiveService,
         )
 
         assert FALSE_POSITIVE_DISABLE_THRESHOLD == 3
@@ -136,10 +138,10 @@ class TestFalsePositiveService:
 
     @pytest.mark.asyncio
     async def test_raises_not_found_for_unknown_finding(self):
-        """Raises FindingNotFound when the finding doesn't exist."""
+        """Raises FindingNotFoundError when the finding doesn't exist."""
         from apps.api.src.services.false_positive import (
             FalsePositiveService,
-            FindingNotFound,
+            FindingNotFoundError,
         )
 
         finding_repo = AsyncMock()
@@ -148,13 +150,14 @@ class TestFalsePositiveService:
 
         service = FalsePositiveService(finding_repo=finding_repo, rule_repo=rule_repo)
 
-        with pytest.raises(FindingNotFound):
+        with pytest.raises(FindingNotFoundError):
             await service.report(finding_id="nonexistent", reported_by="user-x")
 
 
 # ---------------------------------------------------------------------------
 # HTTP endpoint tests (FastAPI TestClient or HTTPX async client)
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def fake_request_state():
@@ -168,10 +171,10 @@ def fake_request_state():
 
 
 class TestFalsePositiveEndpoint:
-
     def _make_app(self, service_mock):
         """Create a minimal FastAPI app with the findings router mounted."""
         from fastapi import FastAPI
+
         from apps.api.src.routes.findings import router
 
         app = FastAPI()
@@ -182,7 +185,8 @@ class TestFalsePositiveEndpoint:
     @pytest.mark.asyncio
     async def test_returns_200_on_success(self):
         """POST /findings/{id}/false-positive returns 200 for an editor."""
-        from httpx import AsyncClient, ASGITransport
+        from httpx import ASGITransport, AsyncClient
+
         from apps.api.src.services.false_positive import FalsePositiveService
 
         finding = FakeFinding(false_positive_count=1, status="false_positive")
@@ -191,13 +195,13 @@ class TestFalsePositiveEndpoint:
 
         app = self._make_app(service)
 
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             # Inject auth state via middleware override
-            with patch("apps.api.src.routes.findings.get_tenant_id", return_value="tenant-abc"), \
-                 patch("apps.api.src.routes.findings.get_user_id", return_value="user-editor"), \
-                 patch("apps.api.src.routes.findings.require_editor"):
+            with (
+                patch("apps.api.src.routes.findings.get_tenant_id", return_value="tenant-abc"),
+                patch("apps.api.src.routes.findings.get_user_id", return_value="user-editor"),
+                patch("apps.api.src.routes.findings.require_editor"),
+            ):
                 resp = await client.post("/findings/finding-1/false-positive")
 
         assert resp.status_code == 200
@@ -208,20 +212,21 @@ class TestFalsePositiveEndpoint:
     @pytest.mark.asyncio
     async def test_returns_404_for_unknown_finding(self):
         """POST /findings/{id}/false-positive returns 404 when finding missing."""
-        from httpx import AsyncClient, ASGITransport
-        from apps.api.src.services.false_positive import FalsePositiveService, FindingNotFound
+        from httpx import ASGITransport, AsyncClient
+
+        from apps.api.src.services.false_positive import FalsePositiveService, FindingNotFoundError
 
         service = AsyncMock(spec=FalsePositiveService)
-        service.report.side_effect = FindingNotFound("nonexistent")
+        service.report.side_effect = FindingNotFoundError("nonexistent")
 
         app = self._make_app(service)
 
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
-            with patch("apps.api.src.routes.findings.get_tenant_id", return_value="tenant-abc"), \
-                 patch("apps.api.src.routes.findings.get_user_id", return_value="user-editor"), \
-                 patch("apps.api.src.routes.findings.require_editor"):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            with (
+                patch("apps.api.src.routes.findings.get_tenant_id", return_value="tenant-abc"),
+                patch("apps.api.src.routes.findings.get_user_id", return_value="user-editor"),
+                patch("apps.api.src.routes.findings.require_editor"),
+            ):
                 resp = await client.post("/findings/nonexistent/false-positive")
 
         assert resp.status_code == 404
@@ -229,8 +234,8 @@ class TestFalsePositiveEndpoint:
     @pytest.mark.asyncio
     async def test_returns_403_for_viewer_role(self):
         """POST /findings/{id}/false-positive returns 403 for viewers."""
-        from httpx import AsyncClient, ASGITransport
         from fastapi import HTTPException
+        from httpx import ASGITransport, AsyncClient
 
         finding = FakeFinding()
         service = AsyncMock()
@@ -238,15 +243,15 @@ class TestFalsePositiveEndpoint:
 
         app = self._make_app(service)
 
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
-            with patch("apps.api.src.routes.findings.get_tenant_id", return_value="tenant-abc"), \
-                 patch("apps.api.src.routes.findings.get_user_id", return_value="user-viewer"), \
-                 patch(
-                     "apps.api.src.routes.findings.require_editor",
-                     side_effect=HTTPException(status_code=403, detail="FORBIDDEN"),
-                 ):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            with (
+                patch("apps.api.src.routes.findings.get_tenant_id", return_value="tenant-abc"),
+                patch("apps.api.src.routes.findings.get_user_id", return_value="user-viewer"),
+                patch(
+                    "apps.api.src.routes.findings.require_editor",
+                    side_effect=HTTPException(status_code=403, detail="FORBIDDEN"),
+                ),
+            ):
                 resp = await client.post("/findings/finding-1/false-positive")
 
         assert resp.status_code == 403

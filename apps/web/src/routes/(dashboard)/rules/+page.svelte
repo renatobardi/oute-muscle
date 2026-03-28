@@ -15,9 +15,16 @@
   let toastError = $state<string | null>(null);
 
   const categories: Category[] = [
-    'unsafe-regex', 'race-condition', 'missing-error-handling', 'injection',
-    'resource-exhaustion', 'missing-safety-check', 'deployment-error',
-    'data-consistency', 'unsafe-api-usage', 'cascading-failure',
+    'unsafe-regex',
+    'race-condition',
+    'missing-error-handling',
+    'injection',
+    'resource-exhaustion',
+    'missing-safety-check',
+    'deployment-error',
+    'data-consistency',
+    'unsafe-api-usage',
+    'cascading-failure',
   ];
 
   async function load() {
@@ -70,7 +77,7 @@
       aria-label="category"
       bind:value={filterCategory}
       onchange={load}
-      class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+      class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
     >
       <option value="">All categories</option>
       {#each categories as cat}
@@ -79,9 +86,10 @@
     </select>
 
     <select
+      aria-label="status"
       bind:value={filterEnabled}
       onchange={load}
-      class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+      class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
     >
       <option value="">All statuses</option>
       <option value="true">Enabled</option>
@@ -99,10 +107,14 @@
 
   {#if loading}
     <div class="flex justify-center py-12">
-      <span class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"></span>
+      <span
+        class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"
+      ></span>
     </div>
   {:else if rules.length === 0}
-    <div class="rounded-xl border border-dashed border-gray-300 py-12 text-center text-sm text-gray-500">
+    <div
+      class="rounded-xl border border-dashed border-gray-300 py-12 text-center text-sm text-gray-500"
+    >
       No rules found.
     </div>
   {:else}
@@ -132,7 +144,10 @@
               </td>
               <td class="px-4 py-3">
                 {#if rule.incident_title}
-                  <a href="/incidents/{rule.incident_id}" class="text-indigo-600 hover:underline truncate max-w-xs block">
+                  <a
+                    href="/incidents/{rule.incident_id}"
+                    class="block max-w-xs truncate text-indigo-600 hover:underline"
+                  >
                     {rule.incident_title}
                   </a>
                 {:else}
@@ -144,6 +159,7 @@
                   <!-- Toggle switch -->
                   <button
                     role="switch"
+                    aria-label="Toggle rule {rule.id}"
                     aria-checked={rule.enabled}
                     disabled={!$isAdmin}
                     onclick={() => handleToggle(rule)}
@@ -164,7 +180,8 @@
               </td>
               <td class="px-4 py-3">
                 <a
-                  href="{import.meta.env.VITE_API_BASE_URL ?? 'https://api.outemuscle.com/v1'}/rules/{rule.id}/yaml"
+                  href="{import.meta.env.VITE_API_BASE_URL ??
+                    'https://api.outemuscle.com/v1'}/rules/{rule.id}/yaml"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="text-xs text-indigo-600 hover:underline"

@@ -13,13 +13,9 @@ Requires: DATABASE_URL env var pointing to test PostgreSQL instance.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
 
 import pytest
-
 from src.domain.incidents.entity import Incident
-from src.domain.incidents.enums import IncidentCategory, IncidentSeverity
-
 
 # Skip these tests if DATABASE_URL is not set
 pytestmark = pytest.mark.integration
@@ -87,15 +83,11 @@ class TestPostgreSQLIncidentRepo:
         """Test list() excludes soft-deleted incidents unless include_deleted=True."""
         pytest.skip("PostgreSQL adapter not yet implemented")
 
-    async def test_list_filters_by_category(
-        self, sample_incident_with_embedding: Incident
-    ) -> None:
+    async def test_list_filters_by_category(self, sample_incident_with_embedding: Incident) -> None:
         """Test list(category=...) filters incidents by category."""
         pytest.skip("PostgreSQL adapter not yet implemented")
 
-    async def test_list_filters_by_severity(
-        self, sample_incident_with_embedding: Incident
-    ) -> None:
+    async def test_list_filters_by_severity(self, sample_incident_with_embedding: Incident) -> None:
         """Test list(severity=...) filters incidents by severity."""
         pytest.skip("PostgreSQL adapter not yet implemented")
 

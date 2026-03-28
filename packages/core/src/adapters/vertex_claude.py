@@ -44,16 +44,14 @@ class VertexClaudeSonnet4(LLMPort):
         """
         if not os.getenv("GOOGLE_CLOUD_PROJECT"):
             raise LLMError(
-                "GOOGLE_CLOUD_PROJECT env var not set; "
-                "cannot initialize Vertex AI client"
+                "GOOGLE_CLOUD_PROJECT env var not set; cannot initialize Vertex AI client"
             )
 
         try:
             # Placeholder for actual implementation
             # In real scenario, would call anthropic.AnthropicVertex API
             raise NotImplementedError(
-                "Vertex AI Claude Sonnet 4 implementation pending "
-                "(requires anthropic[vertex])"
+                "Vertex AI Claude Sonnet 4 implementation pending (requires anthropic[vertex])"
             )
         except TimeoutError as e:
             raise LLMTimeoutError(f"Claude Sonnet 4 timeout: {e}") from e
@@ -88,9 +86,7 @@ class VertexClaudeSonnet4(LLMPort):
 
         try:
             # Placeholder for actual implementation
-            raise NotImplementedError(
-                "Vertex AI Claude Sonnet 4 structured output pending"
-            )
+            raise NotImplementedError("Vertex AI Claude Sonnet 4 structured output pending")
         except TimeoutError as e:
             raise LLMTimeoutError(f"Claude Sonnet 4 timeout: {e}") from e
         except Exception as e:

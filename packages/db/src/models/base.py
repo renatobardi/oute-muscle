@@ -30,9 +30,7 @@ class Base(DeclarativeBase):
         return re.sub("([a-z0-9])([A-Z])", r"\1_\2", name).lower()
 
     id: Any = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    created_at: Any = Column(
-        "created_at", type_=None, nullable=False, default=datetime.utcnow
-    )
+    created_at: Any = Column("created_at", type_=None, nullable=False, default=datetime.utcnow)
     updated_at: Any = Column(
         "updated_at", type_=None, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
     )

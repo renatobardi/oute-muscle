@@ -31,11 +31,17 @@ class SemgrepRule(Base):
     )
 
     # Semgrep rule content
-    category: Any = Column(String(50), nullable=False, index=True)  # unsafe-regex, race-condition, etc.
-    sequence_number: Any = Column(Integer, nullable=False, default=1)  # next sequence within category
+    category: Any = Column(
+        String(50), nullable=False, index=True
+    )  # unsafe-regex, race-condition, etc.
+    sequence_number: Any = Column(
+        Integer, nullable=False, default=1
+    )  # next sequence within category
     yaml_content: Any = Column(Text, nullable=False)  # Full YAML rule definition
     test_file_content: Any = Column(Text, nullable=False)  # Test cases (Semgrep format)
-    languages: Any = Column("languages", type_=None, default=list, nullable=False)  # [python, javascript, ...]
+    languages: Any = Column(
+        "languages", type_=None, default=list, nullable=False
+    )  # [python, javascript, ...]
     severity: Any = Column(String(50), nullable=False)  # error, warning, info (Semgrep severity)
     message: Any = Column(Text, nullable=False)
     remediation: Any = Column(Text, nullable=False)
@@ -64,4 +70,6 @@ class SemgrepRule(Base):
     )
 
     def __repr__(self) -> str:
-        return f"<SemgrepRule(id={self.id}, category={self.category}, is_approved={self.is_approved})>"
+        return (
+            f"<SemgrepRule(id={self.id}, category={self.category}, is_approved={self.is_approved})>"
+        )

@@ -1,4 +1,5 @@
 """Test cases for cascading-failure-001: retry without exponential backoff."""
+
 import time
 
 # ruleid: cascading-failure-001
@@ -23,11 +24,13 @@ for attempt in range(5):
         result = call_service()
         break
     except Exception:
-        wait = 2 ** attempt
+        wait = 2**attempt
         time.sleep(wait)
 
 # ok
 from tenacity import retry, wait_exponential
+
+
 @retry(wait=wait_exponential(multiplier=1, min=1, max=10))
 def call_with_retry():
     return call_service()

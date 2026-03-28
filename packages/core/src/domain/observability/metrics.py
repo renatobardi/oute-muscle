@@ -3,7 +3,7 @@ T182: Cloud Monitoring custom metrics.
 
 Defines and records three metric families:
   1. LLM latency per model  — histogram (ms)
-  2. Rule match rates        — counter (rule_id × tenant)
+  2. Rule match rates        — counter (rule_id x tenant)
   3. Tenant usage            — gauge (scans, findings, rules per tenant)
 
 The metrics are emitted via the OpenTelemetry Metrics API so they work with
@@ -31,8 +31,8 @@ from __future__ import annotations
 
 import logging
 import time
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Generator, Optional
 
 log = logging.getLogger(__name__)
 
@@ -40,9 +40,9 @@ log = logging.getLogger(__name__)
 # OpenTelemetry instruments (lazily initialised)
 # ---------------------------------------------------------------------------
 
-_llm_latency_histogram = None      # Histogram[ms]
-_rule_match_counter = None         # Counter
-_tenant_scan_gauge = None          # ObservableGauge
+_llm_latency_histogram = None  # Histogram[ms]
+_rule_match_counter = None  # Counter
+_tenant_scan_gauge = None  # ObservableGauge
 _tenant_finding_gauge = None
 _tenant_rule_gauge = None
 
@@ -52,7 +52,7 @@ _SCHEMA_URL = "https://opentelemetry.io/schemas/1.24.0"
 
 def configure_metrics(
     exporter: str = "gcp",
-    gcp_project_id: Optional[str] = None,
+    gcp_project_id: str | None = None,
     export_interval_seconds: int = 60,
 ) -> None:
     """
@@ -73,7 +73,7 @@ def configure_metrics(
         from opentelemetry import metrics as otel_metrics
         from opentelemetry.sdk.metrics import MeterProvider
         from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
-        from opentelemetry.sdk.resources import Resource, SERVICE_NAME
+        from opentelemetry.sdk.resources import SERVICE_NAME, Resource
     except ImportError:
         log.warning("opentelemetry-sdk not installed — metrics disabled")
         return
@@ -98,6 +98,7 @@ def configure_metrics(
     elif exporter == "prometheus":
         try:
             from opentelemetry.exporter.prometheus import PrometheusMetricReader
+
             readers.append(PrometheusMetricReader())
         except ImportError:
             log.warning("opentelemetry-exporter-prometheus not installed")
@@ -105,6 +106,7 @@ def configure_metrics(
 
     elif exporter == "console":
         from opentelemetry.sdk.metrics.export import ConsoleMetricExporter
+
         readers.append(
             PeriodicExportingMetricReader(
                 ConsoleMetricExporter(),
@@ -154,6 +156,7 @@ def configure_metrics(
 # ---------------------------------------------------------------------------
 # Public recording functions
 # ---------------------------------------------------------------------------
+
 
 def record_llm_call(
     model: str,

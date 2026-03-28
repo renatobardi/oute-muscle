@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Protocol
+from typing import Protocol
 
 SYNTHESIS_THRESHOLD: int = 3  # must stay in sync with synthesis_candidate.py
 
@@ -21,9 +21,11 @@ SYNTHESIS_THRESHOLD: int = 3  # must stay in sync with synthesis_candidate.py
 # Data transfer objects
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True)
 class PatternMatch:
     """A hash that has reached (or exceeded) the synthesis threshold."""
+
     hash: str
     count: int
     sample_incident_id: str
@@ -32,6 +34,7 @@ class PatternMatch:
 # ---------------------------------------------------------------------------
 # Repository Protocol (injected, implemented by DB adapter)
 # ---------------------------------------------------------------------------
+
 
 class PatternDetectorRepo(Protocol):
     async def count_advisories_by_hash(self) -> list[PatternMatch]:
@@ -50,6 +53,7 @@ class PatternDetectorRepo(Protocol):
 # ---------------------------------------------------------------------------
 # PatternDetector service
 # ---------------------------------------------------------------------------
+
 
 class PatternDetector:
     """Stateless detection service. All state comes from the injected repo."""

@@ -20,10 +20,9 @@ Response headers on every request:
 
 from __future__ import annotations
 
-import math
 import time
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
@@ -41,16 +40,17 @@ _BYPASS_PATHS = frozenset(["/health", "/ready", "/metrics"])
 # Tier limits
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True)
 class TierLimits:
     requests_per_minute: int
-    burst_limit: int          # max in burst_window_seconds
+    burst_limit: int  # max in burst_window_seconds
     burst_window_seconds: int = 10
     window_seconds: int = 60
 
     @classmethod
-    def for_plan(cls, plan: str) -> "TierLimits":
-        _LIMITS: dict[str, TierLimits] = {
+    def for_plan(cls, plan: str) -> TierLimits:
+        limits: dict[str, TierLimits] = {
             "free": cls(
                 requests_per_minute=30,
                 burst_limit=60,
@@ -64,12 +64,13 @@ class TierLimits:
                 burst_limit=1200,
             ),
         }
-        return _LIMITS.get(plan, _LIMITS["free"])
+        return limits.get(plan, limits["free"])
 
 
 # ---------------------------------------------------------------------------
 # In-process counter store (replace with Redis adapter in production)
 # ---------------------------------------------------------------------------
+
 
 class _InMemoryRateStore:
     """Sliding-window counter backed by a plain dict.
@@ -90,7 +91,6 @@ class _InMemoryRateStore:
 
     def ttl_seconds(self, window: int) -> int:
         """Seconds until the current window expires."""
-        bucket = int(time.time() / window)
         return window - int(time.time() % window)
 
 
@@ -106,13 +106,12 @@ def get_rate_store() -> _InMemoryRateStore:
 # Middleware
 # ---------------------------------------------------------------------------
 
+
 class RateLimitMiddleware(BaseHTTPMiddleware):
     def __init__(self, app: ASGIApp, **kwargs: Any) -> None:
         super().__init__(app, **kwargs)
 
-    async def dispatch(
-        self, request: Request, call_next: RequestResponseEndpoint
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         path = request.url.path
 
         # Bypass health probes and metrics endpoints

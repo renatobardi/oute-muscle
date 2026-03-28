@@ -1,4 +1,5 @@
 """Test cases for resource-exhaustion-001: HTTP requests without timeout."""
+
 import requests
 
 # ruleid: resource-exhaustion-001

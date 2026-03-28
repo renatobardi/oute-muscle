@@ -6,7 +6,7 @@ Production would use Redis or PostgreSQL.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 TIER_LIMITS = {
     "free": 50,
@@ -18,9 +18,7 @@ TIER_LIMITS = {
 class QuotaExceededError(Exception):
     """User quota exceeded."""
 
-    def __init__(
-        self, user_id: str, limit: int | None, current: int
-    ) -> None:
+    def __init__(self, user_id: str, limit: int | None, current: int) -> None:
         """Initialize quota error.
 
         Args:
@@ -32,10 +30,7 @@ class QuotaExceededError(Exception):
         self.limit = limit
         self.current = current
         if limit is not None:
-            message = (
-                f"Quota exceeded for user {user_id}: "
-                f"{current} >= {limit}"
-            )
+            message = f"Quota exceeded for user {user_id}: {current} >= {limit}"
         else:
             message = f"Unexpected quota error for user {user_id}"
         super().__init__(message)
@@ -56,13 +51,11 @@ class MeteringService:
             user_id: User identifier
             tier: User tier (free, team, enterprise)
         """
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         key = (user_id, now.year, now.month)
         self._calls[key] = self._calls.get(key, 0) + 1
 
-    def _increment_internal(
-        self, user_id: str, tier: str, months_offset: int = 0
-    ) -> None:
+    def _increment_internal(self, user_id: str, tier: str, months_offset: int = 0) -> None:
         """Internal increment with month offset (for testing).
 
         Args:
@@ -70,7 +63,7 @@ class MeteringService:
             tier: User tier
             months_offset: Month offset (negative for past months)
         """
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         # Simple offset (doesn't handle year boundaries perfectly for tests)
         year = now.year
         month = now.month + months_offset
@@ -89,7 +82,7 @@ class MeteringService:
         Returns:
             Number of calls this month
         """
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         key = (user_id, now.year, now.month)
         return self._calls.get(key, 0)
 

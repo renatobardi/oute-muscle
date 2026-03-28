@@ -76,7 +76,9 @@ describe('ApiClient', () => {
       await client.incidents.list();
 
       const [_url, options] = fetchSpy.mock.calls[0];
-      expect((options as RequestInit & { headers: Record<string, string> }).headers?.Authorization).toBeUndefined();
+      expect(
+        (options as RequestInit & { headers: Record<string, string> }).headers?.Authorization
+      ).toBeUndefined();
     });
 
     it('updates token dynamically via setToken', async () => {
@@ -182,7 +184,12 @@ describe('ApiClient', () => {
       fetchSpy = mockFetch(200, { items: [], total: 0, page: 2, per_page: 20 });
       client = new ApiClient({ baseUrl: 'https://api.outemuscle.com/v1', fetch: fetchSpy });
 
-      await client.incidents.list({ q: 'regex', semantic: true, category: 'unsafe-regex', page: 2 });
+      await client.incidents.list({
+        q: 'regex',
+        semantic: true,
+        category: 'unsafe-regex',
+        page: 2,
+      });
 
       const [url] = fetchSpy.mock.calls[0];
       expect(url).toContain('q=regex');

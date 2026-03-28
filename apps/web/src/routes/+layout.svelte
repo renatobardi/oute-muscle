@@ -8,7 +8,7 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
-  import { auth, isAuthenticated } from '$lib/stores/auth';
+  import { isAuthenticated } from '$lib/stores/auth';
   import { tenantStore } from '$lib/stores/tenant';
   import { apiClient } from '$lib/api';
 

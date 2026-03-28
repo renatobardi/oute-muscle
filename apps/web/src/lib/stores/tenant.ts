@@ -53,5 +53,5 @@ export const isEnterprise = derived(tenantStore, ($t) => $t.tenant?.plan === 'en
 
 export const isTeamOrAbove = derived(
   tenantStore,
-  ($t) => $t.tenant?.plan === 'team' || $t.tenant?.plan === 'enterprise',
+  ($t) => $t.tenant?.plan === 'team' || $t.tenant?.plan === 'enterprise'
 );

@@ -35,7 +35,7 @@ test.describe('Rule management', () => {
       localStorage.setItem('auth_token', 'test-jwt-token');
       localStorage.setItem(
         'auth_user',
-        JSON.stringify({ id: 'user-1', email: 'admin@acme.com', role: 'admin' }),
+        JSON.stringify({ id: 'user-1', email: 'admin@acme.com', role: 'admin' })
       );
     });
 
@@ -44,7 +44,7 @@ test.describe('Rule management', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({ items: MOCK_RULES, total: 2, page: 1, per_page: 20 }),
-      }),
+      })
     );
   });
 
@@ -133,7 +133,7 @@ test.describe('Rule management', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({ ...MOCK_RULES[0], enabled: false }),
-      }),
+      })
     );
 
     await page.goto('/rules');
@@ -151,7 +151,7 @@ test.describe('Rule management', () => {
     await page.addInitScript(() => {
       localStorage.setItem(
         'auth_user',
-        JSON.stringify({ id: 'user-2', email: 'editor@acme.com', role: 'editor' }),
+        JSON.stringify({ id: 'user-2', email: 'editor@acme.com', role: 'editor' })
       );
     });
 
@@ -160,7 +160,7 @@ test.describe('Rule management', () => {
         status: 403,
         contentType: 'application/json',
         body: JSON.stringify({ error: 'Forbidden', code: 'FORBIDDEN' }),
-      }),
+      })
     );
 
     await page.goto('/rules');

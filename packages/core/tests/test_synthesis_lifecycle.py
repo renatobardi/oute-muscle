@@ -9,25 +9,27 @@ State machine:
   pending  → archived  (after 30 days via auto-archive job)
 """
 
-import pytest
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
+
+from packages.core.src.domain.rules.synthesis_candidate import (
+    AUTO_ARCHIVE_DAYS,
+    MAX_FAILURE_COUNT,
+    CandidateStatus,
+    SynthesisCandidate,
+)
 from packages.core.src.domain.rules.synthesis_service import (
+    SynthesisCandidateNotFoundError,
     SynthesisService,
-    SynthesisCandidateNotFound,
     SynthesisTransitionError,
 )
-from packages.core.src.domain.rules.synthesis_candidate import (
-    SynthesisCandidate,
-    CandidateStatus,
-    MAX_FAILURE_COUNT,
-    AUTO_ARCHIVE_DAYS,
-)
-
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def make_candidate(
     status: CandidateStatus = CandidateStatus.PENDING,
@@ -42,14 +44,15 @@ def make_candidate(
         failure_count=failure_count,
         failure_reason=None,
         generated_rule_yaml=None,
-        created_at=created_at or datetime.now(timezone.utc),
-        updated_at=datetime.now(timezone.utc),
+        created_at=created_at or datetime.now(UTC),
+        updated_at=datetime.now(UTC),
     )
 
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
+
 
 class TestCandidateConstants:
     def test_max_failure_count_is_3(self):
@@ -62,6 +65,7 @@ class TestCandidateConstants:
 # ---------------------------------------------------------------------------
 # Status: pending → approved → promoted
 # ---------------------------------------------------------------------------
+
 
 class TestApproveTransition:
     @pytest.mark.asyncio
@@ -76,9 +80,7 @@ class TestApproveTransition:
         service = SynthesisService(candidate_repo=mock_repo, rule_repo=mock_rule_repo)
         rule_id = await service.approve("cand-1", approved_by="user-admin")
 
-        mock_repo.update_status.assert_called_once_with(
-            "cand-1", CandidateStatus.APPROVED
-        )
+        mock_repo.update_status.assert_called_once_with("cand-1", CandidateStatus.APPROVED)
         assert rule_id is not None
 
     @pytest.mark.asyncio
@@ -112,13 +114,14 @@ class TestApproveTransition:
 
         service = SynthesisService(candidate_repo=mock_repo, rule_repo=AsyncMock())
 
-        with pytest.raises(SynthesisCandidateNotFound):
+        with pytest.raises(SynthesisCandidateNotFoundError):
             await service.approve("does-not-exist", approved_by="user-admin")
 
 
 # ---------------------------------------------------------------------------
 # Status: pending → rejected
 # ---------------------------------------------------------------------------
+
 
 class TestRejectTransition:
     @pytest.mark.asyncio
@@ -147,6 +150,7 @@ class TestRejectTransition:
 # ---------------------------------------------------------------------------
 # Status: pending → failed → retry or archive
 # ---------------------------------------------------------------------------
+
 
 class TestFailedTransition:
     @pytest.mark.asyncio
@@ -219,12 +223,13 @@ class TestFailedTransition:
 # Auto-archive stale pending candidates
 # ---------------------------------------------------------------------------
 
+
 class TestAutoArchive:
     @pytest.mark.asyncio
     async def test_auto_archive_pending_older_than_30_days(self):
         old_candidate = make_candidate(
             CandidateStatus.PENDING,
-            created_at=datetime.now(timezone.utc) - timedelta(days=31),
+            created_at=datetime.now(UTC) - timedelta(days=31),
         )
         mock_repo = AsyncMock()
         mock_repo.list_stale_pending.return_value = [old_candidate]
@@ -233,15 +238,13 @@ class TestAutoArchive:
         archived_count = await service.auto_archive_stale()
 
         assert archived_count == 1
-        mock_repo.update_status.assert_called_once_with(
-            old_candidate.id, CandidateStatus.ARCHIVED
-        )
+        mock_repo.update_status.assert_called_once_with(old_candidate.id, CandidateStatus.ARCHIVED)
 
     @pytest.mark.asyncio
     async def test_does_not_archive_pending_within_30_days(self):
         recent_candidate = make_candidate(
             CandidateStatus.PENDING,
-            created_at=datetime.now(timezone.utc) - timedelta(days=10),
+            created_at=datetime.now(UTC) - timedelta(days=10),
         )
         mock_repo = AsyncMock()
         mock_repo.list_stale_pending.return_value = []
@@ -255,8 +258,12 @@ class TestAutoArchive:
     @pytest.mark.asyncio
     async def test_auto_archive_returns_total_archived_count(self):
         stale_candidates = [
-            make_candidate(CandidateStatus.PENDING, created_at=datetime.now(timezone.utc) - timedelta(days=35)),
-            make_candidate(CandidateStatus.PENDING, created_at=datetime.now(timezone.utc) - timedelta(days=40)),
+            make_candidate(
+                CandidateStatus.PENDING, created_at=datetime.now(UTC) - timedelta(days=35)
+            ),
+            make_candidate(
+                CandidateStatus.PENDING, created_at=datetime.now(UTC) - timedelta(days=40)
+            ),
         ]
         stale_candidates[1].id = "cand-2"
 

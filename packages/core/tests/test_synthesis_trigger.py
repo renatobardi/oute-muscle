@@ -4,18 +4,20 @@ Invariant: 3+ advisories with the same anti_pattern_hash → trigger synthesis.
 """
 
 import hashlib
+from unittest.mock import AsyncMock
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+
 from packages.core.src.domain.rules.pattern_detector import (
+    SYNTHESIS_THRESHOLD,
     PatternDetector,
     PatternMatch,
-    SYNTHESIS_THRESHOLD,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _hash(pattern: str) -> str:
     return hashlib.sha256(pattern.encode()).hexdigest()
@@ -35,6 +37,7 @@ def make_advisory(anti_pattern: str, incident_id: str = "inc-1") -> dict:
 # Threshold
 # ---------------------------------------------------------------------------
 
+
 class TestSynthesisThreshold:
     def test_threshold_is_3(self):
         assert SYNTHESIS_THRESHOLD == 3
@@ -43,6 +46,7 @@ class TestSynthesisThreshold:
 # ---------------------------------------------------------------------------
 # PatternDetector.should_trigger
 # ---------------------------------------------------------------------------
+
 
 class TestPatternDetectorShouldTrigger:
     def test_returns_false_for_fewer_than_3_matches(self):
@@ -68,6 +72,7 @@ class TestPatternDetectorShouldTrigger:
 # ---------------------------------------------------------------------------
 # PatternDetector.group_by_hash
 # ---------------------------------------------------------------------------
+
 
 class TestPatternDetectorGroupByHash:
     def test_groups_advisories_with_same_hash(self):
@@ -105,6 +110,7 @@ class TestPatternDetectorGroupByHash:
 # PatternDetector.detect_triggerable (async, queries DB)
 # ---------------------------------------------------------------------------
 
+
 class TestPatternDetectorDetectTriggerable:
     @pytest.mark.asyncio
     async def test_returns_pattern_matches_above_threshold(self):
@@ -117,7 +123,7 @@ class TestPatternDetectorDetectTriggerable:
         # Simulate DB returning advisory counts per hash
         mock_repo.count_advisories_by_hash.return_value = [
             PatternMatch(hash=retry_hash, count=5, sample_incident_id="inc-1"),
-            PatternMatch(hash=sql_hash, count=2, sample_incident_id="inc-2"),   # below threshold
+            PatternMatch(hash=sql_hash, count=2, sample_incident_id="inc-2"),  # below threshold
         ]
 
         results = await detector.detect_triggerable(mock_repo)

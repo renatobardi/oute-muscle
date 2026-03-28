@@ -8,13 +8,13 @@ Free: 90 days | Team: 365 days | Enterprise: 730 days
 
 import os
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
 import pytest_asyncio
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
 
 pytestmark = pytest.mark.skipif(
     os.getenv("SKIP_INTEGRATION") == "1" or not os.getenv("DATABASE_URL"),
@@ -27,6 +27,7 @@ DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://localhost/oute_te
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest_asyncio.fixture
 async def db_session():
@@ -89,6 +90,7 @@ async def create_finding(
 async def run_retention_purge(session: AsyncSession) -> int:
     """Execute the retention purge logic (the actual worker SQL or function call)."""
     from apps.api.src.workers.retention_purge import purge_expired_findings
+
     return await purge_expired_findings(session)
 
 
@@ -96,21 +98,20 @@ async def run_retention_purge(session: AsyncSession) -> int:
 # Tests
 # ---------------------------------------------------------------------------
 
+
 class TestFindingsRetentionPurge:
     @pytest.mark.asyncio
     async def test_free_tier_purges_findings_older_than_90_days(self, db_session):
         tenant = await create_tenant_with_plan(db_session, "free")
         scan = await create_scan(db_session, tenant)
 
-        old_date = datetime.now(timezone.utc) - timedelta(days=91)
-        recent_date = datetime.now(timezone.utc) - timedelta(days=30)
+        old_date = datetime.now(UTC) - timedelta(days=91)
+        recent_date = datetime.now(UTC) - timedelta(days=30)
 
         old_finding = await create_finding(db_session, tenant, scan, old_date)
         recent_finding = await create_finding(db_session, tenant, scan, recent_date)
 
-        await db_session.execute(
-            text("SET LOCAL \"app.tenant_id\" = :tid"), {"tid": tenant}
-        )
+        await db_session.execute(text('SET LOCAL "app.tenant_id" = :tid'), {"tid": tenant})
 
         purged = await run_retention_purge(db_session)
 
@@ -131,15 +132,13 @@ class TestFindingsRetentionPurge:
         tenant = await create_tenant_with_plan(db_session, "team")
         scan = await create_scan(db_session, tenant)
 
-        old_date = datetime.now(timezone.utc) - timedelta(days=366)
-        mid_date = datetime.now(timezone.utc) - timedelta(days=200)
+        old_date = datetime.now(UTC) - timedelta(days=366)
+        mid_date = datetime.now(UTC) - timedelta(days=200)
 
         old_finding = await create_finding(db_session, tenant, scan, old_date)
         mid_finding = await create_finding(db_session, tenant, scan, mid_date)
 
-        await db_session.execute(
-            text("SET LOCAL \"app.tenant_id\" = :tid"), {"tid": tenant}
-        )
+        await db_session.execute(text('SET LOCAL "app.tenant_id" = :tid'), {"tid": tenant})
 
         await run_retention_purge(db_session)
 
@@ -158,12 +157,10 @@ class TestFindingsRetentionPurge:
         tenant = await create_tenant_with_plan(db_session, "enterprise")
         scan = await create_scan(db_session, tenant)
 
-        almost_limit_date = datetime.now(timezone.utc) - timedelta(days=729)
+        almost_limit_date = datetime.now(UTC) - timedelta(days=729)
         finding = await create_finding(db_session, tenant, scan, almost_limit_date)
 
-        await db_session.execute(
-            text("SET LOCAL \"app.tenant_id\" = :tid"), {"tid": tenant}
-        )
+        await db_session.execute(text('SET LOCAL "app.tenant_id" = :tid'), {"tid": tenant})
 
         await run_retention_purge(db_session)
 
@@ -177,12 +174,10 @@ class TestFindingsRetentionPurge:
         tenant = await create_tenant_with_plan(db_session, "enterprise")
         scan = await create_scan(db_session, tenant)
 
-        over_limit_date = datetime.now(timezone.utc) - timedelta(days=731)
+        over_limit_date = datetime.now(UTC) - timedelta(days=731)
         finding = await create_finding(db_session, tenant, scan, over_limit_date)
 
-        await db_session.execute(
-            text("SET LOCAL \"app.tenant_id\" = :tid"), {"tid": tenant}
-        )
+        await db_session.execute(text('SET LOCAL "app.tenant_id" = :tid'), {"tid": tenant})
 
         await run_retention_purge(db_session)
 
@@ -199,19 +194,15 @@ class TestFindingsRetentionPurge:
 
         scan_b = await create_scan(db_session, tenant_b)
         # B has an old finding but enterprise retains longer
-        recent_b = datetime.now(timezone.utc) - timedelta(days=91)
+        recent_b = datetime.now(UTC) - timedelta(days=91)
         finding_b = await create_finding(db_session, tenant_b, scan_b, recent_b)
 
         # Run purge for tenant A context only
-        await db_session.execute(
-            text("SET LOCAL \"app.tenant_id\" = :tid"), {"tid": tenant_a}
-        )
+        await db_session.execute(text('SET LOCAL "app.tenant_id" = :tid'), {"tid": tenant_a})
         await run_retention_purge(db_session)
 
         # Tenant B's finding must be unaffected
-        await db_session.execute(
-            text("SET LOCAL \"app.tenant_id\" = :tid"), {"tid": tenant_b}
-        )
+        await db_session.execute(text('SET LOCAL "app.tenant_id" = :tid'), {"tid": tenant_b})
         result = await db_session.execute(
             text("SELECT id FROM findings WHERE id = :id"), {"id": finding_b}
         )
@@ -222,14 +213,12 @@ class TestFindingsRetentionPurge:
         tenant = await create_tenant_with_plan(db_session, "free")
         scan = await create_scan(db_session, tenant)
 
-        old_date = datetime.now(timezone.utc) - timedelta(days=100)
+        old_date = datetime.now(UTC) - timedelta(days=100)
         await create_finding(db_session, tenant, scan, old_date)
         await create_finding(db_session, tenant, scan, old_date)
         await create_finding(db_session, tenant, scan, old_date)
 
-        await db_session.execute(
-            text("SET LOCAL \"app.tenant_id\" = :tid"), {"tid": tenant}
-        )
+        await db_session.execute(text('SET LOCAL "app.tenant_id" = :tid'), {"tid": tenant})
         purged = await run_retention_purge(db_session)
 
         assert purged == 3

@@ -72,7 +72,10 @@ export const auth = createAuthStore();
 // Derived helpers
 // ---------------------------------------------------------------------------
 
-export const isAuthenticated = derived(auth, ($auth) => $auth.token !== null && $auth.user !== null);
+export const isAuthenticated = derived(
+  auth,
+  ($auth) => $auth.token !== null && $auth.user !== null
+);
 
 export const currentUser = derived(auth, ($auth) => $auth.user);
 
@@ -80,7 +83,7 @@ export const isAdmin = derived(auth, ($auth) => $auth.user?.role === 'admin');
 
 export const isEditorOrAbove = derived(
   auth,
-  ($auth) => $auth.user?.role === 'admin' || $auth.user?.role === 'editor',
+  ($auth) => $auth.user?.role === 'admin' || $auth.user?.role === 'editor'
 );
 
 /** Returns true if the current user has at least the given role. */

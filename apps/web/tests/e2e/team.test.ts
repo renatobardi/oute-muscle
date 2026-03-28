@@ -15,7 +15,7 @@ test.describe('Team management', () => {
       localStorage.setItem('auth_token', 'test-jwt-token');
       localStorage.setItem(
         'auth_user',
-        JSON.stringify({ id: 'user-1', email: 'admin@acme.com', role: 'admin' }),
+        JSON.stringify({ id: 'user-1', email: 'admin@acme.com', role: 'admin' })
       );
     });
 
@@ -91,7 +91,7 @@ test.describe('Team management', () => {
         status: 409,
         contentType: 'application/json',
         body: JSON.stringify({ error: 'User already exists in tenant', code: 'CONFLICT' }),
-      }),
+      })
     );
 
     await page.goto('/settings');
@@ -116,7 +116,7 @@ test.describe('Team management', () => {
           repo_count: 1,
           created_at: '2024-01-01T00:00:00Z',
         }),
-      }),
+      })
     );
 
     await page.route('**/v1/tenants/me/users/invite', (route) =>
@@ -127,7 +127,7 @@ test.describe('Team management', () => {
           error: 'Plan limit exceeded: max 5 contributors on Free plan',
           code: 'PLAN_LIMIT_EXCEEDED',
         }),
-      }),
+      })
     );
 
     await page.goto('/settings');
@@ -172,7 +172,7 @@ test.describe('Team management', () => {
     await page.addInitScript(() => {
       localStorage.setItem(
         'auth_user',
-        JSON.stringify({ id: 'user-2', email: 'editor@acme.com', role: 'editor' }),
+        JSON.stringify({ id: 'user-2', email: 'editor@acme.com', role: 'editor' })
       );
     });
 
@@ -194,7 +194,7 @@ test.describe('Team management', () => {
     await page.addInitScript(() => {
       localStorage.setItem(
         'auth_user',
-        JSON.stringify({ id: 'user-3', email: 'viewer@acme.com', role: 'viewer' }),
+        JSON.stringify({ id: 'user-3', email: 'viewer@acme.com', role: 'viewer' })
       );
     });
 
@@ -207,7 +207,7 @@ test.describe('Team management', () => {
     await page.addInitScript(() => {
       localStorage.setItem(
         'auth_user',
-        JSON.stringify({ id: 'user-2', email: 'editor@acme.com', role: 'editor' }),
+        JSON.stringify({ id: 'user-2', email: 'editor@acme.com', role: 'editor' })
       );
     });
 

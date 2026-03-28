@@ -104,9 +104,7 @@ class TestCheckRunCreation:
             assert call_args.kwargs["conclusion"] == "failure"
 
     @pytest.mark.asyncio
-    async def test_check_run_failure_on_findings(
-        self, skip_if_no_github_app: None
-    ) -> None:
+    async def test_check_run_failure_on_findings(self, skip_if_no_github_app: None) -> None:
         """Check Run conclusion is 'failure' when findings are present."""
         from packages.core.src.adapters.github_adapter import GitHubAdapter
 
@@ -162,9 +160,7 @@ class TestCheckRunCreation:
             assert result.check_run_id == 999
 
     @pytest.mark.asyncio
-    async def test_check_run_success_on_no_findings(
-        self, skip_if_no_github_app: None
-    ) -> None:
+    async def test_check_run_success_on_no_findings(self, skip_if_no_github_app: None) -> None:
         """Check Run conclusion is 'success' when no findings are present."""
         from packages.core.src.adapters.github_adapter import GitHubAdapter
 

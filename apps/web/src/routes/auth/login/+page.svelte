@@ -6,9 +6,11 @@
   import { isAuthenticated } from '$lib/stores/auth';
   import { onMount } from 'svelte';
 
-  const OAUTH_AUTH_URL = import.meta.env.VITE_MCP_AUTH_URL ?? 'https://mcp.outemuscle.com/oauth/authorize';
+  const OAUTH_AUTH_URL =
+    import.meta.env.VITE_MCP_AUTH_URL ?? 'https://mcp.outemuscle.com/oauth/authorize';
   const CLIENT_ID = import.meta.env.VITE_OAUTH_CLIENT_ID ?? 'oute-dashboard';
-  const REDIRECT_URI = typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : '';
+  const REDIRECT_URI =
+    typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : '';
 
   let loading = $state(false);
 
@@ -71,7 +73,8 @@
              disabled:cursor-not-allowed disabled:opacity-60"
     >
       {#if loading}
-        <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+        <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+        ></span>
         Redirecting…
       {:else}
         Continue with SSO

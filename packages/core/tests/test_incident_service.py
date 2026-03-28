@@ -10,10 +10,8 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
-from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-
 from src.domain.incidents.entity import Incident
 from src.domain.incidents.enums import IncidentCategory, IncidentSeverity
 
@@ -67,9 +65,7 @@ class MockIncidentRepoPort:
         self.storage[incident.id] = incident
         return incident
 
-    async def soft_delete(
-        self, incident_id: uuid.UUID, *, tenant_id: uuid.UUID
-    ) -> None:
+    async def soft_delete(self, incident_id: uuid.UUID, *, tenant_id: uuid.UUID) -> None:
         """Soft delete by ID."""
         self.calls["soft_delete"].append((incident_id, tenant_id))
         stored = self.storage.get(incident_id)
@@ -78,9 +74,7 @@ class MockIncidentRepoPort:
         if stored.semgrep_rule_id is not None:
             raise ValueError("IncidentHasActiveRuleError")
         # Mark as deleted
-        self.storage[incident_id] = stored.model_copy(
-            update={"deleted_at": datetime.utcnow()}
-        )
+        self.storage[incident_id] = stored.model_copy(update={"deleted_at": datetime.utcnow()})
 
     async def list(
         self,
@@ -157,9 +151,7 @@ class TestIncidentServiceCreate:
         assert sample_incident.tenant_id is not None
 
         # Act
-        created = await mock_incident_repo_port.create(
-            sample_incident.with_embedding([0.1] * 768)
-        )
+        created = await mock_incident_repo_port.create(sample_incident.with_embedding([0.1] * 768))
 
         # Assert
         assert created.tenant_id == sample_incident.tenant_id
@@ -172,9 +164,7 @@ class TestIncidentServiceCreate:
         public_incident = sample_incident.model_copy(update={"tenant_id": None})
 
         # Act
-        created = await mock_incident_repo_port.create(
-            public_incident.with_embedding([0.1] * 768)
-        )
+        created = await mock_incident_repo_port.create(public_incident.with_embedding([0.1] * 768))
 
         # Assert
         assert created.tenant_id is None
@@ -201,9 +191,7 @@ class TestIncidentServiceUpdate:
                 "updated_at": datetime.utcnow(),
             }
         )
-        result = await mock_incident_repo_port.update(
-            updated_incident, expected_version=1
-        )
+        result = await mock_incident_repo_port.update(updated_incident, expected_version=1)
 
         # Assert
         assert result.version == 2
@@ -311,9 +299,7 @@ class TestIncidentServiceSearch:
         )
 
         # Act: soft delete one
-        await mock_incident_repo_port.soft_delete(
-            inc1.id, tenant_id=inc1.tenant_id or uuid.uuid4()
-        )
+        await mock_incident_repo_port.soft_delete(inc1.id, tenant_id=inc1.tenant_id or uuid.uuid4())
 
         # Act: list
         results = await mock_incident_repo_port.list()

@@ -90,7 +90,9 @@
 
   {#if !$isEnterprise}
     <div class="rounded-xl border border-amber-200 bg-amber-50 p-6 text-center">
-      <p class="text-sm font-medium text-amber-800">Rule synthesis is available on the Enterprise plan.</p>
+      <p class="text-sm font-medium text-amber-800">
+        Rule synthesis is available on the Enterprise plan.
+      </p>
       <a href="/settings/billing" class="mt-2 inline-block text-sm text-amber-700 underline">
         Upgrade to Enterprise
       </a>
@@ -106,10 +108,14 @@
 
     {#if loading}
       <div class="flex justify-center py-12">
-        <span class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"></span>
+        <span
+          class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"
+        ></span>
       </div>
     {:else if candidates.length === 0}
-      <div class="rounded-xl border border-dashed border-gray-300 py-12 text-center text-sm text-gray-500">
+      <div
+        class="rounded-xl border border-dashed border-gray-300 py-12 text-center text-sm text-gray-500"
+      >
         No synthesis candidates. Candidates appear when 3+ advisories match the same anti-pattern.
       </div>
     {:else}
@@ -120,10 +126,16 @@
               <div>
                 <p class="font-mono text-xs text-gray-500">{candidate.id}</p>
                 <div class="mt-1 flex items-center gap-3">
-                  <span class="rounded-full px-2 py-0.5 text-xs font-medium {statusColor[candidate.status] ?? 'bg-gray-100 text-gray-600'}">
+                  <span
+                    class="rounded-full px-2 py-0.5 text-xs font-medium {statusColor[
+                      candidate.status
+                    ] ?? 'bg-gray-100 text-gray-600'}"
+                  >
                     {candidate.status}
                   </span>
-                  <span class="text-xs text-gray-500">{candidate.advisory_count} advisory matches</span>
+                  <span class="text-xs text-gray-500"
+                    >{candidate.advisory_count} advisory matches</span
+                  >
                   {#if candidate.failure_count > 0}
                     <span class="text-xs text-red-500">{candidate.failure_count} failures</span>
                   {/if}
@@ -144,7 +156,8 @@
                 <summary class="cursor-pointer text-xs font-medium text-indigo-600 hover:underline">
                   View generated YAML
                 </summary>
-                <pre class="mt-2 overflow-x-auto rounded-lg bg-gray-900 p-3 text-xs text-gray-100">{candidate.generated_rule_yaml}</pre>
+                <pre
+                  class="mt-2 overflow-x-auto rounded-lg bg-gray-900 p-3 text-xs text-gray-100">{candidate.generated_rule_yaml}</pre>
               </details>
             {/if}
 

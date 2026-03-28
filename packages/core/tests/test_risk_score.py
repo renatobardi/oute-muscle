@@ -8,7 +8,6 @@ Weights: critical=5, high=3, medium=2, low=1
 """
 
 import pytest
-
 from src.domain.incidents.enums import IncidentSeverity, RiskLevel
 from src.domain.scanning.risk_score import (
     SEVERITY_WEIGHTS,

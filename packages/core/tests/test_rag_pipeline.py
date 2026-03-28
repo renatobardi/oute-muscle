@@ -116,9 +116,7 @@ class TestRAGPipeline:
         diff = "code diff"
         tenant_id = uuid.uuid4()
 
-        await pipeline.process(
-            diff, tenant_id=tenant_id, risk_level=RiskLevel.LOW
-        )
+        await pipeline.process(diff, tenant_id=tenant_id, risk_level=RiskLevel.LOW)
 
         # Verify LLM was called with incidents in context
         llm_router.generate.assert_called_once()
@@ -147,9 +145,7 @@ class TestRAGPipeline:
         diff = "code diff"
         tenant_id = uuid.uuid4()
 
-        advisory = await pipeline.process(
-            diff, tenant_id=tenant_id, risk_level=RiskLevel.LOW
-        )
+        advisory = await pipeline.process(diff, tenant_id=tenant_id, risk_level=RiskLevel.LOW)
 
         # Verify LLM was still called
         llm_router.generate.assert_called_once()
@@ -177,18 +173,14 @@ class TestRAGPipeline:
         large_diff = "\n".join([f"line {i}" for i in range(3001)])
         tenant_id = uuid.uuid4()
 
-        await pipeline.process(
-            large_diff, tenant_id=tenant_id, risk_level=RiskLevel.LOW
-        )
+        await pipeline.process(large_diff, tenant_id=tenant_id, risk_level=RiskLevel.LOW)
 
         # Verify embedding was called with truncated version
         embedding_adapter.embed.assert_called_once()
         call_args = embedding_adapter.embed.call_args
         embedded_text = call_args[0][0]
         # Should contain truncation warning
-        assert "truncated" in embedded_text.lower() or len(
-            embedded_text.split("\n")
-        ) <= 3001
+        assert "truncated" in embedded_text.lower() or len(embedded_text.split("\n")) <= 3001
 
     @pytest.mark.asyncio
     async def test_pipeline_returns_advisory_entity(self) -> None:
@@ -257,9 +249,7 @@ class TestRAGPipeline:
             llm_router=llm_router,
         )
 
-        advisory = await pipeline.process(
-            "diff", tenant_id=uuid.uuid4(), risk_level=RiskLevel.LOW
-        )
+        advisory = await pipeline.process("diff", tenant_id=uuid.uuid4(), risk_level=RiskLevel.LOW)
 
         assert advisory.confidence_score >= 0.7
 
@@ -281,8 +271,6 @@ class TestRAGPipeline:
             llm_router=llm_router,
         )
 
-        advisory = await pipeline.process(
-            "diff", tenant_id=uuid.uuid4(), risk_level=RiskLevel.LOW
-        )
+        advisory = await pipeline.process("diff", tenant_id=uuid.uuid4(), risk_level=RiskLevel.LOW)
 
         assert advisory.confidence_score < 0.5
