@@ -45,6 +45,12 @@ COPY apps/api/      apps/api/
 COPY packages/core/ packages/core/
 COPY packages/db/   packages/db/
 
+# Install local packages so they are importable as Python modules
+RUN pip install --no-cache-dir --no-deps \
+    -e packages/core \
+    -e packages/db \
+    -e apps/api
+
 # ─────────────────────────────────────────────────────────────
 # Stage 2 – runtime
 # ─────────────────────────────────────────────────────────────
