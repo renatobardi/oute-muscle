@@ -66,7 +66,11 @@ testpaths = [
 python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = "--strict-markers"
+addopts = "--strict-markers -p no:cacheprovider"
+markers = [
+    "acceptance: marks tests as acceptance tests (deselect with -m 'not acceptance')",
+    "integration: marks tests as integration tests requiring live DB/network",
+]
 
 [tool.coverage.run]
 source = ["packages/core/src", "apps/api/src", "apps/mcp/src", "packages/db/src"]

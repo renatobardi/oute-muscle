@@ -292,27 +292,27 @@
 
 ### Tests for User Story 7
 
-- [ ] T133 [P] [US7] Write unit tests for API client (typed fetch wrappers for incidents, rules, scans, users) in apps/web/tests/unit/api-client.test.ts
-- [ ] T134 [P] [US7] Write e2e test for incident CRUD flow (list → create → edit → delete) in apps/web/tests/e2e/incidents.test.ts
-- [ ] T135 [P] [US7] Write e2e test for rule management (list rules → toggle enable/disable) in apps/web/tests/e2e/rules.test.ts
-- [ ] T136 [US7] Write e2e test for team management (invite user → change role → verify access) in apps/web/tests/e2e/team.test.ts
+- [x] T133 [P] [US7] Write unit tests for API client (typed fetch wrappers for incidents, rules, scans, users) in apps/web/tests/unit/api-client.test.ts
+- [x] T134 [P] [US7] Write e2e test for incident CRUD flow (list → create → edit → delete) in apps/web/tests/e2e/incidents.test.ts
+- [x] T135 [P] [US7] Write e2e test for rule management (list rules → toggle enable/disable) in apps/web/tests/e2e/rules.test.ts
+- [x] T136 [US7] Write e2e test for team management (invite user → change role → verify access) in apps/web/tests/e2e/team.test.ts
 
 ### Implementation for User Story 7
 
-- [ ] T137 [US7] Create SvelteKit layout with auth guard and navigation in apps/web/src/routes/+layout.svelte
-- [ ] T138 [US7] Implement auth pages (login, callback, register) in apps/web/src/routes/auth/
-- [ ] T139 [US7] Create typed API client library with auth token management in apps/web/src/lib/api/client.ts
-- [ ] T140 [US7] Implement auth and tenant context Svelte stores in apps/web/src/lib/stores/
-- [ ] T141 [US7] Implement incidents list page with search (text + semantic) and filters in apps/web/src/routes/(dashboard)/incidents/+page.svelte
-- [ ] T142 [US7] Implement incident detail/edit page with form validation and optimistic locking in apps/web/src/routes/(dashboard)/incidents/[id]/+page.svelte
-- [ ] T143 [US7] Implement incident ingest-from-URL page (paste URL → review draft → confirm) in apps/web/src/routes/(dashboard)/incidents/ingest/+page.svelte
-- [ ] T144 [US7] Implement rules list page with enable/disable toggles and incident links in apps/web/src/routes/(dashboard)/rules/+page.svelte
-- [ ] T145 [US7] Implement scan results page with trends chart and findings detail in apps/web/src/routes/(dashboard)/scans/+page.svelte
-- [ ] T146 [US7] Implement settings page (tenant config, team members, role management) in apps/web/src/routes/(dashboard)/settings/+page.svelte
-- [ ] T147 [US7] Implement billing/usage page with plan limits and upgrade prompts in apps/web/src/routes/(dashboard)/settings/billing/+page.svelte
-- [ ] T148 [US7] Implement audit log page (Enterprise only, chronological mutations) in apps/web/src/routes/(dashboard)/audit/+page.svelte
-- [ ] T149 [US7] Implement synthesis candidate approval queue page (Enterprise only) in apps/web/src/routes/(dashboard)/rules/candidates/+page.svelte
-- [ ] T150 [US7] Create SvelteKit Dockerfile in apps/web/Dockerfile
+- [x] T137 [US7] Create SvelteKit layout with auth guard and navigation in apps/web/src/routes/+layout.svelte
+- [x] T138 [US7] Implement auth pages (login, callback, register) in apps/web/src/routes/auth/
+- [x] T139 [US7] Create typed API client library with auth token management in apps/web/src/lib/api/client.ts
+- [x] T140 [US7] Implement auth and tenant context Svelte stores in apps/web/src/lib/stores/
+- [x] T141 [US7] Implement incidents list page with search (text + semantic) and filters in apps/web/src/routes/(dashboard)/incidents/+page.svelte
+- [x] T142 [US7] Implement incident detail/edit page with form validation and optimistic locking in apps/web/src/routes/(dashboard)/incidents/[id]/+page.svelte
+- [x] T143 [US7] Implement incident ingest-from-URL page (paste URL → review draft → confirm) in apps/web/src/routes/(dashboard)/incidents/ingest/+page.svelte
+- [x] T144 [US7] Implement rules list page with enable/disable toggles and incident links in apps/web/src/routes/(dashboard)/rules/+page.svelte
+- [x] T145 [US7] Implement scan results page with trends chart and findings detail in apps/web/src/routes/(dashboard)/scans/+page.svelte
+- [x] T146 [US7] Implement settings page (tenant config, team members, role management) in apps/web/src/routes/(dashboard)/settings/+page.svelte
+- [x] T147 [US7] Implement billing/usage page with plan limits and upgrade prompts in apps/web/src/routes/(dashboard)/settings/billing/+page.svelte
+- [x] T148 [US7] Implement audit log page (Enterprise only, chronological mutations) in apps/web/src/routes/(dashboard)/audit/+page.svelte
+- [x] T149 [US7] Implement synthesis candidate approval queue page (Enterprise only) in apps/web/src/routes/(dashboard)/rules/candidates/+page.svelte
+- [x] T150 [US7] Create SvelteKit Dockerfile in apps/web/Dockerfile
 
 **Checkpoint**: Dashboard functional for all CRUD flows. Admin can manage incidents, rules, team, and billing. Viewer/editor role restrictions enforced in UI.
 
@@ -326,21 +326,21 @@
 
 ### Tests for Multi-Tenancy
 
-- [ ] T151 [P] [US7] Write integration test for RLS tenant isolation (tenant A cannot see tenant B data) in packages/db/tests/integration/test_rls_isolation.py
-- [ ] T152 [P] [US7] Write unit tests for rate limiting middleware (per-tier limits, burst allowance) in apps/api/tests/unit/test_rate_limit.py
-- [ ] T153 [P] [US7] Write unit tests for plan limit enforcement (contributor/repo caps, layer access) in apps/api/tests/unit/test_plan_limits.py
-- [ ] T154 [US7] Write integration test for findings retention auto-purge (Free 90d, Team 1y, Enterprise 2y) in packages/db/tests/integration/test_retention_purge.py
+- [x] T151 [P] [US7] Write integration test for RLS tenant isolation (tenant A cannot see tenant B data) in packages/db/tests/integration/test_rls_isolation.py
+- [x] T152 [P] [US7] Write unit tests for rate limiting middleware (per-tier limits, burst allowance) in apps/api/tests/unit/test_rate_limit.py
+- [x] T153 [P] [US7] Write unit tests for plan limit enforcement (contributor/repo caps, layer access) in apps/api/tests/unit/test_plan_limits.py
+- [x] T154 [US7] Write integration test for findings retention auto-purge (Free 90d, Team 1y, Enterprise 2y) in packages/db/tests/integration/test_retention_purge.py
 
 ### Implementation for Multi-Tenancy
 
-- [ ] T155 [US7] Implement RLS middleware (extract tenant from JWT/API key, SET LOCAL "app.tenant_id") in apps/api/src/middleware/rls.py
-- [ ] T156 [US7] Implement per-tier rate limiting middleware (Free 30/min, Team 120/min, Enterprise 600/min, burst 2x/10s) in apps/api/src/middleware/rate_limit.py
-- [ ] T157 [US7] Implement plan limit enforcement service (contributor count, repo count, layer access) in packages/core/src/domain/tenants/plan_limits.py
-- [ ] T158 [US7] Implement findings retention scheduled job (auto-purge expired findings per tier) in apps/api/src/workers/retention_purge.py
-- [ ] T159 [US7] Create REST API routes for tenant management (GET /tenants/me, users, invite, role update) in apps/api/src/routes/tenants.py
-- [ ] T160 [US7] Create REST API route for audit log (GET /audit-log, Enterprise only) in apps/api/src/routes/audit.py
-- [ ] T161 [US7] Implement correlation ID middleware for request tracing in apps/api/src/middleware/correlation.py
-- [ ] T162 [US7] Configure structlog JSON logging with tenant_id, user_id, correlation_id in apps/api/src/config.py
+- [x] T155 [US7] Implement RLS middleware (extract tenant from JWT/API key, SET LOCAL "app.tenant_id") in apps/api/src/middleware/rls.py
+- [x] T156 [US7] Implement per-tier rate limiting middleware (Free 30/min, Team 120/min, Enterprise 600/min, burst 2x/10s) in apps/api/src/middleware/rate_limit.py
+- [x] T157 [US7] Implement plan limit enforcement service (contributor count, repo count, layer access) in packages/core/src/domain/tenants/plan_limits.py
+- [x] T158 [US7] Implement findings retention scheduled job (auto-purge expired findings per tier) in apps/api/src/workers/retention_purge.py
+- [x] T159 [US7] Create REST API routes for tenant management (GET /tenants/me, users, invite, role update) in apps/api/src/routes/tenants.py
+- [x] T160 [US7] Create REST API route for audit log (GET /audit-log, Enterprise only) in apps/api/src/routes/audit.py
+- [x] T161 [US7] Implement correlation ID middleware for request tracing in apps/api/src/middleware/correlation.py
+- [x] T162 [US7] Configure structlog JSON logging with tenant_id, user_id, correlation_id in apps/api/src/config.py
 
 **Checkpoint**: Tenant isolation verified — no cross-tenant data leaks. Rate limits enforced per tier. Plan limits block excess contributors/repos. Findings auto-purge per retention policy.
 
@@ -354,20 +354,20 @@
 
 ### Tests for User Story 4
 
-- [ ] T163 [P] [US4] Write unit tests for pattern detection (3+ advisories with same anti_pattern_hash → trigger synthesis) in packages/core/tests/test_synthesis_trigger.py
-- [ ] T164 [P] [US4] Write unit tests for rule generation (LLM generates valid Semgrep YAML + test cases) in packages/core/tests/test_rule_generator.py
-- [ ] T165 [P] [US4] Write unit tests for SynthesisCandidate lifecycle (pending→approved→promoted, pending→failed→retry, failure_count>=3→archived) in packages/core/tests/test_synthesis_lifecycle.py
-- [ ] T166 [US4] Write integration test for end-to-end synthesis pipeline (3 advisories → candidate → PR → approve → L1 rule) in packages/core/tests/integration/test_synthesis_e2e.py
+- [x] T163 [P] [US4] Write unit tests for pattern detection (3+ advisories with same anti_pattern_hash → trigger synthesis) in packages/core/tests/test_synthesis_trigger.py
+- [x] T164 [P] [US4] Write unit tests for rule generation (LLM generates valid Semgrep YAML + test cases) in packages/core/tests/test_rule_generator.py
+- [x] T165 [P] [US4] Write unit tests for SynthesisCandidate lifecycle (pending→approved→promoted, pending→failed→retry, failure_count>=3→archived) in packages/core/tests/test_synthesis_lifecycle.py
+- [x] T166 [US4] Write integration test for end-to-end synthesis pipeline (3 advisories → candidate → PR → approve → L1 rule) in packages/core/tests/integration/test_synthesis_e2e.py
 
 ### Implementation for User Story 4
 
-- [ ] T167 [US4] Implement pattern detection service (hash anti-patterns, count advisory matches, trigger at threshold 3) in packages/core/src/domain/rules/pattern_detector.py
-- [ ] T168 [US4] Implement rule synthesis service (LLM generates Semgrep YAML + positive/negative test file) in packages/core/src/domain/rules/synthesizer.py
-- [ ] T169 [US4] Implement candidate test validator (run semgrep --test on candidate, transition to failed if tests fail) in packages/core/src/domain/rules/test_validator.py
-- [ ] T170 [US4] Implement SynthesisCandidate lifecycle service (create, approve→promote, reject, archive, failed→retry with backoff, failure_count check) in packages/core/src/domain/rules/synthesis_service.py
-- [ ] T171 [US4] Implement synthesis worker (Cloud Tasks trigger, generate rule, validate tests, open PR) with retry (1min, 5min, 15min) in apps/api/src/workers/synthesis.py
-- [ ] T172 [US4] Create REST API routes for synthesis candidates (GET /synthesis/candidates, POST approve, POST reject) in apps/api/src/routes/synthesis.py
-- [ ] T173 [US4] Implement auto-archive scheduled job (archive pending candidates older than 30 days, notify admin) in apps/api/src/workers/synthesis_archive.py
+- [x] T167 [US4] Implement pattern detection service (hash anti-patterns, count advisory matches, trigger at threshold 3) in packages/core/src/domain/rules/pattern_detector.py
+- [x] T168 [US4] Implement rule synthesis service (LLM generates Semgrep YAML + positive/negative test file) in packages/core/src/domain/rules/synthesizer.py
+- [x] T169 [US4] Implement candidate test validator (run semgrep --test on candidate, transition to failed if tests fail) in packages/core/src/domain/rules/test_validator.py
+- [x] T170 [US4] Implement SynthesisCandidate lifecycle service (create, approve→promote, reject, archive, failed→retry with backoff, failure_count check) in packages/core/src/domain/rules/synthesis_service.py
+- [x] T171 [US4] Implement synthesis worker (Cloud Tasks trigger, generate rule, validate tests, open PR) with retry (1min, 5min, 15min) in apps/api/src/workers/synthesis.py
+- [x] T172 [US4] Create REST API routes for synthesis candidates (GET /synthesis/candidates, POST approve, POST reject) in apps/api/src/routes/synthesis.py
+- [x] T173 [US4] Implement auto-archive scheduled job (archive pending candidates older than 30 days, notify admin) in apps/api/src/workers/synthesis_archive.py
 
 **Checkpoint**: Layer 3 detects repeated patterns, generates valid rules with tests, opens PRs. Approval promotes to L1. Failed candidates retry with backoff, auto-archive after 30d or 3 failures. Enterprise-only guard enforced.
 
@@ -377,22 +377,22 @@
 
 **Purpose**: Infrastructure, deployment, observability, and production readiness.
 
-- [ ] T174 [P] Create FastAPI Dockerfile (multi-stage build) in apps/api/Dockerfile
-- [ ] T175 [P] Create health and readiness probe endpoints in apps/api/src/routes/health.py
-- [ ] T176 [P] Create GCP Terraform main configuration (Cloud Run, Cloud SQL, Vertex AI, Secret Manager, Artifact Registry) in infra/gcp/main.tf
-- [ ] T177 [P] Create Terraform modules for cloud-run, cloud-sql, vertex-ai, secret-manager, artifact-registry, iam in infra/gcp/modules/
-- [ ] T178 [P] Create Terraform environment tfvars (dev, staging, prod) in infra/gcp/environments/
-- [ ] T179 [P] Create Terraform IAM module for Workload Identity Federation (GitHub Actions → GCP) in infra/gcp/modules/iam/
-- [ ] T180 Create GitHub Actions deploy workflow (build → push to Artifact Registry → deploy to Cloud Run) in .github/workflows/deploy.yml
-- [ ] T181 [P] Configure OpenTelemetry tracing (spans: API→LLM→DB) with GCP Cloud Trace exporter in apps/api/src/config.py
-- [ ] T182 [P] Configure Cloud Monitoring custom metrics (LLM latency per model, rule match rates, tenant usage) in packages/core/src/domain/observability/metrics.py
-- [ ] T183 [P] Write tests for false positive reporting endpoint (POST /findings/:id/false-positive returns 200, updates finding status, increments false_positive_count, auto-disables at threshold 3, requires editor+ role) in apps/api/tests/test_findings.py
-- [ ] T184 [P] Create false positive reporting endpoint (POST /findings/:id/false-positive, auto-disable at threshold 3) in apps/api/src/routes/findings.py
-- [ ] T185 [P] Create sync-rules.py script for syncing rules to GitHub App / API consumers in scripts/sync-rules.py
-- [ ] T186 [P] Create .dependabot.yml for automated dependency updates in .github/dependabot.yml
-- [ ] T187 Run quickstart.md validation scenarios (all 8 scenarios) as acceptance tests
-- [ ] T188 Verify 80% unit test coverage across all packages (pytest --cov)
-- [ ] T189 Run full Semgrep rule test suite and verify all 10+ rules pass
+- [x] T174 [P] Create FastAPI Dockerfile (multi-stage build) in apps/api/Dockerfile
+- [x] T175 [P] Create health and readiness probe endpoints in apps/api/src/routes/health.py
+- [x] T176 [P] Create GCP Terraform main configuration (Cloud Run, Cloud SQL, Vertex AI, Secret Manager, Artifact Registry) in infra/gcp/main.tf
+- [x] T177 [P] Create Terraform modules for cloud-run, cloud-sql, vertex-ai, secret-manager, artifact-registry, iam in infra/gcp/modules/
+- [x] T178 [P] Create Terraform environment tfvars (dev, staging, prod) in infra/gcp/environments/
+- [x] T179 [P] Create Terraform IAM module for Workload Identity Federation (GitHub Actions → GCP) in infra/gcp/modules/iam/
+- [x] T180 Create GitHub Actions deploy workflow (build → push to Artifact Registry → deploy to Cloud Run) in .github/workflows/deploy.yml
+- [x] T181 [P] Configure OpenTelemetry tracing (spans: API→LLM→DB) with GCP Cloud Trace exporter in apps/api/src/config.py
+- [x] T182 [P] Configure Cloud Monitoring custom metrics (LLM latency per model, rule match rates, tenant usage) in packages/core/src/domain/observability/metrics.py
+- [x] T183 [P] Write tests for false positive reporting endpoint (POST /findings/:id/false-positive returns 200, updates finding status, increments false_positive_count, auto-disables at threshold 3, requires editor+ role) in apps/api/tests/test_findings.py
+- [x] T184 [P] Create false positive reporting endpoint (POST /findings/:id/false-positive, auto-disable at threshold 3) in apps/api/src/routes/findings.py
+- [x] T185 [P] Create sync-rules.py script for syncing rules to GitHub App / API consumers in scripts/sync-rules.py
+- [x] T186 [P] Create .dependabot.yml for automated dependency updates in .github/dependabot.yml
+- [x] T187 Run quickstart.md validation scenarios (all 8 scenarios) as acceptance tests
+- [x] T188 Verify 80% unit test coverage across all packages (pytest --cov)
+- [x] T189 Run full Semgrep rule test suite and verify all 10+ rules pass
 
 **Checkpoint**: Terraform plan dry-run passes without errors. Docker builds for all apps complete without warnings. OpenTelemetry traces arrive in Cloud Monitoring on staging. GitHub Actions full workflow green (lint + test + build + deploy). Semgrep scan of oute-muscle codebase itself passes with zero critical findings.
 

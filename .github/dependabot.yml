@@ -1,0 +1,135 @@
+# T186: Dependabot configuration
+# Automated dependency updates for all package managers in the monorepo.
+
+version: 2
+
+updates:
+  # ─── GitHub Actions ────────────────────────────────────────────────────
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Sao_Paulo"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore(ci)"
+
+  # ─── Python — API ──────────────────────────────────────────────────────
+  - package-ecosystem: "pip"
+    directory: "/apps/api"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Sao_Paulo"
+    labels:
+      - "dependencies"
+      - "python"
+      - "api"
+    commit-message:
+      prefix: "chore(deps)"
+    # Group minor/patch bumps to reduce noise
+    groups:
+      python-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+
+  # ─── Python — core package ─────────────────────────────────────────────
+  - package-ecosystem: "pip"
+    directory: "/packages/core"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Sao_Paulo"
+    labels:
+      - "dependencies"
+      - "python"
+      - "core"
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      python-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+
+  # ─── Python — db package ───────────────────────────────────────────────
+  - package-ecosystem: "pip"
+    directory: "/packages/db"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Sao_Paulo"
+    labels:
+      - "dependencies"
+      - "python"
+      - "db"
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      python-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+
+  # ─── Node.js — SvelteKit dashboard ─────────────────────────────────────
+  - package-ecosystem: "npm"
+    directory: "/apps/web"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Sao_Paulo"
+    labels:
+      - "dependencies"
+      - "javascript"
+      - "frontend"
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      svelte-ecosystem:
+        patterns:
+          - "svelte*"
+          - "@svelte*"
+          - "vite*"
+          - "@vitejs*"
+      node-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+
+  # ─── Node.js — MCP server ──────────────────────────────────────────────
+  - package-ecosystem: "npm"
+    directory: "/apps/mcp"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Sao_Paulo"
+    labels:
+      - "dependencies"
+      - "javascript"
+      - "mcp"
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      node-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+
+  # ─── Terraform ─────────────────────────────────────────────────────────
+  - package-ecosystem: "terraform"
+    directory: "/infra/gcp"
+    schedule:
+      interval: "monthly"
+      time: "09:00"
+      timezone: "America/Sao_Paulo"
+    labels:
+      - "dependencies"
+      - "terraform"
+      - "infrastructure"
+    commit-message:
+      prefix: "chore(infra)"
