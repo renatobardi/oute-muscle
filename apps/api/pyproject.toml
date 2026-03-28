@@ -18,6 +18,10 @@ dependencies = [
     "oute-muscle-db",
 ]
 
+[tool.uv.sources]
+oute-muscle-core = { workspace = true }
+oute-muscle-db = { workspace = true }
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

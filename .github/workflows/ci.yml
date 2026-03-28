@@ -21,7 +21,7 @@ jobs:
         with:
           version: "latest"
       - name: Install dependencies
-        run: uv sync --all-packages --extra dev
+        run: uv sync --all-packages --group dev
       - name: Ruff lint
         run: uv run ruff check .
       - name: Ruff format check
@@ -38,7 +38,7 @@ jobs:
         with:
           version: "latest"
       - name: Install dependencies
-        run: uv sync --all-packages --extra dev
+        run: uv sync --all-packages --group dev
       - name: Run tests with coverage
         run: uv run pytest --cov --cov-report=xml --cov-fail-under=80
       - name: Upload coverage
@@ -94,10 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: returntocorp/semgrep-action@v1
-        with:
-          config: packages/semgrep-rules/rules/
+      - name: Install Semgrep
+        run: pip install semgrep
       - name: Run rule test suite
-        run: |
-          pip install semgrep
-          semgrep --test packages/semgrep-rules/ || echo "No rule tests yet — skipping"
+        run: semgrep --test packages/semgrep-rules/

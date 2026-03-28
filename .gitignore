@@ -62,6 +62,7 @@ crash.*.log
 # GCP / Google credentials
 *.json
 !package.json
+!package-lock.json
 !tsconfig.json
 !packages/semgrep-rules/metadata/registry.json
 gcloud-service-key.json

@@ -12,7 +12,7 @@ help: ## Show this help
 
 # ── Setup ──────────────────────────────────────────────────────────────────
 install: ## Install all dependencies (Python + Node)
-	uv sync --all-packages --extra dev
+	uv sync --all-packages --group dev
 	cd apps/web && npm install
 
 # ── Development ────────────────────────────────────────────────────────────

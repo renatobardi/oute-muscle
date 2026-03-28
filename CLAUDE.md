@@ -12,7 +12,7 @@ Ratified at `.specify/memory/constitution.md` (v1.1.0, 12 principles). Key princ
 
 - **Incident Traceability**: Every rule links to a real documented incident
 - **Three-Layer Detection**: L1 Semgrep (blocking) → L2 RAG (consultive) → L3 Synthesis (progressive)
-- **Hexagonal Boundaries**: Ports/adapters only at real boundaries (LLM router, delivery channels, GCP adapters)
+- **Hexagonal Boundaries**: Ports/adapters only at real boundaries (LLM router, delivery channels, GCP adapters) — no speculative interfaces
 - **Incremental Complexity**: L1 proven before L2, L2 before L3. Abstractions require 2 implementations
 - **Quality Gates**: TDD mandatory, 80% coverage, mypy strict, Ruff, ESLint
 
@@ -27,8 +27,60 @@ Ratified at `.specify/memory/constitution.md` (v1.1.0, 12 principles). Key princ
 | Static Analysis | Semgrep (custom rules with mandatory test files) |
 | Infra | GCP Managed: Cloud Run, Cloud SQL, Vertex AI, Secret Manager |
 | CI/CD | GitHub Actions, Workload Identity Federation, Conventional Commits |
-| Testing | pytest + pytest-asyncio (backend), vitest + playwright (frontend) |
-| Linting | Ruff (Python), ESLint + eslint-plugin-svelte (frontend) |
+| Monorepo | UV workspaces (Python), npm (frontend) |
+
+## Development Commands
+
+All common commands are in the `Makefile`. Run `make help` to see all targets.
+
+### Setup
+
+```bash
+scripts/dev-setup.sh     # First-time setup: checks prereqs (uv, node, gcloud), installs deps, pre-commit hooks
+make install             # Install all deps: uv sync --all-packages --extra dev + npm install in apps/web
+```
+
+### Running
+
+```bash
+make dev                 # FastAPI dev server on 0.0.0.0:8000 with reload
+make dev-web             # SvelteKit dev server
+```
+
+### Testing
+
+```bash
+make test                # All backend tests (pytest)
+make test-unit           # Unit tests only: apps/api/tests/unit/ + packages/core/tests/
+make test-cov            # Tests with coverage (HTML report in htmlcov/, fails under 80%)
+make test-rules          # Semgrep rule tests: semgrep --test packages/semgrep-rules/
+make test-web            # Frontend unit tests: vitest run
+make test-e2e            # Playwright e2e tests
+
+# Run a single Python test:
+pytest apps/api/tests/unit/test_foo.py::test_bar -v
+
+# Run a single frontend test:
+cd apps/web && npx vitest run src/lib/foo.test.ts
+```
+
+### Linting & Type Checking
+
+```bash
+make lint                # Ruff check + ESLint
+make type-check          # mypy --strict packages/core/ + svelte-check
+make format              # Ruff format + Prettier
+```
+
+### Database Migrations
+
+```bash
+make migrate-up          # alembic upgrade head
+make migrate-down        # alembic downgrade -1
+make migrate-gen MSG="description"  # autogenerate new migration
+```
+
+Alembic config: `packages/db/alembic.ini`. Migrations live in `packages/db/src/migrations/`.
 
 ## Monorepo Structure
 
@@ -40,55 +92,65 @@ packages/core/     — Shared domain logic (hexagonal: domain/, ports/, adapters
 packages/db/       — SQLAlchemy models + Alembic migrations
 packages/semgrep-rules/ — Rules organized by 10 categories
 infra/gcp/         — Terraform (Cloud Run, Cloud SQL, Vertex AI, IAM)
-scripts/           — CLI tools (seeding, rule sync)
-.github/workflows/ — CI, deploy, Semgrep scan
+scripts/           — CLI tools (dev-setup, deploy-bootstrap, rule sync, seed)
+.github/workflows/ — CI (lint, test, semgrep), deploy (Cloud Run)
+specs/             — SpecKit feature design artifacts
 ```
 
-## Current Feature: 001-incident-code-guardrails
+UV workspace members: `apps/api`, `apps/mcp`, `packages/core`, `packages/db`.
 
-**Branch**: `001-incident-code-guardrails`
-**Status**: Design complete, ready for implementation
+## Architecture
 
-### Design Artifacts (specs/001-incident-code-guardrails/)
+### Hexagonal Core (`packages/core/`)
 
-| Artifact | Content |
-|----------|---------|
-| spec.md | 7 user stories (P1-P7), 32 functional requirements, 10 success criteria |
-| plan.md | Tech stack, monorepo structure, constitution check (12/12 PASS) |
-| data-model.md | 9 entities: Tenant, User, Incident, SemgrepRule, Scan, Finding, Advisory, AuditLogEntry, SynthesisCandidate |
-| research.md | 8 research decisions (Semgrep SARIF, pgvector HNSW, Vertex AI routing, GitHub App, MCP OAuth, RLS, monorepo, observability) |
-| contracts/ | 4 contracts: api-rest.md, api-github-webhook.md, api-mcp-tools.md, api-internal.md |
-| tasks.md | 189 tasks across 12 phases |
+- **`src/domain/`** — Pure business logic, no framework dependencies
+- **`src/ports/`** — Interface definitions (abstract base classes for adapters/services)
+- **`src/adapters/`** — Implementations (LLM routers, DB queries, embeddings)
 
-### Findings Resolved
+`packages/core` depends only on Pydantic — no GCP, no FastAPI, no SQLAlchemy.
 
-13 findings (F1-F13) from two analyze cycles, all resolved:
-- F1-F10: spec/data-model/contract consistency (rate limits, pagination, versioning, locking, etc.)
-- F11: Phase 12 checkpoint added
-- F12: TDD test for false positive endpoint added
-- F13: FastAPI entry point moved to Phase 4
+### API Layer (`apps/api/`)
 
-### Implementation Phases
+- **Entry point**: `apps/api/src/main.py` — FastAPI app with lifespan, DI container, routes at `/v1`
+- **Routes**: `src/routes/` — one router per domain (incidents, scans, findings, webhooks, sarif, synthesis, tenants, audit, health)
+- **Middleware stack**: `src/middleware/` — auth (JWT), webhook_auth (GitHub signature), rate_limit, rls (tenant context), correlation (request tracing)
+- **Workers**: `src/workers/` — background tasks (synthesis, RAG, retention purge, archive)
+- **Config**: `src/config.py` — Pydantic BaseSettings (DB URL, JWT key, GCP project, Vertex AI location)
 
-| Phase | Scope | Tasks |
-|-------|-------|-------|
-| 1 | Setup (monorepo init) | T001-T012 |
-| 2 | Foundational (domain + ports) | T013-T027 |
-| 3 | **US1 — Semgrep Rules (L1 MVP, zero GCP)** | T028-T053 |
-| 4 | US2 — Knowledge Base (PostgreSQL + CRUD) | T054-T083 |
-| 5 | US3 — RAG Advisory (LLM Router) | T084-T098 |
-| 6 | GitHub App (webhooks + Check Runs) | T099-T108 |
-| 7 | US5 — MCP Server (5 tools + OAuth) | T109-T125 |
-| 8 | US6 — REST API (SARIF + API key) | T126-T132 |
-| 9 | US7 — Dashboard (SvelteKit) | T133-T150 |
-| 10 | Multi-tenancy (RLS + billing + tiers) | T151-T162 |
-| 11 | US4 — Synthesis (L3, Enterprise) | T163-T173 |
-| 12 | Polish (infra, deploy, observability) | T174-T189 |
+### Semgrep Rules (`packages/semgrep-rules/`)
 
-### Next Steps
+10 categories: unsafe-regex, injection, deployment-error, missing-safety-check, race-condition, unsafe-api-usage, resource-exhaustion, data-consistency, missing-error-handling, cascading-failure.
 
-1. `/speckit.taskstoissues` — Convert tasks to GitHub issues
-2. `/speckit.implement` — Start with Phase 1 (Setup)
+Rule ID format: `{category}-{NNN}` (e.g., `unsafe-regex-001`). Each rule YAML requires: id, message, severity, languages, pattern.
+
+### Deploy Pipeline
+
+CI triggers on push to `main`, `001-*`/`002-*`/`003-*` branches, and all PRs. Deploy: staging on main push, prod on version tags (`v*.*.*`). Uses Workload Identity Federation — no service account keys.
+
+## Code Style
+
+### Python
+- Line length: 100
+- Ruff rules: E, W, F, I, N, UP, B, C4, PTH, RUF
+- 4-space indent, double quotes
+- `asyncio_mode = "auto"` in pytest (no need for `@pytest.mark.asyncio`)
+- `S101` (assert) ignored in test files
+
+### Frontend
+- 2-space indent, TypeScript strict
+- `no-explicit-any` is an error
+- Unused args prefixed with `_` (e.g., `_event`)
+- Path aliases: `$lib`, `$components`
+
+### Pre-commit Hooks
+Ruff (lint + format), mypy strict on `packages/core/`, Semgrep on staged Python files, plus standard checks (trailing whitespace, EOF, YAML/JSON, no large files >500KB).
+
+## Conventions
+
+- Commits: Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`)
+- Code + public docs: English. Internal docs: PT-BR
+- Branch naming: sequential `NNN-short-name` (auto-incremented)
+- Tasks format: `- [ ] TXXX [P] [USY] Description with file path`
 
 ## SpecKit Workflow
 
@@ -96,20 +158,6 @@ This project uses SpecKit v0.4.3 for structured feature development:
 
 1. `/speckit.constitution` → `/speckit.specify` → `/speckit.clarify` → `/speckit.plan` → `/speckit.tasks` → `/speckit.analyze` → `/speckit.implement`
 
-## Key Scripts
-
-All in `.specify/scripts/bash/`:
-
-- `create-new-feature.sh` — Creates feature branch + spec directory. Flags: `--json`, `--short-name`, `--timestamp`
-- `check-prerequisites.sh` — Validates feature context. Flags: `--json`, `--require-tasks`, `--include-tasks`, `--paths-only`
-
-## Branch Naming
-
-Sequential numbering (`NNN-short-name`), configured in `.specify/init-options.json`. Auto-increments by scanning branches and `specs/`.
-
-## Conventions
-
-- Tasks format: `- [ ] TXXX [P] [USY] Description with file path`
-- Commits: Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`)
-- Code + public docs: English. Internal docs: PT-BR
-- Semgrep rule IDs: `{category}-{NNN}` (e.g., `unsafe-regex-001`)
+Design artifacts live in `specs/{feature-name}/`. Key scripts in `.specify/scripts/bash/`:
+- `create-new-feature.sh` — Creates feature branch + spec directory
+- `check-prerequisites.sh` — Validates feature context
