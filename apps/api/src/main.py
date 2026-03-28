@@ -89,6 +89,12 @@ def create_app() -> FastAPI:
     from apps.api.src.routes.scans import router as scans_router
 
     app.include_router(scans_router, prefix="/v1")
+
+    # Phase 6: GitHub webhook routes
+    from apps.api.src.routes.webhooks import router as webhooks_router
+
+    app.include_router(webhooks_router, prefix="/v1")
+
     # Phase 5+: rules, advisory routes added as phases complete
 
     return app
