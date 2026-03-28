@@ -210,19 +210,19 @@
 
 ### Tests for User Story 3 (GitHub Channel)
 
-- [ ] T099 [P] [US3] Write unit tests for webhook HMAC-SHA256 signature verification in apps/api/tests/unit/test_webhook_auth.py
-- [ ] T100 [P] [US3] Write unit tests for GitHub webhook event routing (pull_request, push, installation) in apps/api/tests/unit/test_webhook_router.py
-- [ ] T101 [P] [US3] Write integration test for Check Run creation with SARIF annotations in apps/api/tests/integration/test_check_runs.py
-- [ ] T102 [US3] Write integration test for PR review comment posting (inline + top-level) in apps/api/tests/integration/test_pr_comments.py
+- [x] T099 [P] [US3] Write unit tests for webhook HMAC-SHA256 signature verification in apps/api/tests/unit/test_webhook_auth.py
+- [x] T100 [P] [US3] Write unit tests for GitHub webhook event routing (pull_request, push, installation) in apps/api/tests/unit/test_webhook_router.py
+- [x] T101 [P] [US3] Write integration test for Check Run creation with SARIF annotations in apps/api/tests/integration/test_check_runs.py
+- [x] T102 [US3] Write integration test for PR review comment posting (inline + top-level) in apps/api/tests/integration/test_pr_comments.py
 
 ### Implementation for GitHub Channel
 
-- [ ] T103 [US3] Implement GitHub adapter (PyGithub: get_pr_diff, create_check_run, post_review_comment, create_pr) in packages/core/src/adapters/github_adapter.py
-- [ ] T104 [US3] Implement webhook signature verification middleware (HMAC-SHA256, 5min replay protection) in apps/api/src/middleware/webhook_auth.py
-- [ ] T105 [US3] Implement GitHub webhook routes (pull_request.opened, pull_request.synchronize, push, installation) in apps/api/src/routes/webhooks.py
-- [ ] T106 [US3] Implement webhook → Layer 1 scan pipeline (fetch diff → run Semgrep → create Check Run with SARIF) in apps/api/src/routes/webhooks.py
-- [ ] T107 [US3] Implement webhook → Layer 2 advisory pipeline (risk score → LLM route → RAG → post review comment) in apps/api/src/routes/webhooks.py
-- [ ] T108 [US3] Implement installation.created/deleted handlers (tenant provisioning/deprovisioning) in apps/api/src/routes/webhooks.py
+- [x] T103 [US3] Implement GitHub adapter (PyGithub: get_pr_diff, create_check_run, post_review_comment, create_pr) in packages/core/src/adapters/github_adapter.py
+- [x] T104 [US3] Implement webhook signature verification middleware (HMAC-SHA256, 5min replay protection) in apps/api/src/middleware/webhook_auth.py
+- [x] T105 [US3] Implement GitHub webhook routes (pull_request.opened, pull_request.synchronize, push, installation) in apps/api/src/routes/webhooks.py
+- [x] T106 [US3] Implement webhook → Layer 1 scan pipeline (fetch diff → run Semgrep → create Check Run with SARIF) in apps/api/src/routes/webhooks.py
+- [x] T107 [US3] Implement webhook → Layer 2 advisory pipeline (risk score → LLM route → RAG → post review comment) in apps/api/src/routes/webhooks.py
+- [x] T108 [US3] Implement installation.created/deleted handlers (tenant provisioning/deprovisioning) in apps/api/src/routes/webhooks.py
 
 **Checkpoint**: GitHub App receives webhooks, verifies signatures. push events produce SARIF Check Runs. PR events trigger L1+L2 with advisory comments. Installation events provision tenants.
 
