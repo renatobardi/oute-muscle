@@ -88,9 +88,8 @@ Thumbs.db
 .semgrep/
 semgrep.sarif
 
-# Alembic
-packages/db/src/migrations/versions/*.py
-!packages/db/src/migrations/versions/.gitkeep
+# Alembic — migration files are tracked (use `git add` normally)
+# Previously ignored; removed so migrations are reviewed in PRs
 
 # Logs
 *.log
