@@ -54,3 +54,10 @@ Configured for **sequential** numbering (in `.specify/init-options.json`). Branc
 - Tasks use strict checklist format: `- [ ] T001 [P] [US1] Description with file path`
 - `[P]` marks parallelizable tasks; `[US1]` maps to user stories from the spec
 - Constitution (`.specify/memory/constitution.md`) must be filled before it governs the project — currently contains only the template placeholders
+
+## Active Technologies
+- Python 3.12+ (backend), TypeScript strict (frontend) + FastAPI, asyncpg, pgvector, google-cloud-aiplatform, PyGithub, pydantic v2, uvicorn (backend); SvelteKit, Tailwind CSS, shadcn-svelte (frontend) (001-incident-code-guardrails)
+- PostgreSQL 16 with pgvector extension (Cloud SQL), HNSW indexes, Row-Level Security (001-incident-code-guardrails)
+
+## Recent Changes
+- 001-incident-code-guardrails: Added Python 3.12+ (backend), TypeScript strict (frontend) + FastAPI, asyncpg, pgvector, google-cloud-aiplatform, PyGithub, pydantic v2, uvicorn (backend); SvelteKit, Tailwind CSS, shadcn-svelte (frontend)
