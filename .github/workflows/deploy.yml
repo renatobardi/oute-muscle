@@ -64,7 +64,7 @@ jobs:
       image: ${{ steps.image.outputs.image }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Authenticate to GCP
         id: auth
@@ -106,7 +106,7 @@ jobs:
     environment: ${{ needs.setup.outputs.environment }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Authenticate to GCP
         uses: google-github-actions/auth@v2
