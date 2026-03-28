@@ -5,15 +5,13 @@ from __future__ import annotations
 import re
 import uuid
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from ..incidents.enums import (
     IncidentCategory,
-    IncidentSeverity,
-    RuleSource,
     RuleSeverity,
+    RuleSource,
 )
 
 RULE_ID_PATTERN = re.compile(
@@ -33,7 +31,7 @@ class SemgrepRule(BaseModel):
     model_config = {"frozen": True}
 
     id: str = Field(min_length=1, max_length=50)  # e.g. 'unsafe-regex-001'
-    tenant_id: Optional[uuid.UUID] = None  # NULL = public rule
+    tenant_id: uuid.UUID | None = None  # NULL = public rule
 
     incident_id: uuid.UUID
     category: IncidentCategory
@@ -48,7 +46,7 @@ class SemgrepRule(BaseModel):
     remediation: str = Field(min_length=1)
 
     source: RuleSource
-    synthesis_confidence: Optional[float] = Field(default=None, ge=0.0, le=1.0)
+    synthesis_confidence: float | None = Field(default=None, ge=0.0, le=1.0)
 
     enabled: bool = True
     false_positive_count: int = Field(default=0, ge=0)
@@ -56,8 +54,8 @@ class SemgrepRule(BaseModel):
 
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
-    approved_by: Optional[uuid.UUID] = None
-    approved_at: Optional[datetime] = None
+    approved_by: uuid.UUID | None = None
+    approved_at: datetime | None = None
 
     @field_validator("id")
     @classmethod
@@ -72,14 +70,14 @@ class SemgrepRule(BaseModel):
         return v
 
     @model_validator(mode="after")
-    def validate_synthesis_approval(self) -> "SemgrepRule":
+    def validate_synthesis_approval(self) -> SemgrepRule:
         """Synthesized rules require explicit approval; manual rules are auto-approved."""
         if self.source == RuleSource.SYNTHESIZED and self.synthesis_confidence is None:
             raise ValueError("Synthesized rules must have a synthesis_confidence score.")
         return self
 
     @model_validator(mode="after")
-    def validate_auto_disable_threshold(self) -> "SemgrepRule":
+    def validate_auto_disable_threshold(self) -> SemgrepRule:
         if self.false_positive_count >= 3 and not self.auto_disabled:
             raise ValueError(
                 "Rule with false_positive_count >= 3 must have auto_disabled=True."

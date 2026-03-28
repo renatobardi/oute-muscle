@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from typing import Optional, Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
 
 from ..domain.incidents.entity import Incident
 from ..domain.incidents.enums import IncidentCategory, IncidentSeverity
@@ -29,8 +29,8 @@ class IncidentRepoPort(Protocol):
         ...
 
     async def get_by_id(
-        self, incident_id: uuid.UUID, *, tenant_id: Optional[uuid.UUID] = None
-    ) -> Optional[Incident]:
+        self, incident_id: uuid.UUID, *, tenant_id: uuid.UUID | None = None
+    ) -> Incident | None:
         """Retrieve an incident by ID.
 
         Args:
@@ -79,9 +79,9 @@ class IncidentRepoPort(Protocol):
     async def list(
         self,
         *,
-        tenant_id: Optional[uuid.UUID] = None,
-        category: Optional[IncidentCategory] = None,
-        severity: Optional[IncidentSeverity] = None,
+        tenant_id: uuid.UUID | None = None,
+        category: IncidentCategory | None = None,
+        severity: IncidentSeverity | None = None,
         limit: int = 50,
         offset: int = 0,
         include_deleted: bool = False,
@@ -93,7 +93,7 @@ class IncidentRepoPort(Protocol):
         self,
         query: str,
         *,
-        tenant_id: Optional[uuid.UUID] = None,
+        tenant_id: uuid.UUID | None = None,
         limit: int = 20,
     ) -> list[Incident]:
         """Full-text search over title, anti_pattern, and remediation."""

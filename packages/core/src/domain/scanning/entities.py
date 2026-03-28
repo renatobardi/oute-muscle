@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -28,7 +27,7 @@ class Finding(BaseModel):
     file_path: str = Field(min_length=1, max_length=1000)
     start_line: int = Field(ge=1)
     end_line: int = Field(ge=1)
-    code_snippet: Optional[str] = None  # context only, not full source — Constitution VI
+    code_snippet: str | None = None  # context only, not full source — Constitution VI
 
     severity: IncidentSeverity
     message: str = Field(min_length=1)
@@ -67,9 +66,9 @@ class Advisory(BaseModel):
     llm_model_used: str = Field(min_length=1, max_length=50)
 
     # Nullable: set when advisory can be anchored to a file/line in the diff
-    file_path: Optional[str] = Field(default=None, max_length=1000)
-    start_line: Optional[int] = Field(default=None, ge=1)
-    github_comment_id: Optional[int] = None
+    file_path: str | None = Field(default=None, max_length=1000)
+    start_line: int | None = Field(default=None, ge=1)
+    github_comment_id: int | None = None
 
     created_at: datetime = Field(default_factory=datetime.utcnow)
 

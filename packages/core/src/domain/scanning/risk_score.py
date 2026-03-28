@@ -17,7 +17,6 @@ Weights:
 
 from ..incidents.enums import IncidentSeverity, RiskLevel
 
-
 SEVERITY_WEIGHTS: dict[IncidentSeverity, int] = {
     IncidentSeverity.CRITICAL: 5,
     IncidentSeverity.HIGH: 3,

@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import uuid
-from typing import Optional, Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
 
-from ..domain.rules.entity import SemgrepRule
 from ..domain.incidents.enums import IncidentCategory
+from ..domain.rules.entity import SemgrepRule
 
 
 @runtime_checkable
@@ -22,15 +22,15 @@ class RuleRepoPort(Protocol):
         """
         ...
 
-    async def get_by_id(self, rule_id: str) -> Optional[SemgrepRule]:
+    async def get_by_id(self, rule_id: str) -> SemgrepRule | None:
         """Retrieve a rule by its category-prefixed ID (e.g. 'unsafe-regex-001')."""
         ...
 
     async def list_active(
         self,
         *,
-        tenant_id: Optional[uuid.UUID] = None,
-        category: Optional[IncidentCategory] = None,
+        tenant_id: uuid.UUID | None = None,
+        category: IncidentCategory | None = None,
     ) -> list[SemgrepRule]:
         """List all enabled (non-auto-disabled) rules."""
         ...
@@ -46,7 +46,7 @@ class RuleRepoPort(Protocol):
         ...
 
     async def next_sequence_number(
-        self, category: IncidentCategory, *, tenant_id: Optional[uuid.UUID] = None
+        self, category: IncidentCategory, *, tenant_id: uuid.UUID | None = None
     ) -> int:
         """Return the next available sequence number for a category.
 

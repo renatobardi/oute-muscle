@@ -7,7 +7,6 @@ from __future__ import annotations
 
 from typing import Protocol, runtime_checkable
 
-
 EMBEDDING_DIMENSIONS = 768  # text-embedding-005 output size
 
 

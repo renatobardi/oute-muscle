@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass
-from typing import Optional, Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
 
 from ..domain.incidents.entity import Incident
 
@@ -29,7 +29,7 @@ class VectorSearchPort(Protocol):
         self,
         query_embedding: list[float],
         *,
-        tenant_id: Optional[uuid.UUID] = None,
+        tenant_id: uuid.UUID | None = None,
         limit: int = 5,
         min_similarity: float = 0.7,
     ) -> list[VectorSearchResult]:

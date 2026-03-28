@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import uuid
 from datetime import date, datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -21,34 +20,34 @@ class Incident(BaseModel):
     model_config = {"frozen": True}
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
-    tenant_id: Optional[uuid.UUID] = None  # NULL = shared/public incident
+    tenant_id: uuid.UUID | None = None  # NULL = shared/public incident
 
     # Core content
     title: str = Field(min_length=1, max_length=500)
-    date: Optional[date] = None
-    source_url: Optional[str] = Field(default=None, max_length=2048)
-    organization: Optional[str] = Field(default=None, max_length=255)
+    date: date | None = None
+    source_url: str | None = Field(default=None, max_length=2048)
+    organization: str | None = Field(default=None, max_length=255)
     category: IncidentCategory
-    subcategory: Optional[str] = Field(default=None, max_length=100)
-    failure_mode: Optional[str] = None
+    subcategory: str | None = Field(default=None, max_length=100)
+    failure_mode: str | None = None
     severity: IncidentSeverity
     affected_languages: list[str] = Field(default_factory=list)
     anti_pattern: str = Field(min_length=1)
-    code_example: Optional[str] = None
+    code_example: str | None = None
     remediation: str = Field(min_length=1)
 
     # Rule linkage
     static_rule_possible: bool = False
-    semgrep_rule_id: Optional[str] = Field(default=None, max_length=50)
+    semgrep_rule_id: str | None = Field(default=None, max_length=50)
 
     # Vector embedding — 768 dimensions (text-embedding-005)
     # Not required at construction; populated by embedding adapter before persistence
-    embedding: Optional[list[float]] = None
+    embedding: list[float] | None = None
 
     # Metadata
     tags: list[str] = Field(default_factory=list)
     version: int = Field(default=1, ge=1)
-    deleted_at: Optional[datetime] = None
+    deleted_at: datetime | None = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     created_by: uuid.UUID
@@ -56,15 +55,15 @@ class Incident(BaseModel):
     @field_validator("embedding")
     @classmethod
     def validate_embedding_dimensions(
-        cls, v: Optional[list[float]]
-    ) -> Optional[list[float]]:
+        cls, v: list[float] | None
+    ) -> list[float] | None:
         if v is not None and len(v) != 768:
             raise ValueError(f"Embedding must have 768 dimensions, got {len(v)}")
         return v
 
     @field_validator("semgrep_rule_id")
     @classmethod
-    def validate_rule_id_format(cls, v: Optional[str]) -> Optional[str]:
+    def validate_rule_id_format(cls, v: str | None) -> str | None:
         if v is not None:
             parts = v.rsplit("-", 1)
             if len(parts) != 2 or not parts[1].isdigit():
@@ -74,7 +73,7 @@ class Incident(BaseModel):
         return v
 
     @model_validator(mode="after")
-    def validate_deletion_state(self) -> "Incident":
+    def validate_deletion_state(self) -> Incident:
         if self.deleted_at is not None and self.semgrep_rule_id is not None:
             raise ValueError(
                 "Cannot soft-delete an incident that has an active semgrep_rule_id. "
@@ -86,6 +85,6 @@ class Incident(BaseModel):
     def is_deleted(self) -> bool:
         return self.deleted_at is not None
 
-    def with_embedding(self, embedding: list[float]) -> "Incident":
+    def with_embedding(self, embedding: list[float]) -> Incident:
         """Return a new Incident with the embedding set (immutable update)."""
         return self.model_copy(update={"embedding": embedding})

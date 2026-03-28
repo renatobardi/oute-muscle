@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -25,28 +24,28 @@ class Scan(BaseModel):
     tenant_id: uuid.UUID
 
     trigger_source: ScanTriggerSource
-    repository: Optional[str] = Field(default=None, max_length=500)
-    pr_number: Optional[int] = Field(default=None, ge=1)
-    commit_sha: Optional[str] = Field(default=None, max_length=40)
-    diff_lines: Optional[int] = Field(default=None, ge=0)
+    repository: str | None = Field(default=None, max_length=500)
+    pr_number: int | None = Field(default=None, ge=1)
+    commit_sha: str | None = Field(default=None, max_length=40)
+    diff_lines: int | None = Field(default=None, ge=0)
     diff_truncated: bool = False
 
     # Layer 2 outputs (NULL for L1-only scans)
-    risk_level: Optional[RiskLevel] = None
-    risk_score: Optional[int] = Field(default=None, ge=0)
-    llm_model_used: Optional[str] = Field(default=None, max_length=50)
+    risk_level: RiskLevel | None = None
+    risk_score: int | None = Field(default=None, ge=0)
+    llm_model_used: str | None = Field(default=None, max_length=50)
 
     layer1_findings_count: int = Field(default=0, ge=0)
     layer2_advisories_count: int = Field(default=0, ge=0)
     duration_ms: int = Field(ge=0)
     status: ScanStatus
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    completed_at: Optional[datetime] = None
+    completed_at: datetime | None = None
 
     @model_validator(mode="after")
-    def validate_layer2_consistency(self) -> "Scan":
+    def validate_layer2_consistency(self) -> Scan:
         """risk_level and risk_score must be set together or both absent."""
         has_level = self.risk_level is not None
         has_score = self.risk_score is not None
@@ -58,7 +57,7 @@ class Scan(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def validate_completed_state(self) -> "Scan":
+    def validate_completed_state(self) -> Scan:
         if self.status == ScanStatus.COMPLETED and self.completed_at is None:
             raise ValueError("completed_at must be set when status is COMPLETED.")
         if self.status in (ScanStatus.FAILED, ScanStatus.TIMEOUT) and self.error_message is None:
