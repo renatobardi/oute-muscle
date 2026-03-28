@@ -1,0 +1,89 @@
+[tool.uv.workspace]
+members = ["apps/api", "apps/mcp", "packages/core", "packages/db"]
+
+# ---------------------------------------------------------------------------
+# Ruff — replaces flake8, isort, black (Constitution VII)
+# ---------------------------------------------------------------------------
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "PTH", # flake8-use-pathlib
+    "RUF", # ruff-specific
+]
+ignore = ["E501"]  # line length handled by formatter
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]  # allow assert in tests
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+# ---------------------------------------------------------------------------
+# mypy — strict mode (Constitution VII)
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+no_implicit_reexport = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = ["semgrep.*", "google.cloud.*", "anthropic.*"]
+ignore_missing_imports = true
+
+# ---------------------------------------------------------------------------
+# pytest (Constitution VII — TDD, 80% coverage)
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = [
+    "packages/core/tests",
+    "apps/api/tests",
+    "apps/mcp/tests",
+    "packages/db/tests",
+]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "--strict-markers"
+
+[tool.coverage.run]
+source = ["packages/core/src", "apps/api/src", "apps/mcp/src", "packages/db/src"]
+omit = ["*/tests/*", "*/migrations/*"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+
+# ---------------------------------------------------------------------------
+# Shared dev dependencies
+# ---------------------------------------------------------------------------
+[dependency-groups]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.4.0",
+    "mypy>=1.10.0",
+]
