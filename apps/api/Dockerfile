@@ -90,7 +90,7 @@ EXPOSE ${APP_PORT}
 # Uvicorn: 1 worker per CPU core, managed by Cloud Run autoscaling
 CMD ["sh", "-c", "uvicorn apps.api.src.main:app \
     --host 0.0.0.0 \
-    --port ${APP_PORT} \
+    --port ${PORT:-${APP_PORT}} \
     --workers 1 \
     --loop uvloop \
     --no-access-log"]
