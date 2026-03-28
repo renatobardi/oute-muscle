@@ -13,6 +13,7 @@ Endpoints:
 from __future__ import annotations
 
 from datetime import date, datetime
+from typing import Optional
 
 from fastapi import APIRouter, Query
 from pydantic import BaseModel, Field
@@ -28,7 +29,7 @@ class IncidentCreateRequest(BaseModel):
     severity: str = Field(...)  # critical, high, medium, low
     anti_pattern: str = Field(..., min_length=1)
     remediation: str = Field(..., min_length=1)
-    date: date | None = None
+    date: Optional[date] = None
     organization: str | None = Field(None, max_length=255)
     source_url: str | None = Field(None, max_length=2048)
     affected_languages: list[str] = Field(default_factory=list)
@@ -47,7 +48,7 @@ class IncidentUpdateRequest(BaseModel):
     severity: str | None = None
     anti_pattern: str | None = Field(None, min_length=1)
     remediation: str | None = Field(None, min_length=1)
-    date: date | None = None
+    date: Optional[date] = None
     organization: str | None = Field(None, max_length=255)
     affected_languages: list[str] | None = None
     code_example: str | None = None
