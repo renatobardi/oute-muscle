@@ -1,6 +1,7 @@
 """Alembic migration environment."""
 
 import asyncio
+import os
 from logging.config import fileConfig
 
 from alembic import context
@@ -10,14 +11,16 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
+# Prefer DATABASE_URL env var over alembic.ini interpolation
+_url = os.environ.get("DATABASE_URL") or config.get_main_option("sqlalchemy.url")
+
 target_metadata = None
 
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode."""
-    url = config.get_main_option("sqlalchemy.url")
     context.configure(
-        url=url,
+        url=_url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -28,9 +31,7 @@ def run_migrations_offline() -> None:
 
 async def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
-    connectable = create_async_engine(
-        config.get_main_option("sqlalchemy.url"),  # type: ignore[arg-type]
-    )
+    connectable = create_async_engine(_url)
     async with connectable.connect() as connection:
         await connection.run_sync(
             lambda conn: context.configure(connection=conn, target_metadata=target_metadata)
