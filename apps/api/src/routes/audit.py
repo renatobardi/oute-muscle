@@ -14,10 +14,8 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from packages.core.src.domain.tenants.plan_limits import Plan
-from packages.db.src.session import get_session
+from apps.api.src.dependencies import DbSession
 
 router = APIRouter(prefix="/audit-log", tags=["audit"])
 
@@ -57,7 +55,7 @@ def get_tenant_id(request: Request) -> str:
 
 def require_enterprise(request: Request) -> None:
     plan = getattr(request.state, "plan", "free")
-    if plan != Plan.ENTERPRISE.value:
+    if plan != "enterprise":
         raise HTTPException(
             status_code=403,
             detail={
@@ -82,7 +80,7 @@ async def list_audit_log(
     page: int = Query(1, ge=1),
     per_page: int = Query(50, ge=1, le=200),
     tenant_id: str = Depends(get_tenant_id),
-    session: AsyncSession = Depends(get_session),
+    session: DbSession = None,  # type: ignore[assignment]
 ) -> PaginatedAuditLog:
     require_enterprise(request)
 

@@ -62,7 +62,12 @@ pytest apps/api/tests/unit/test_foo.py::test_bar -v
 
 # Run a single frontend test:
 cd apps/web && npx vitest run src/lib/foo.test.ts
+
+# Skip slow tests:
+pytest -m "not integration and not acceptance"
 ```
+
+Custom markers: `acceptance` (full user-flow), `integration` (requires live DB/network). Coverage omits `tests/` and `migrations/`.
 
 ### Linting & Type Checking
 
@@ -127,6 +132,8 @@ Rule ID format: `{category}-{NNN}` (e.g., `unsafe-regex-001`). Each rule YAML re
 
 CI triggers on push to `main`, `001-*`/`002-*`/`003-*` branches, and all PRs. Deploy: staging on main push, prod on version tags (`v*.*.*`). Uses Workload Identity Federation — no service account keys.
 
+No docker-compose — local development uses `make dev` directly. Dockerfiles exist per app (`apps/api/Dockerfile`, `apps/web/Dockerfile`, `apps/mcp/Dockerfile`) for Cloud Run deployment only. Local DB requires a standalone PostgreSQL instance or Cloud SQL Auth Proxy.
+
 ## Code Style
 
 ### Python
@@ -134,7 +141,7 @@ CI triggers on push to `main`, `001-*`/`002-*`/`003-*` branches, and all PRs. De
 - Ruff rules: E, W, F, I, N, UP, B, C4, PTH, RUF
 - 4-space indent, double quotes
 - `asyncio_mode = "auto"` in pytest (no need for `@pytest.mark.asyncio`)
-- `S101` (assert) ignored in test files
+- Per-file Ruff ignores: `S101` in tests, `B008` in routes (FastAPI `Depends()`), relaxed rules in Semgrep test fixtures
 
 ### Frontend
 - 2-space indent, TypeScript strict

@@ -118,6 +118,36 @@ def _run_l1_stub(diff: str, tenant_id: str) -> list[dict[str, Any]]:
     ]
 
 
+@router.get("", status_code=200)
+async def list_scans(
+    tenant: dict[str, str] = Depends(require_api_key),
+    repository: str | None = Query(None, description="Filter by repository (e.g. org/repo)"),
+    status: str | None = Query(None, description="Filter by status (running, completed, failed)"),
+    page: int = Query(1, ge=1),
+    per_page: int = Query(20, ge=1, le=100),
+) -> Response:
+    """List scans for the authenticated tenant.
+
+    Returns a paginated list of scan records. Scans are returned in reverse
+    chronological order (newest first).
+
+    Note: This endpoint currently returns an empty list until full DB persistence
+    is wired into POST /scans.  The schema is correct and matches the frontend
+    client expectations.
+    """
+    # TODO: Query scans from DB once POST /scans persists scan records.
+    # The structure below matches the PaginatedResponse<Scan> schema.
+    from apps.api.src.routes.sarif import findings_to_sarif  # noqa: F401 (avoid unused import lint)
+
+    resp = {
+        "items": [],
+        "total": 0,
+        "page": page,
+        "per_page": per_page,
+    }
+    return Response(content=json.dumps(resp), media_type="application/json")
+
+
 @router.post("", status_code=200)
 async def create_scan(
     request: Request,
