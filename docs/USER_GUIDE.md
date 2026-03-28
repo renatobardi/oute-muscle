@@ -49,23 +49,26 @@ Toda regra L1 aponta para o incidente que a originou. Todo finding de um scan ap
 
 ## Primeiros passos
 
-### Criar uma conta
+> **Status do beta**: a plataforma está em beta privado. O dashboard web está em desenvolvimento — durante o beta, o acesso é feito **exclusivamente via API**. Você receberá sua API Key diretamente pela equipe Oute ao ser onboardado.
 
-1. Acesse [oute.me](https://oute.me) e clique em **Request access**
-2. Aguarde o convite por email (beta privado)
-3. Clique no link do convite → crie sua senha
+### Solicitar acesso
 
-### Criar um tenant (organização)
+1. Acesse [muscle.oute.pro](https://muscle.oute.pro) e preencha o formulário de **Request access**
+2. Aguarde o contato da equipe Oute (beta por convite)
+3. Você receberá sua **API Key** por email para começar a usar
 
-Um tenant é o espaço da sua organização na plataforma. Todo conteúdo (incidentes, regras, scans, findings) é isolado por tenant.
+### URLs atuais
 
-Ao criar sua conta você é automaticamente `admin` do seu tenant.
+| Serviço | URL |
+|---------|-----|
+| Landing page / waitlist | https://muscle.oute.pro *(em breve)* |
+| API (prod) | https://oute-prod-api-ujzimacvza-uc.a.run.app |
+| API (staging) | https://oute-staging-api-ujzimacvza-uc.a.run.app |
+| Dashboard web | Em desenvolvimento |
 
-### Gerar uma API Key
+### Usar a API Key
 
-Vá em **Settings → API Keys → New key**. Guarde a chave — ela não é exibida novamente.
-
-A key é enviada no header `X-API-Key` em todas as chamadas de API.
+A key recebida é enviada no header `X-API-Key` em todas as chamadas:
 
 ```bash
 curl -H "X-API-Key: sk-..." https://oute-prod-api-ujzimacvza-uc.a.run.app/v1/incidents
@@ -75,33 +78,24 @@ curl -H "X-API-Key: sk-..." https://oute-prod-api-ujzimacvza-uc.a.run.app/v1/inc
 
 ## Documentando incidentes
 
-### Via dashboard
+### Via dashboard *(em desenvolvimento)*
 
-1. Vá em **Incidents → New incident**
-2. Preencha os campos:
-   - **Title** — descrição concisa do que aconteceu
-   - **Category** — tipo do padrão (veja categorias abaixo)
-   - **Severity** — `critical` / `high` / `medium` / `low`
-   - **Anti-pattern** — o trecho de código ou padrão que causou o problema
-   - **Remediation** — como corrigir / evitar no futuro
-   - **Affected languages** — Python, TypeScript, Go, etc.
-   - **Code example** — snippet do código problemático
-   - **Source URL** — link para o post-mortem ou ticket
-   - **Date** — quando o incidente ocorreu
-3. Clique em **Save**
+O dashboard web ainda não está disponível no beta atual. Use a API diretamente (seções abaixo). O dashboard será disponibilizado nas próximas semanas.
 
 ### Via URL (extração automática)
 
 Se você tem o post-mortem em uma URL pública (Notion, Confluence, GitHub issue):
 
 ```bash
-POST /v1/incidents/ingest-url
-{"url": "https://notion.so/seu-post-mortem"}
+curl -X POST https://oute-prod-api-ujzimacvza-uc.a.run.app/v1/incidents/ingest-url \
+  -H "X-API-Key: sk-..." \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://notion.so/seu-post-mortem"}'
 ```
 
-O LLM extrai os campos automaticamente e cria um **draft** para revisão. Você revisa e publica.
+O LLM extrai os campos automaticamente e cria um **draft** para revisão. Confirme com um `PUT /v1/incidents/{id}` com `status: published`.
 
-### Via API direta
+### Via API (criar diretamente)
 
 ```bash
 curl -X POST https://oute-prod-api-ujzimacvza-uc.a.run.app/v1/incidents \
@@ -282,7 +276,14 @@ Advisories são retornados no campo `advisories` da resposta. Eles não bloqueia
 
 ### Ver regras ativas
 
-**Dashboard → Rules** lista todas as regras Semgrep ativas para o seu tenant, com link para o incidente de origem.
+Durante o beta, as regras são gerenciadas via API. O dashboard web (em desenvolvimento) trará uma interface visual para isso.
+
+```bash
+# Listar regras ativas (endpoint em desenvolvimento)
+GET /v1/rules
+```
+
+As regras Semgrep do seu tenant ficam no repositório `packages/semgrep-rules/`, organizadas por categoria.
 
 ### Regras por categoria
 
@@ -315,7 +316,7 @@ Quando o L2 detecta um padrão semanticamente similar a incidentes passados, mas
 
 ### Revisar candidatos
 
-**Dashboard → Rules → Candidates** lista todos os candidatos pendentes.
+Durante o beta, a revisão de candidatos é feita via API. O dashboard trará uma fila visual de aprovação futuramente.
 
 Para cada candidato você pode:
 
@@ -368,7 +369,7 @@ POST /v1/findings/{finding_id}/false-positive
 
 ### Convidar um membro
 
-**Settings → Team → Invite** — ou via API:
+Durante o beta, convites são feitos via API:
 
 ```bash
 POST /v1/tenants/me/users/invite
