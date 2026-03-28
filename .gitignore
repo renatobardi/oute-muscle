@@ -1,0 +1,96 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.env
+.venv
+env/
+venv/
+ENV/
+.uv/
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+pip-wheel-metadata/
+share/python-wheels/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ruff
+.ruff_cache/
+
+# pytest
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# Node / SvelteKit
+node_modules/
+.svelte-kit/
+build/
+dist/
+.env.local
+.env.*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.backup
+*.tfvars
+!infra/gcp/environments/*.tfvars.example
+.terraformrc
+terraform.rc
+crash.log
+crash.*.log
+
+# GCP / Google credentials
+*.json
+!package.json
+!tsconfig.json
+!packages/semgrep-rules/metadata/registry.json
+gcloud-service-key.json
+application_default_credentials.json
+
+# Secrets — never commit these
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Semgrep
+.semgrep/
+semgrep.sarif
+
+# Alembic
+packages/db/src/migrations/versions/*.py
+!packages/db/src/migrations/versions/.gitkeep
+
+# Logs
+*.log
+logs/

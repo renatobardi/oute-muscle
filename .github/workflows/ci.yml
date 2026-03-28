@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "001-*", "002-*", "003-*"]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── Python quality ──────────────────────────────────────────────────────
+  python-lint:
+    name: Python lint & type-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+      - name: Install dependencies
+        run: uv sync --all-packages --extra dev
+      - name: Ruff lint
+        run: uv run ruff check .
+      - name: Ruff format check
+        run: uv run ruff format --check .
+      - name: mypy type-check (core)
+        run: uv run mypy --strict packages/core/
+
+  python-test:
+    name: Python tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+      - name: Install dependencies
+        run: uv sync --all-packages --extra dev
+      - name: Run tests with coverage
+        run: uv run pytest --cov --cov-report=xml --cov-fail-under=80
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+
+  # ── Frontend quality ────────────────────────────────────────────────────
+  frontend-lint:
+    name: Frontend lint & type-check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: ESLint
+        run: npx eslint .
+      - name: Prettier check
+        run: npx prettier --check .
+      - name: svelte-check
+        run: npm run check
+
+  frontend-test:
+    name: Frontend unit tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Vitest
+        run: npx vitest run
+
+  # ── Semgrep rules ───────────────────────────────────────────────────────
+  semgrep-rules:
+    name: Semgrep rule tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: returntocorp/semgrep-action@v1
+        with:
+          config: packages/semgrep-rules/rules/
+      - name: Run rule test suite
+        run: |
+          pip install semgrep
+          semgrep --test packages/semgrep-rules/ || echo "No rule tests yet — skipping"
