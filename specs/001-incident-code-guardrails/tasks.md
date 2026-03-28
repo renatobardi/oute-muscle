@@ -269,16 +269,16 @@
 
 ### Tests for User Story 6
 
-- [ ] T126 [P] [US6] Write unit tests for API key authentication middleware in apps/api/tests/unit/test_api_key_auth.py
-- [ ] T127 [P] [US6] Write integration test for POST /scans with diff payload → JSON findings response in apps/api/tests/integration/test_rest_scan.py
-- [ ] T128 [US6] Write integration test for POST /scans with Accept: application/sarif+json → SARIF response in apps/api/tests/integration/test_rest_sarif.py
+- [x] T126 [P] [US6] Write unit tests for API key authentication middleware in apps/api/tests/unit/test_api_key_auth.py
+- [x] T127 [P] [US6] Write integration test for POST /scans with diff payload → JSON findings response in apps/api/tests/integration/test_rest_scan.py
+- [x] T128 [US6] Write integration test for POST /scans with Accept: application/sarif+json → SARIF response in apps/api/tests/integration/test_rest_sarif.py
 
 ### Implementation for User Story 6
 
-- [ ] T129 [US6] Implement API key authentication middleware (X-API-Key header, tenant resolution) in apps/api/src/middleware/auth.py
-- [ ] T130 [US6] Implement SARIF 2.1.0 response formatter in apps/api/src/routes/sarif.py
-- [ ] T131 [US6] Extend POST /scans route to support API key auth and SARIF content negotiation in apps/api/src/routes/scans.py
-- [ ] T132 [US6] Implement tier-based feature gating (Free=L1 only, Team=L1+L2) on scan endpoint in apps/api/src/routes/scans.py
+- [x] T129 [US6] Implement API key authentication middleware (X-API-Key header, tenant resolution) in apps/api/src/middleware/auth.py
+- [x] T130 [US6] Implement SARIF 2.1.0 response formatter in apps/api/src/routes/sarif.py
+- [x] T131 [US6] Extend POST /scans route to support API key auth and SARIF content negotiation in apps/api/src/routes/scans.py
+- [x] T132 [US6] Implement tier-based feature gating (Free=L1 only, Team=L1+L2) on scan endpoint in apps/api/src/routes/scans.py
 
 **Checkpoint**: REST API accepts diffs via API key, returns findings in JSON and SARIF. Free tier gets L1 only, Team gets L1+L2.
 
