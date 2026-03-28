@@ -9,6 +9,7 @@ from __future__ import annotations
 import uuid
 from collections.abc import AsyncGenerator
 
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
@@ -32,7 +33,8 @@ class TenantContextSession(AsyncSession):
         if self.tenant_id:
             # SET LOCAL is transaction-scoped, will be cleared on commit/rollback
             await self.execute(
-                f"SET LOCAL app.tenant_id = '{self.tenant_id}'"  # type: ignore[arg-type]
+                text("SET LOCAL app.tenant_id = :tenant_id"),
+                {"tenant_id": str(self.tenant_id)},
             )
         return self
 
