@@ -179,24 +179,24 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T084 [P] [US3] Write unit tests for LLM router (risk score → model selection, fallback chain Flash→Pro→Claude) in packages/core/tests/test_llm_router.py
-- [ ] T085 [P] [US3] Write unit tests for RAG pipeline (diff → embedding → vector search → advisory generation) in packages/core/tests/test_rag_pipeline.py
-- [ ] T086 [P] [US3] Write integration test for Vertex AI Gemini Flash adapter in packages/core/tests/integration/test_vertex_gemini_flash.py
-- [ ] T087 [P] [US3] Write integration test for Vertex AI Gemini Pro adapter in packages/core/tests/integration/test_vertex_gemini_pro.py
-- [ ] T088 [P] [US3] Write integration test for Vertex AI Claude Sonnet 4 adapter in packages/core/tests/integration/test_vertex_claude.py
-- [ ] T089 [US3] Write integration test for end-to-end RAG advisory (diff in → advisory comment out) in packages/core/tests/integration/test_rag_e2e.py
+- [x] T084 [P] [US3] Write unit tests for LLM router (risk score → model selection, fallback chain Flash→Pro→Claude) in packages/core/tests/test_llm_router.py
+- [x] T085 [P] [US3] Write unit tests for RAG pipeline (diff → embedding → vector search → advisory generation) in packages/core/tests/test_rag_pipeline.py
+- [x] T086 [P] [US3] Write integration test for Vertex AI Gemini Flash adapter in packages/core/tests/integration/test_vertex_gemini_flash.py
+- [x] T087 [P] [US3] Write integration test for Vertex AI Gemini Pro adapter in packages/core/tests/integration/test_vertex_gemini_pro.py
+- [x] T088 [P] [US3] Write integration test for Vertex AI Claude Sonnet 4 adapter in packages/core/tests/integration/test_vertex_claude.py
+- [x] T089 [US3] Write integration test for end-to-end RAG advisory (diff in → advisory comment out) in packages/core/tests/integration/test_rag_e2e.py
 
 ### Implementation for User Story 3
 
-- [ ] T090 [US3] Implement Vertex AI Gemini Flash LLM adapter in packages/core/src/adapters/vertex_llm.py
-- [ ] T091 [US3] Implement Vertex AI Gemini Pro LLM adapter (extend vertex_llm.py with model parameter) in packages/core/src/adapters/vertex_llm.py
-- [ ] T092 [US3] Implement Vertex AI Claude Sonnet 4 adapter (via anthropic[vertex]) in packages/core/src/adapters/vertex_claude.py
-- [ ] T093 [US3] Implement LLM Router service (risk score → model selection, 30s timeout, fallback chain) in packages/core/src/domain/advisory/llm_router.py
-- [ ] T094 [US3] Implement RAG pipeline service (extract diff → embed → vector search → build prompt → generate advisory) in packages/core/src/domain/advisory/rag_pipeline.py
-- [ ] T095 [US3] Implement diff truncation logic (3,000 line limit with warning) in packages/core/src/domain/advisory/diff_processor.py
-- [ ] T096 [US3] Implement advisory formatting service (structured markdown template with severity badge, incident link, confidence) in packages/core/src/domain/advisory/formatter.py
-- [ ] T097 [US3] Create RAG worker entry point (Cloud Run Job) in apps/api/src/workers/rag_worker.py
-- [ ] T098 [US3] Create REST API route for triggering scan with advisory (POST /scans with Layer 2) in apps/api/src/routes/scans.py
+- [x] T090 [US3] Implement Vertex AI Gemini Flash LLM adapter in packages/core/src/adapters/vertex_llm.py
+- [x] T091 [US3] Implement Vertex AI Gemini Pro LLM adapter (extend vertex_llm.py with model parameter) in packages/core/src/adapters/vertex_llm.py
+- [x] T092 [US3] Implement Vertex AI Claude Sonnet 4 adapter (via anthropic[vertex]) in packages/core/src/adapters/vertex_claude.py
+- [x] T093 [US3] Implement LLM Router service (risk score → model selection, 30s timeout, fallback chain) in packages/core/src/domain/advisory/llm_router.py
+- [x] T094 [US3] Implement RAG pipeline service (extract diff → embed → vector search → build prompt → generate advisory) in packages/core/src/domain/advisory/rag_pipeline.py
+- [x] T095 [US3] Implement diff truncation logic (3,000 line limit with warning) in packages/core/src/domain/advisory/diff_processor.py
+- [x] T096 [US3] Implement advisory formatting service (structured markdown template with severity badge, incident link, confidence) in packages/core/src/domain/advisory/formatter.py
+- [x] T097 [US3] Create RAG worker entry point (Cloud Run Job) in apps/api/src/workers/rag_worker.py
+- [x] T098 [US3] Create REST API route for triggering scan with advisory (POST /scans with Layer 2) in apps/api/src/routes/scans.py
 
 **Checkpoint**: RAG pipeline classifies risk in <3s, posts advisory with incident references and confidence scores. LLM router correctly routes Flash/Pro/Claude based on composite score.
 
