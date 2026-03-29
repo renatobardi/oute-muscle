@@ -6,6 +6,7 @@
   import { apiClient, type TenantUser, type Role, ApiError } from '$lib/api';
   import { tenantStore } from '$lib/stores/tenant';
   import { isAdmin } from '$lib/stores/auth';
+  import { PageHeader, Badge, Button, Card, Input, Select, Modal, LoadingSkeleton } from '$components/ui';
 
   let users = $state<TenantUser[]>([]);
   let loadingUsers = $state(false);
@@ -22,6 +23,7 @@
   let roleError = $state<string | null>(null);
 
   const roles: Role[] = ['admin', 'editor', 'viewer'];
+  const roleOptions = roles.map((r) => ({ value: r, label: r }));
 
   // Local role edits (before save)
   let pendingRoles = $state<Record<string, Role>>({});
@@ -75,81 +77,70 @@
 </script>
 
 <div class="mx-auto max-w-3xl space-y-8">
-  <h1 class="text-2xl font-bold text-gray-900">Settings</h1>
+  <PageHeader title="Settings" />
 
   <!-- Tenant info -->
   {#if $tenantStore.tenant}
-    <section class="rounded-xl border border-gray-200 bg-white p-6">
-      <h2 class="mb-4 text-lg font-semibold text-gray-900">Workspace</h2>
+    <Card>
+      <h2 class="mb-4 text-lg font-semibold text-light-text">Workspace</h2>
       <dl class="grid grid-cols-2 gap-4 text-sm">
         <div>
-          <dt class="text-gray-500">Name</dt>
-          <dd class="font-medium text-gray-900">{$tenantStore.tenant.name}</dd>
+          <dt class="text-light-text-secondary">Name</dt>
+          <dd class="font-medium text-light-text">{$tenantStore.tenant.name}</dd>
         </div>
         <div>
-          <dt class="text-gray-500">Plan</dt>
+          <dt class="text-light-text-secondary">Plan</dt>
           <dd>
-            <span
-              class="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700 capitalize"
-            >
-              {$tenantStore.tenant.plan}
-            </span>
+            <Badge label={$tenantStore.tenant.plan} />
           </dd>
         </div>
         <div>
-          <dt class="text-gray-500">Contributors</dt>
-          <dd class="font-medium text-gray-900">{$tenantStore.tenant.contributor_count}</dd>
+          <dt class="text-light-text-secondary">Contributors</dt>
+          <dd class="font-medium text-light-text">{$tenantStore.tenant.contributor_count}</dd>
         </div>
         <div>
-          <dt class="text-gray-500">Repositories</dt>
-          <dd class="font-medium text-gray-900">{$tenantStore.tenant.repo_count}</dd>
+          <dt class="text-light-text-secondary">Repositories</dt>
+          <dd class="font-medium text-light-text">{$tenantStore.tenant.repo_count}</dd>
         </div>
       </dl>
       <div class="mt-4">
-        <a href="/settings/billing" class="text-sm text-indigo-600 hover:underline">
+        <a href="/settings/billing" class="text-sm text-primary-500 hover:underline">
           Manage plan & billing →
         </a>
       </div>
-    </section>
+    </Card>
   {/if}
 
   <!-- Team members -->
-  <section class="rounded-xl border border-gray-200 bg-white p-6">
+  <Card>
     <div class="mb-4 flex items-center justify-between">
-      <h2 class="text-lg font-semibold text-gray-900">Team</h2>
+      <h2 class="text-lg font-semibold text-light-text">Team</h2>
       {#if $isAdmin}
-        <button
-          onclick={() => (showInviteModal = true)}
-          class="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-500"
-        >
-          Invite
-        </button>
+        <Button size="sm" onclick={() => (showInviteModal = true)}>Invite</Button>
       {/if}
     </div>
 
     {#if inviteSuccess}
-      <div class="mb-3 rounded-lg bg-green-50 p-3 text-sm text-green-700">{inviteSuccess}</div>
+      <div class="mb-3 rounded-lg bg-success-light border border-success-border p-3 text-sm text-success-text">{inviteSuccess}</div>
     {/if}
 
     {#if roleError}
-      <div class="mb-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">{roleError}</div>
+      <div class="mb-3 rounded-lg bg-error-light border border-error-border p-3 text-sm text-error-text">{roleError}</div>
     {/if}
 
     {#if loadingUsers}
-      <div class="flex justify-center py-8">
-        <span
-          class="h-5 w-5 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"
-        ></span>
+      <div class="py-8">
+        <LoadingSkeleton variant="text" lines={4} />
       </div>
     {:else if usersError}
-      <div class="rounded-lg bg-red-50 p-3 text-sm text-red-700">{usersError}</div>
+      <div class="rounded-lg bg-error-light border border-error-border p-3 text-sm text-error-text">{usersError}</div>
     {:else}
       <ul class="space-y-3">
         {#each users as user}
           <li data-user-id={user.id} class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-900">{user.email}</p>
-              <p class="text-xs text-gray-400">
+              <p class="text-sm font-medium text-light-text">{user.email}</p>
+              <p class="text-xs text-light-text-muted">
                 Joined {new Date(user.joined_at).toLocaleDateString()}
               </p>
             </div>
@@ -159,7 +150,7 @@
                 aria-label="role"
                 bind:value={pendingRoles[user.id]}
                 disabled={!$isAdmin}
-                class="rounded-lg border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-50"
+                class="rounded-lg border border-light-border-strong bg-light-bg text-light-text px-2 py-1 text-sm focus:border-primary-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {#each roles as r}
                   <option value={r}>{r}</option>
@@ -167,75 +158,62 @@
               </select>
 
               {#if $isAdmin && pendingRoles[user.id] !== user.role}
-                <button
+                <Button
+                  size="sm"
                   onclick={() => handleSaveRole(user)}
                   disabled={savingRole[user.id]}
-                  class="rounded-lg bg-indigo-600 px-2 py-1 text-xs font-medium text-white hover:bg-indigo-500 disabled:opacity-60"
-                  >Save</button
-                >
+                >Save</Button>
               {/if}
             </div>
           </li>
         {/each}
       </ul>
     {/if}
-  </section>
+  </Card>
 </div>
 
 <!-- Invite modal -->
-{#if showInviteModal}
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-    <div class="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
-      <h2 class="mb-4 text-lg font-semibold text-gray-900">Invite team member</h2>
+<Modal
+  bind:open={showInviteModal}
+  onClose={() => { showInviteModal = false; inviteError = null; }}
+  title="Invite team member"
+>
+  {#if inviteError}
+    <div class="mb-3 rounded-lg bg-error-light border border-error-border p-3 text-sm text-error-text">{inviteError}</div>
+  {/if}
 
-      {#if inviteError}
-        <div class="mb-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">{inviteError}</div>
-      {/if}
+  <div class="space-y-4">
+    <Input
+      label="Email"
+      type="email"
+      bind:value={inviteEmail}
+      placeholder="colleague@company.com"
+    />
 
-      <div class="space-y-4">
-        <div>
-          <label for="invite-email" class="block text-sm font-medium text-gray-700">Email</label>
-          <input
-            id="invite-email"
-            type="email"
-            bind:value={inviteEmail}
-            required
-            class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
-            placeholder="colleague@company.com"
-          />
-        </div>
-
-        <div>
-          <label for="invite-role" class="block text-sm font-medium text-gray-700">Role</label>
-          <select
-            id="invite-role"
-            bind:value={inviteRole}
-            class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
-          >
-            {#each roles as r}
-              <option value={r}>{r}</option>
-            {/each}
-          </select>
-        </div>
-      </div>
-
-      <div class="mt-5 flex justify-end gap-3">
-        <button
-          onclick={() => {
-            showInviteModal = false;
-            inviteError = null;
-          }}
-          class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >Cancel</button
-        >
-        <button
-          onclick={handleInvite}
-          disabled={inviting || !inviteEmail}
-          class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-60"
-        >
-          {inviting ? 'Sending…' : 'Send invite'}
-        </button>
-      </div>
-    </div>
+    <Select
+      label="Role"
+      options={roleOptions}
+      value={inviteRole}
+      onchange={(v) => { inviteRole = v as Role; }}
+    />
   </div>
-{/if}
+
+  {#snippet footer()}
+    <div class="flex justify-end gap-3">
+      <Button
+        variant="secondary"
+        onclick={() => {
+          showInviteModal = false;
+          inviteError = null;
+        }}
+      >Cancel</Button>
+      <Button
+        onclick={handleInvite}
+        disabled={inviting || !inviteEmail}
+        loading={inviting}
+      >
+        {inviting ? 'Sending…' : 'Send invite'}
+      </Button>
+    </div>
+  {/snippet}
+</Modal>

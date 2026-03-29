@@ -4,6 +4,8 @@
    * Collects company name + user email, then starts OAuth flow.
    */
   import { goto } from '$app/navigation';
+  import { Button, Input, Card } from '$components/ui';
+  import { Building2, Mail } from 'lucide-svelte';
 
   let companyName = $state('');
   let email = $state('');
@@ -39,57 +41,58 @@
   }
 </script>
 
-<div class="flex min-h-screen items-center justify-center bg-gray-50">
-  <div class="w-full max-w-sm rounded-xl bg-white p-8 shadow-sm ring-1 ring-gray-200">
+<div class="flex min-h-screen items-center justify-center bg-dark-bg">
+  <div class="w-full max-w-sm p-4">
+    <!-- Branding -->
     <div class="mb-8 text-center">
-      <h1 class="text-2xl font-bold text-gray-900">Create workspace</h1>
-      <p class="mt-1 text-sm text-gray-500">Get started with Oute Muscle</p>
+      <div class="inline-flex items-center gap-2 mb-2">
+        <h1 class="text-2xl font-bold text-dark-text">Oute Muscle</h1>
+        <span class="rounded bg-primary-500/20 px-1.5 py-0.5 text-xs font-medium text-primary-400">&beta;</span>
+      </div>
+      <p class="text-sm text-dark-text-muted">Create your workspace</p>
     </div>
 
-    {#if error}
-      <div class="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>
-    {/if}
+    <Card>
+      {#if error}
+        <div class="mb-4 flex items-center gap-2 rounded-lg bg-error-light border border-error-border p-3 text-sm text-error-text" role="alert">
+          <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          {error}
+        </div>
+      {/if}
 
-    <form onsubmit={handleRegister} class="space-y-4">
-      <div>
-        <label for="company" class="block text-sm font-medium text-gray-700">Company name</label>
-        <input
-          id="company"
+      <form onsubmit={handleRegister} class="space-y-4">
+        <Input
+          label="Company name"
           type="text"
           bind:value={companyName}
-          required
-          class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm
-                 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+          icon={Building2}
           placeholder="Acme Corp"
+          required
+          disabled={submitting}
         />
-      </div>
 
-      <div>
-        <label for="email" class="block text-sm font-medium text-gray-700">Work email</label>
-        <input
-          id="email"
+        <Input
+          label="Work email"
           type="email"
           bind:value={email}
-          required
-          class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm
-                 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+          icon={Mail}
           placeholder="you@company.com"
+          autocomplete="email"
+          required
+          disabled={submitting}
         />
-      </div>
 
-      <button
-        type="submit"
-        disabled={submitting}
-        class="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm
-               transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {submitting ? 'Creating workspace…' : 'Create workspace'}
-      </button>
-    </form>
+        <Button type="submit" loading={submitting} disabled={submitting} class="w-full">
+          {submitting ? 'Creating workspace...' : 'Create workspace'}
+        </Button>
+      </form>
+    </Card>
 
-    <p class="mt-4 text-center text-sm text-gray-500">
+    <p class="mt-6 text-center text-sm text-dark-text-muted">
       Already have an account?
-      <a href="/auth/login" class="text-indigo-600 hover:underline">Sign in</a>
+      <a href="/auth/login" class="text-primary-400 hover:underline">Sign in</a>
     </p>
   </div>
 </div>

@@ -4,6 +4,7 @@
    */
   import { onMount } from 'svelte';
   import { apiClient, type AdminAuditLogEntry, ApiError } from '$lib/api';
+  import { PageHeader, Badge, Button, EmptyState, LoadingSkeleton } from '$components/ui';
 
   let entries = $state<AdminAuditLogEntry[]>([]);
   let total = $state(0);
@@ -49,10 +50,10 @@
 </script>
 
 <div>
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">Access Control</h1>
-    <p class="mt-1 text-sm text-gray-500">Platform-wide audit log — {total} entries</p>
-  </div>
+  <PageHeader
+    title="Access Control"
+    description="Platform-wide audit log — {total} entries"
+  />
 
   <!-- Filters -->
   <div class="mb-4 flex flex-wrap gap-3">
@@ -60,7 +61,7 @@
       aria-label="entity type"
       bind:value={filterEntityType}
       onchange={onFilterChange}
-      class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+      class="rounded-lg border border-light-border px-3 py-2 text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none"
     >
       <option value="">All entity types</option>
       <option value="user">User</option>
@@ -74,7 +75,7 @@
       aria-label="action"
       bind:value={filterAction}
       onchange={onFilterChange}
-      class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+      class="rounded-lg border border-light-border px-3 py-2 text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none"
     >
       <option value="">All actions</option>
       <option value="create">Create</option>
@@ -91,7 +92,7 @@
       aria-label="from date"
       bind:value={filterFrom}
       onchange={onFilterChange}
-      class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+      class="rounded-lg border border-light-border px-3 py-2 text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none"
     />
 
     <input
@@ -99,73 +100,58 @@
       aria-label="to date"
       bind:value={filterTo}
       onchange={onFilterChange}
-      class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+      class="rounded-lg border border-light-border px-3 py-2 text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none"
     />
   </div>
 
   {#if error}
-    <div class="rounded-lg bg-red-50 p-4 text-sm text-red-700">
+    <div class="rounded-lg bg-error-light border border-error-border p-4 text-sm text-error-text">
       <p>{error}</p>
-      <button
-        onclick={loadAuditLog}
-        class="mt-2 rounded bg-red-100 px-3 py-1 text-sm font-medium text-red-700 hover:bg-red-200"
-      >
-        Retry
-      </button>
+      <Button variant="danger" size="sm" onclick={loadAuditLog} class="mt-2">
+        {#snippet children()}Retry{/snippet}
+      </Button>
     </div>
   {:else if loading}
-    <div class="flex justify-center py-12">
-      <span
-        class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"
-      ></span>
-    </div>
+    <LoadingSkeleton variant="table-row" rows={8} />
   {:else if entries.length === 0}
-    <div
-      class="rounded-xl border border-dashed border-gray-300 py-12 text-center text-sm text-gray-500"
-    >
-      No audit log entries found.
-    </div>
+    <EmptyState title="No audit log entries found" description="Try adjusting your filters." />
   {:else}
-    <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+    <div class="overflow-x-auto rounded-xl border border-light-border bg-light-bg">
       <table class="w-full text-sm">
-        <thead class="border-b border-gray-200 bg-gray-50">
+        <thead class="border-b border-light-border-strong bg-light-bg-hover">
           <tr>
-            <th class="px-4 py-3 text-left font-medium text-gray-500">Action</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-500">Entity Type</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-500">Entity ID</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-500">Performed By</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-500">Changes</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-500">Date</th>
+            <th class="px-4 py-3 text-left font-medium text-light-text-secondary">Action</th>
+            <th class="px-4 py-3 text-left font-medium text-light-text-secondary">Entity Type</th>
+            <th class="px-4 py-3 text-left font-medium text-light-text-secondary">Entity ID</th>
+            <th class="px-4 py-3 text-left font-medium text-light-text-secondary">Performed By</th>
+            <th class="px-4 py-3 text-left font-medium text-light-text-secondary">Changes</th>
+            <th class="px-4 py-3 text-left font-medium text-light-text-secondary">Date</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100">
+        <tbody class="divide-y divide-light-border">
           {#each entries as entry}
-            <tr class="hover:bg-gray-50">
+            <tr class="hover:bg-light-bg-hover">
               <td class="px-4 py-3">
-                <span
-                  class="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700"
-                >
-                  {entry.action}
-                </span>
+                <Badge label={entry.action} dot={false} />
               </td>
-              <td class="px-4 py-3 text-gray-600 capitalize">{entry.entity_type}</td>
-              <td class="px-4 py-3 font-mono text-xs text-gray-500">
+              <td class="px-4 py-3 text-light-text-secondary capitalize">{entry.entity_type}</td>
+              <td class="px-4 py-3 font-mono text-xs text-light-text-muted">
                 {entry.entity_id.slice(0, 8)}...
               </td>
-              <td class="px-4 py-3 text-xs text-gray-600">
+              <td class="px-4 py-3 text-xs text-light-text-secondary">
                 {entry.performed_by_email ?? entry.performed_by?.slice(0, 8) ?? '—'}
               </td>
               <td class="max-w-xs px-4 py-3">
                 {#if entry.changes}
                   <pre
-                    class="overflow-hidden text-xs text-ellipsis whitespace-nowrap text-gray-500">{JSON.stringify(
+                    class="overflow-hidden text-xs text-ellipsis whitespace-nowrap text-light-text-muted">{JSON.stringify(
                       entry.changes
                     )}</pre>
                 {:else}
-                  <span class="text-gray-400">—</span>
+                  <span class="text-light-text-muted">—</span>
                 {/if}
               </td>
-              <td class="px-4 py-3 text-xs text-gray-500">
+              <td class="px-4 py-3 text-xs text-light-text-muted">
                 {new Date(entry.created_at).toLocaleString()}
               </td>
             </tr>
@@ -176,29 +162,31 @@
 
     <!-- Pagination -->
     {#if totalPages > 1}
-      <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
+      <div class="mt-4 flex items-center justify-between text-sm text-light-text-muted">
         <span>Page {page} of {totalPages}</span>
         <div class="flex gap-2">
-          <button
+          <Button
+            variant="secondary"
+            size="sm"
             disabled={page <= 1}
             onclick={() => {
               page--;
               loadAuditLog();
             }}
-            class="rounded border border-gray-300 px-3 py-1 disabled:opacity-40"
           >
-            Previous
-          </button>
-          <button
+            {#snippet children()}Previous{/snippet}
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
             disabled={page >= totalPages}
             onclick={() => {
               page++;
               loadAuditLog();
             }}
-            class="rounded border border-gray-300 px-3 py-1 disabled:opacity-40"
           >
-            Next
-          </button>
+            {#snippet children()}Next{/snippet}
+          </Button>
         </div>
       </div>
     {/if}

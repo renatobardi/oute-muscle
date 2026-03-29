@@ -4,6 +4,7 @@
    */
   import { goto } from '$app/navigation';
   import { apiClient, type IncidentDraft, type Category, type Severity, ApiError } from '$lib/api';
+  import { Button, Card, PageHeader } from '$components/ui';
 
   let url = $state('');
   let extracting = $state(false);
@@ -64,12 +65,12 @@
 <div class="mx-auto max-w-2xl">
   <a
     href="/incidents"
-    class="mb-6 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900"
+    class="mb-6 inline-flex items-center gap-1 text-sm text-light-text-muted hover:text-light-text"
   >
     ← Back to incidents
   </a>
 
-  <h1 class="mb-6 text-2xl font-bold text-gray-900">Ingest from URL</h1>
+  <PageHeader title="Ingest from URL" />
 
   <!-- Step 1: URL input -->
   <form onsubmit={handleExtract} class="mb-6 flex gap-3">
@@ -80,117 +81,105 @@
       placeholder="https://blog.example.com/post-mortem"
       bind:value={url}
       required
-      class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+      class="flex-1 rounded-lg border border-light-border-strong bg-light-bg px-3 py-2 text-sm text-light-text placeholder:text-light-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
     />
-    <button
-      type="submit"
-      disabled={extracting}
-      class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-60"
-    >
-      {extracting ? 'Extracting…' : 'Extract'}
-    </button>
+    <Button type="submit" loading={extracting}>
+      {extracting ? 'Extracting...' : 'Extract'}
+    </Button>
   </form>
 
   {#if error}
-    <div class="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>
+    <div class="mb-4 rounded-lg bg-error-light border border-error-border p-3 text-sm text-error-text">{error}</div>
   {/if}
 
   <!-- Step 2: Review draft -->
   {#if draft}
-    <div class="rounded-xl border border-indigo-200 bg-indigo-50 p-1">
-      <div class="rounded-lg bg-white p-5">
-        <p class="mb-4 text-xs font-semibold tracking-wider text-indigo-600 uppercase">
-          Review extracted draft
-        </p>
+    <Card class="border-primary-200 bg-primary-50/30">
+      <p class="mb-4 text-xs font-semibold tracking-wider text-primary-500 uppercase">
+        Review extracted draft
+      </p>
 
-        <div class="space-y-4">
-          <div>
-            <label for="draft-title" class="block text-sm font-medium text-gray-700">Title</label>
-            <input
-              id="draft-title"
-              type="text"
-              bind:value={draft.title}
-              class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
-            />
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label for="draft-category" class="block text-sm font-medium text-gray-700"
-                >Category</label
-              >
-              <select
-                id="draft-category"
-                bind:value={draft.category}
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
-              >
-                {#each categories as cat}
-                  <option value={cat}>{cat}</option>
-                {/each}
-              </select>
-            </div>
-            <div>
-              <label for="draft-severity" class="block text-sm font-medium text-gray-700"
-                >Severity</label
-              >
-              <select
-                id="draft-severity"
-                bind:value={draft.severity}
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
-              >
-                {#each severities as sev}
-                  <option value={sev}>{sev}</option>
-                {/each}
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label for="draft-anti" class="block text-sm font-medium text-gray-700"
-              >Anti-pattern</label
-            >
-            <textarea
-              id="draft-anti"
-              bind:value={draft.anti_pattern}
-              rows={3}
-              class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
-            ></textarea>
-          </div>
-
-          <div>
-            <label for="draft-remediation" class="block text-sm font-medium text-gray-700"
-              >Remediation</label
-            >
-            <textarea
-              id="draft-remediation"
-              bind:value={draft.remediation}
-              rows={3}
-              class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
-            ></textarea>
-          </div>
-
-          {#if draft.organization}
-            <p class="text-xs text-gray-500">
-              Organization (LLM-extracted): <strong>{draft.organization}</strong>
-            </p>
-          {/if}
+      <div class="space-y-4">
+        <div>
+          <label for="draft-title" class="block text-sm font-medium text-light-text">Title</label>
+          <input
+            id="draft-title"
+            type="text"
+            bind:value={draft.title}
+            class="mt-1 block w-full rounded-lg border border-light-border-strong bg-light-bg px-3 py-2 text-sm text-light-text focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+          />
         </div>
 
-        <div class="mt-5 flex justify-end gap-3">
-          <button
-            onclick={() => (draft = null)}
-            class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >Discard</button
-          >
-          <button
-            onclick={handleConfirm}
-            disabled={confirming}
-            class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-60"
-          >
-            {confirming ? 'Saving…' : 'Confirm'}
-          </button>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label for="draft-category" class="block text-sm font-medium text-light-text"
+              >Category</label
+            >
+            <select
+              id="draft-category"
+              bind:value={draft.category}
+              class="mt-1 block w-full rounded-lg border border-light-border-strong bg-light-bg px-3 py-2 text-sm text-light-text focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+            >
+              {#each categories as cat}
+                <option value={cat}>{cat}</option>
+              {/each}
+            </select>
+          </div>
+          <div>
+            <label for="draft-severity" class="block text-sm font-medium text-light-text"
+              >Severity</label
+            >
+            <select
+              id="draft-severity"
+              bind:value={draft.severity}
+              class="mt-1 block w-full rounded-lg border border-light-border-strong bg-light-bg px-3 py-2 text-sm text-light-text focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+            >
+              {#each severities as sev}
+                <option value={sev}>{sev}</option>
+              {/each}
+            </select>
+          </div>
         </div>
+
+        <div>
+          <label for="draft-anti" class="block text-sm font-medium text-light-text"
+            >Anti-pattern</label
+          >
+          <textarea
+            id="draft-anti"
+            bind:value={draft.anti_pattern}
+            rows={3}
+            class="mt-1 block w-full rounded-lg border border-light-border-strong bg-light-bg px-3 py-2 text-sm text-light-text focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+          ></textarea>
+        </div>
+
+        <div>
+          <label for="draft-remediation" class="block text-sm font-medium text-light-text"
+            >Remediation</label
+          >
+          <textarea
+            id="draft-remediation"
+            bind:value={draft.remediation}
+            rows={3}
+            class="mt-1 block w-full rounded-lg border border-light-border-strong bg-light-bg px-3 py-2 text-sm text-light-text focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+          ></textarea>
+        </div>
+
+        {#if draft.organization}
+          <p class="text-xs text-light-text-muted">
+            Organization (LLM-extracted): <strong>{draft.organization}</strong>
+          </p>
+        {/if}
       </div>
-    </div>
+
+      <div class="mt-5 flex justify-end gap-3">
+        <Button variant="secondary" onclick={() => (draft = null)}>
+          Discard
+        </Button>
+        <Button loading={confirming} onclick={handleConfirm}>
+          {confirming ? 'Saving...' : 'Confirm'}
+        </Button>
+      </div>
+    </Card>
   {/if}
 </div>

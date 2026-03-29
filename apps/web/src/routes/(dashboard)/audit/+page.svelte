@@ -6,6 +6,8 @@
   import { apiClient, type AuditLogEntry, ApiError } from '$lib/api';
   import { isEnterprise } from '$lib/stores/tenant';
   import { goto } from '$app/navigation';
+  import { PageHeader, Badge, Button, Select, Input, LoadingSkeleton, EmptyState } from '$components/ui';
+  import { ScrollText } from 'lucide-svelte';
 
   let entries = $state<AuditLogEntry[]>([]);
   let total = $state(0);
@@ -18,6 +20,25 @@
   let filterAction = $state('');
   let filterFrom = $state('');
   let filterTo = $state('');
+
+  const entityTypeOptions = [
+    { value: 'incident', label: 'Incident' },
+    { value: 'rule', label: 'Rule' },
+    { value: 'scan', label: 'Scan' },
+    { value: 'user', label: 'User' },
+  ];
+
+  const actionOptions = [
+    { value: 'create', label: 'Create' },
+    { value: 'update', label: 'Update' },
+    { value: 'delete', label: 'Delete' },
+  ];
+
+  const actionBadgeMap: Record<string, 'active' | 'running' | 'failed'> = {
+    create: 'active',
+    update: 'running',
+    delete: 'failed',
+  };
 
   async function load() {
     if (!$isEnterprise) return;
@@ -45,12 +66,6 @@
     return new Date(iso).toLocaleString();
   }
 
-  const actionColor: Record<string, string> = {
-    create: 'bg-green-100 text-green-700',
-    update: 'bg-blue-100 text-blue-700',
-    delete: 'bg-red-100 text-red-700',
-  };
-
   onMount(async () => {
     if (!$isEnterprise) {
       await goto('/settings/billing');
@@ -63,56 +78,40 @@
 </script>
 
 <div>
-  <div class="mb-6 flex items-center justify-between">
-    <div>
-      <h1 class="text-2xl font-bold text-gray-900">Audit Log</h1>
-      <p class="mt-1 text-sm text-gray-500">Immutable record of all mutations — {total} entries</p>
-    </div>
-  </div>
+  <PageHeader title="Audit Log" description="Immutable record of all mutations — {total} entries" />
 
   {#if !$isEnterprise}
-    <div class="rounded-xl border border-amber-200 bg-amber-50 p-6 text-center">
-      <p class="text-sm font-medium text-amber-800">
+    <div class="rounded-xl border border-warning-border bg-warning-light p-6 text-center">
+      <p class="text-sm font-medium text-warning-text">
         Audit log is available on the Enterprise plan.
       </p>
-      <a href="/settings/billing" class="mt-2 inline-block text-sm text-amber-700 underline">
+      <a href="/settings/billing" class="mt-2 inline-block text-sm text-warning-text underline">
         Upgrade to Enterprise
       </a>
     </div>
   {:else}
     <!-- Filters -->
     <div class="mb-4 flex flex-wrap gap-3">
-      <select
-        aria-label="entity type"
-        bind:value={filterEntityType}
-        onchange={load}
-        class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
-      >
-        <option value="">All entity types</option>
-        <option value="incident">Incident</option>
-        <option value="rule">Rule</option>
-        <option value="scan">Scan</option>
-        <option value="user">User</option>
-      </select>
+      <Select
+        options={entityTypeOptions}
+        value={filterEntityType}
+        placeholder="All entity types"
+        onchange={(v) => { filterEntityType = v; load(); }}
+      />
 
-      <select
-        aria-label="action"
-        bind:value={filterAction}
-        onchange={load}
-        class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
-      >
-        <option value="">All actions</option>
-        <option value="create">Create</option>
-        <option value="update">Update</option>
-        <option value="delete">Delete</option>
-      </select>
+      <Select
+        options={actionOptions}
+        value={filterAction}
+        placeholder="All actions"
+        onchange={(v) => { filterAction = v; load(); }}
+      />
 
       <input
         type="date"
         aria-label="from date"
         bind:value={filterFrom}
         onchange={load}
-        class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+        class="rounded-lg border border-light-border-strong bg-light-bg text-light-text px-3 py-2.5 text-sm h-11 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
       />
 
       <input
@@ -120,54 +119,51 @@
         aria-label="to date"
         bind:value={filterTo}
         onchange={load}
-        class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+        class="rounded-lg border border-light-border-strong bg-light-bg text-light-text px-3 py-2.5 text-sm h-11 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
       />
     </div>
 
     {#if error}
-      <div class="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>
+      <div class="mb-4 rounded-lg bg-error-light border border-error-border p-3 text-sm text-error-text">{error}</div>
     {/if}
 
     {#if loading}
-      <div class="flex justify-center py-12">
-        <span
-          class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"
-        ></span>
+      <div class="bg-light-bg rounded-xl border border-light-border p-6">
+        <LoadingSkeleton variant="table-row" rows={5} />
       </div>
     {:else if entries.length === 0}
-      <div
-        class="rounded-xl border border-dashed border-gray-300 py-12 text-center text-sm text-gray-500"
-      >
-        No audit log entries.
+      <div class="bg-light-bg rounded-xl border border-light-border">
+        <EmptyState
+          icon={ScrollText}
+          title="No audit log entries"
+          description="Mutations will appear here as they happen."
+        />
       </div>
     {:else}
-      <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
+      <div class="overflow-hidden rounded-xl border border-light-border bg-light-bg">
         <table class="w-full text-sm">
-          <thead class="border-b border-gray-200 bg-gray-50">
+          <thead class="border-b border-light-border">
             <tr>
-              <th class="px-4 py-3 text-left font-medium text-gray-500">Time</th>
-              <th class="px-4 py-3 text-left font-medium text-gray-500">Actor</th>
-              <th class="px-4 py-3 text-left font-medium text-gray-500">Action</th>
-              <th class="px-4 py-3 text-left font-medium text-gray-500">Entity</th>
-              <th class="px-4 py-3 text-left font-medium text-gray-500">Entity ID</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Time</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Actor</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Action</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Entity</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Entity ID</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-100">
+          <tbody class="divide-y divide-light-border">
             {#each entries as entry}
-              <tr class="hover:bg-gray-50">
-                <td class="px-4 py-3 text-xs text-gray-400">{formatDate(entry.created_at)}</td>
-                <td class="px-4 py-3 text-gray-700">{entry.actor_email}</td>
+              <tr class="hover:bg-light-bg-hover transition-colors">
+                <td class="px-4 py-3 text-xs text-light-text-muted">{formatDate(entry.created_at)}</td>
+                <td class="px-4 py-3 text-light-text">{entry.actor_email}</td>
                 <td class="px-4 py-3">
-                  <span
-                    class="rounded-full px-2 py-0.5 text-xs font-medium {actionColor[
-                      entry.action
-                    ] ?? 'bg-gray-100 text-gray-600'}"
-                  >
-                    {entry.action}
-                  </span>
+                  <Badge
+                    status={actionBadgeMap[entry.action] ?? undefined}
+                    label={entry.action}
+                  />
                 </td>
-                <td class="px-4 py-3 text-gray-700 capitalize">{entry.entity_type}</td>
-                <td class="px-4 py-3 font-mono text-xs text-gray-500"
+                <td class="px-4 py-3 text-light-text capitalize">{entry.entity_type}</td>
+                <td class="px-4 py-3 font-mono text-xs text-light-text-secondary"
                   >{entry.entity_id.slice(0, 12)}…</td
                 >
               </tr>
@@ -177,25 +173,27 @@
       </div>
 
       {#if totalPages > 1}
-        <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
+        <div class="mt-4 flex items-center justify-between text-sm text-light-text-secondary">
           <span>Page {page} of {totalPages}</span>
           <div class="flex gap-2">
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
               disabled={page <= 1}
               onclick={() => {
                 page--;
                 load();
               }}
-              class="rounded border border-gray-300 px-3 py-1 disabled:opacity-40">Previous</button
-            >
-            <button
+            >Previous</Button>
+            <Button
+              variant="secondary"
+              size="sm"
               disabled={page >= totalPages}
               onclick={() => {
                 page++;
                 load();
               }}
-              class="rounded border border-gray-300 px-3 py-1 disabled:opacity-40">Next</button
-            >
+            >Next</Button>
           </div>
         </div>
       {/if}

@@ -1,3 +1,238 @@
+/* ============================================================================
+   Design Tokens — Oute Muscle
+   Single source of truth for all visual values.
+   Change a token here → propagates everywhere via Tailwind config.
+   ============================================================================ */
+
+:root {
+  /* ── Primitive Palette (internal — not exposed as Tailwind classes) ─────── */
+  --palette-indigo-400: #818cf8;
+  --palette-indigo-500: #6366f1;
+  --palette-indigo-600: #4f46e5;
+
+  --palette-gray-50: #f9fafb;
+  --palette-gray-100: #f3f4f6;
+  --palette-gray-200: #e5e7eb;
+  --palette-gray-300: #d1d5db;
+  --palette-gray-400: #9ca3af;
+  --palette-gray-500: #6b7280;
+  --palette-gray-600: #4b5563;
+  --palette-gray-700: #374151;
+  --palette-gray-800: #1f2937;
+  --palette-gray-900: #111827;
+  --palette-gray-950: #030712;
+
+  --palette-red-50: #fef2f2;
+  --palette-red-100: #fee2e2;
+  --palette-red-500: #ef4444;
+  --palette-red-600: #dc2626;
+  --palette-red-700: #b91c1c;
+
+  --palette-orange-50: #fff7ed;
+  --palette-orange-100: #ffedd5;
+  --palette-orange-500: #f97316;
+  --palette-orange-600: #ea580c;
+  --palette-orange-700: #c2410c;
+
+  --palette-yellow-50: #fefce8;
+  --palette-yellow-100: #fef9c3;
+  --palette-yellow-500: #eab308;
+  --palette-yellow-600: #ca8a04;
+  --palette-yellow-700: #a16207;
+
+  --palette-green-50: #f0fdf4;
+  --palette-green-100: #dcfce7;
+  --palette-green-500: #22c55e;
+  --palette-green-600: #16a34a;
+  --palette-green-700: #15803d;
+
+  --palette-blue-50: #eff6ff;
+  --palette-blue-100: #dbeafe;
+  --palette-blue-500: #3b82f6;
+  --palette-blue-600: #2563eb;
+  --palette-blue-700: #1d4ed8;
+
+  --palette-purple-50: #faf5ff;
+  --palette-purple-100: #f3e8ff;
+  --palette-purple-500: #a855f7;
+  --palette-purple-600: #9333ea;
+  --palette-purple-700: #7e22ce;
+
+  --palette-white: #ffffff;
+  --palette-black: #000000;
+
+  /* ── Primary Scale ─────────────────────────────────────────────────────── */
+  --color-primary-400: var(--palette-indigo-400);
+  --color-primary-500: var(--palette-indigo-500);
+  --color-primary-600: var(--palette-indigo-600);
+
+  /* ── Neutral Scale ─────────────────────────────────────────────────────── */
+  --color-neutral-50: var(--palette-gray-50);
+  --color-neutral-100: var(--palette-gray-100);
+  --color-neutral-200: var(--palette-gray-200);
+  --color-neutral-300: var(--palette-gray-300);
+  --color-neutral-400: var(--palette-gray-400);
+  --color-neutral-500: var(--palette-gray-500);
+  --color-neutral-600: var(--palette-gray-600);
+  --color-neutral-700: var(--palette-gray-700);
+  --color-neutral-800: var(--palette-gray-800);
+  --color-neutral-900: var(--palette-gray-900);
+  --color-neutral-950: var(--palette-gray-950);
+
+  /* ── Dark Zone (sidebar, nav, login background) ────────────────────────── */
+  --dark-bg: var(--palette-gray-900);
+  --dark-bg-hover: var(--palette-gray-800);
+  --dark-bg-active: var(--palette-gray-800);
+  --dark-border: var(--palette-gray-700);
+  --dark-text: var(--palette-white);
+  --dark-text-muted: var(--palette-gray-400);
+  --dark-text-dimmed: var(--palette-gray-500);
+
+  /* ── Light Zone (content area) ─────────────────────────────────────────── */
+  --light-bg: var(--palette-white);
+  --light-bg-page: var(--palette-gray-50);
+  --light-bg-hover: var(--palette-gray-50);
+  --light-border: var(--palette-gray-200);
+  --light-border-strong: var(--palette-gray-300);
+  --light-text: var(--palette-gray-900);
+  --light-text-secondary: var(--palette-gray-500);
+  --light-text-muted: var(--palette-gray-400);
+
+  /* ── Semantic Colors ───────────────────────────────────────────────────── */
+  --color-error: var(--palette-red-500);
+  --color-error-light: var(--palette-red-50);
+  --color-error-border: var(--palette-red-100);
+  --color-error-text: var(--palette-red-700);
+
+  --color-warning: var(--palette-yellow-500);
+  --color-warning-light: var(--palette-yellow-50);
+  --color-warning-border: var(--palette-yellow-100);
+  --color-warning-text: var(--palette-yellow-700);
+
+  --color-success: var(--palette-green-500);
+  --color-success-light: var(--palette-green-50);
+  --color-success-border: var(--palette-green-100);
+  --color-success-text: var(--palette-green-700);
+
+  --color-info: var(--palette-blue-500);
+  --color-info-light: var(--palette-blue-50);
+  --color-info-border: var(--palette-blue-100);
+  --color-info-text: var(--palette-blue-700);
+
+  /* ── Severity Mapping ──────────────────────────────────────────────────── */
+  --color-severity-critical: var(--palette-red-500);
+  --color-severity-critical-light: var(--palette-red-50);
+  --color-severity-critical-border: var(--palette-red-100);
+  --color-severity-critical-text: var(--palette-red-700);
+
+  --color-severity-high: var(--palette-orange-500);
+  --color-severity-high-light: var(--palette-orange-50);
+  --color-severity-high-border: var(--palette-orange-100);
+  --color-severity-high-text: var(--palette-orange-700);
+
+  --color-severity-medium: var(--palette-yellow-500);
+  --color-severity-medium-light: var(--palette-yellow-50);
+  --color-severity-medium-border: var(--palette-yellow-100);
+  --color-severity-medium-text: var(--palette-yellow-700);
+
+  --color-severity-low: var(--palette-blue-500);
+  --color-severity-low-light: var(--palette-blue-50);
+  --color-severity-low-border: var(--palette-blue-100);
+  --color-severity-low-text: var(--palette-blue-700);
+
+  --color-severity-info: var(--palette-gray-500);
+  --color-severity-info-light: var(--palette-gray-50);
+  --color-severity-info-border: var(--palette-gray-100);
+  --color-severity-info-text: var(--palette-gray-700);
+
+  /* ── Status Mapping ────────────────────────────────────────────────────── */
+  --color-status-active: var(--palette-green-500);
+  --color-status-active-light: var(--palette-green-50);
+  --color-status-active-border: var(--palette-green-100);
+  --color-status-active-text: var(--palette-green-700);
+
+  --color-status-inactive: var(--palette-gray-500);
+  --color-status-inactive-light: var(--palette-gray-50);
+  --color-status-inactive-border: var(--palette-gray-100);
+  --color-status-inactive-text: var(--palette-gray-700);
+
+  --color-status-pending: var(--palette-yellow-500);
+  --color-status-pending-light: var(--palette-yellow-50);
+  --color-status-pending-border: var(--palette-yellow-100);
+  --color-status-pending-text: var(--palette-yellow-700);
+
+  --color-status-failed: var(--palette-red-500);
+  --color-status-failed-light: var(--palette-red-50);
+  --color-status-failed-border: var(--palette-red-100);
+  --color-status-failed-text: var(--palette-red-700);
+
+  --color-status-running: var(--palette-blue-500);
+  --color-status-running-light: var(--palette-blue-50);
+  --color-status-running-border: var(--palette-blue-100);
+  --color-status-running-text: var(--palette-blue-700);
+
+  /* ── Role Colors ───────────────────────────────────────────────────────── */
+  --color-role-admin: var(--palette-purple-500);
+  --color-role-admin-light: var(--palette-purple-50);
+  --color-role-admin-text: var(--palette-purple-700);
+
+  --color-role-editor: var(--palette-blue-500);
+  --color-role-editor-light: var(--palette-blue-50);
+  --color-role-editor-text: var(--palette-blue-700);
+
+  --color-role-viewer: var(--palette-gray-500);
+  --color-role-viewer-light: var(--palette-gray-50);
+  --color-role-viewer-text: var(--palette-gray-700);
+
+  /* ── Plan Tier Colors ──────────────────────────────────────────────────── */
+  --color-plan-free: var(--palette-gray-500);
+  --color-plan-free-light: var(--palette-gray-50);
+  --color-plan-free-text: var(--palette-gray-700);
+
+  --color-plan-team: var(--palette-blue-500);
+  --color-plan-team-light: var(--palette-blue-50);
+  --color-plan-team-text: var(--palette-blue-700);
+
+  --color-plan-enterprise: var(--palette-purple-500);
+  --color-plan-enterprise-light: var(--palette-purple-50);
+  --color-plan-enterprise-text: var(--palette-purple-700);
+
+  /* ── Typography ────────────────────────────────────────────────────────── */
+  --font-sans: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+
+  /* ── Spacing ───────────────────────────────────────────────────────────── */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* ── Border Radius ─────────────────────────────────────────────────────── */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  /* ── Shadows ───────────────────────────────────────────────────────────── */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* ── Sidebar ───────────────────────────────────────────────────────────── */
+  --sidebar-width: 16rem;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
