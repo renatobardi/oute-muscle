@@ -115,10 +115,14 @@
     </div>
   {:else if loading}
     <div class="flex justify-center py-12">
-      <span class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"></span>
+      <span
+        class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"
+      ></span>
     </div>
   {:else if entries.length === 0}
-    <div class="rounded-xl border border-dashed border-gray-300 py-12 text-center text-sm text-gray-500">
+    <div
+      class="rounded-xl border border-dashed border-gray-300 py-12 text-center text-sm text-gray-500"
+    >
       No audit log entries found.
     </div>
   {:else}
@@ -138,7 +142,9 @@
           {#each entries as entry}
             <tr class="hover:bg-gray-50">
               <td class="px-4 py-3">
-                <span class="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+                <span
+                  class="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700"
+                >
                   {entry.action}
                 </span>
               </td>
@@ -146,12 +152,15 @@
               <td class="px-4 py-3 font-mono text-xs text-gray-500">
                 {entry.entity_id.slice(0, 8)}...
               </td>
-              <td class="px-4 py-3 text-gray-600 text-xs">
+              <td class="px-4 py-3 text-xs text-gray-600">
                 {entry.performed_by_email ?? entry.performed_by?.slice(0, 8) ?? '—'}
               </td>
               <td class="max-w-xs px-4 py-3">
                 {#if entry.changes}
-                  <pre class="overflow-hidden text-ellipsis whitespace-nowrap text-xs text-gray-500">{JSON.stringify(entry.changes)}</pre>
+                  <pre
+                    class="overflow-hidden text-xs text-ellipsis whitespace-nowrap text-gray-500">{JSON.stringify(
+                      entry.changes
+                    )}</pre>
                 {:else}
                   <span class="text-gray-400">—</span>
                 {/if}
@@ -172,14 +181,20 @@
         <div class="flex gap-2">
           <button
             disabled={page <= 1}
-            onclick={() => { page--; loadAuditLog(); }}
+            onclick={() => {
+              page--;
+              loadAuditLog();
+            }}
             class="rounded border border-gray-300 px-3 py-1 disabled:opacity-40"
           >
             Previous
           </button>
           <button
             disabled={page >= totalPages}
-            onclick={() => { page++; loadAuditLog(); }}
+            onclick={() => {
+              page++;
+              loadAuditLog();
+            }}
             class="rounded border border-gray-300 px-3 py-1 disabled:opacity-40"
           >
             Next

@@ -100,7 +100,9 @@
                   <div class="h-2 w-24 rounded-full bg-gray-200">
                     <div
                       class="h-2 rounded-full bg-indigo-500"
-                      style="width: {metrics.incidents.total > 0 ? (count / metrics.incidents.total) * 100 : 0}%"
+                      style="width: {metrics.incidents.total > 0
+                        ? (count / metrics.incidents.total) * 100
+                        : 0}%"
                     ></div>
                   </div>
                   <span class="w-8 text-right text-sm font-medium text-gray-900">{count}</span>
@@ -121,7 +123,7 @@
         <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
           {#each Object.entries(metrics.findings.by_severity) as [severity, count]}
             <div class="rounded-lg border border-gray-200 bg-white p-4 text-center">
-              <p class="text-sm font-medium capitalize text-gray-500">{severity}</p>
+              <p class="text-sm font-medium text-gray-500 capitalize">{severity}</p>
               <p class="mt-1 text-2xl font-bold text-gray-900">{count}</p>
             </div>
           {/each}

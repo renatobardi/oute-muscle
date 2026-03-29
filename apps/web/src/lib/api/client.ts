@@ -437,8 +437,7 @@ export class ApiClient {
   // -------------------------------------------------------------------------
 
   readonly admin = {
-    metrics: (): Promise<AdminMetricsResponse> =>
-      this.request('GET', '/admin/metrics'),
+    metrics: (): Promise<AdminMetricsResponse> => this.request('GET', '/admin/metrics'),
 
     users: {
       list: (params?: {
@@ -447,8 +446,7 @@ export class ApiClient {
         tenant_id?: string;
         page?: number;
         per_page?: number;
-      }): Promise<PaginatedResponse<AdminUser>> =>
-        this.request('GET', '/admin/users', { params }),
+      }): Promise<PaginatedResponse<AdminUser>> => this.request('GET', '/admin/users', { params }),
 
       changeRole: (id: string, role: Role): Promise<AdminUserUpdate> =>
         this.request('POST', `/admin/users/${id}/role`, { body: { role } }),

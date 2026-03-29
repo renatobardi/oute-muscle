@@ -88,10 +88,14 @@
     </div>
   {:else if loading}
     <div class="flex justify-center py-12">
-      <span class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"></span>
+      <span
+        class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"
+      ></span>
     </div>
   {:else if tenants.length === 0}
-    <div class="rounded-xl border border-dashed border-gray-300 py-12 text-center text-sm text-gray-500">
+    <div
+      class="rounded-xl border border-dashed border-gray-300 py-12 text-center text-sm text-gray-500"
+    >
       No tenants found.
     </div>
   {:else}
@@ -113,7 +117,9 @@
             <tr class="hover:bg-gray-50">
               <td class="px-4 py-3 font-medium text-gray-900">{tenant.name}</td>
               <td class="px-4 py-3">
-                <span class="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 capitalize">
+                <span
+                  class="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 capitalize"
+                >
                   {tenant.plan_tier}
                 </span>
               </td>
@@ -122,9 +128,14 @@
               <td class="px-4 py-3 text-right text-gray-600">{tenant.findings_count_30d}</td>
               <td class="px-4 py-3">
                 {#if tenant.is_active}
-                  <span class="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Active</span>
+                  <span
+                    class="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700"
+                    >Active</span
+                  >
                 {:else}
-                  <span class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">Inactive</span>
+                  <span class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700"
+                    >Inactive</span
+                  >
                 {/if}
               </td>
               <td class="px-4 py-3 text-xs text-gray-500">
@@ -142,14 +153,20 @@
         <div class="flex gap-2">
           <button
             disabled={page <= 1}
-            onclick={() => { page--; loadTenants(); }}
+            onclick={() => {
+              page--;
+              loadTenants();
+            }}
             class="rounded border border-gray-300 px-3 py-1 disabled:opacity-40"
           >
             Previous
           </button>
           <button
             disabled={page >= totalPages}
-            onclick={() => { page++; loadTenants(); }}
+            onclick={() => {
+              page++;
+              loadTenants();
+            }}
             class="rounded border border-gray-300 px-3 py-1 disabled:opacity-40"
           >
             Next

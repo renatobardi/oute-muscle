@@ -48,6 +48,6 @@ function mapDecodedToken(decoded: DecodedIdToken): AuthUser {
     uid: decoded.uid,
     email: decoded.email ?? '',
     displayName: decoded.name ?? decoded.email ?? '',
-    emailVerified: decoded.email_verified ?? false
+    emailVerified: decoded.email_verified ?? false,
   };
 }

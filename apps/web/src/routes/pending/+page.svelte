@@ -17,9 +17,7 @@
 
 <div class="flex min-h-screen items-center justify-center bg-gray-50">
   <div class="w-full max-w-md rounded-xl bg-white p-8 text-center shadow-sm ring-1 ring-gray-200">
-    <div
-      class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100"
-    >
+    <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100">
       <svg
         class="h-8 w-8 text-amber-600"
         fill="none"
@@ -48,7 +46,9 @@
              disabled:cursor-not-allowed disabled:opacity-60"
     >
       {#if loggingOut}
-        <span class="h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></span>
+        <span
+          class="h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"
+        ></span>
         Logging out...
       {:else}
         Sign out

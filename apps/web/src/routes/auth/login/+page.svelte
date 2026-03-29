@@ -133,7 +133,8 @@
                disabled:cursor-not-allowed disabled:opacity-60"
       >
         {#if loading}
-          <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+          <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+          ></span>
         {/if}
         Sign in
       </button>

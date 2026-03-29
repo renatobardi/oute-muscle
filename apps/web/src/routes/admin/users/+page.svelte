@@ -91,7 +91,9 @@
 <div>
   <div class="mb-6">
     <h1 class="text-2xl font-bold text-gray-900">Users</h1>
-    <p class="mt-1 text-sm text-gray-500">Manage all platform users across tenants — {total} total</p>
+    <p class="mt-1 text-sm text-gray-500">
+      Manage all platform users across tenants — {total} total
+    </p>
   </div>
 
   <!-- Search -->
@@ -123,10 +125,14 @@
     </div>
   {:else if loading}
     <div class="flex justify-center py-12">
-      <span class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"></span>
+      <span
+        class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"
+      ></span>
     </div>
   {:else if users.length === 0}
-    <div class="rounded-xl border border-dashed border-gray-300 py-12 text-center text-sm text-gray-500">
+    <div
+      class="rounded-xl border border-dashed border-gray-300 py-12 text-center text-sm text-gray-500"
+    >
       No users found.
     </div>
   {:else}
@@ -151,21 +157,28 @@
               <td class="px-4 py-3 text-gray-600">{user.display_name ?? '—'}</td>
               <td class="px-4 py-3 text-gray-600">{user.tenant_name ?? '—'}</td>
               <td class="px-4 py-3">
-                <span class="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700 capitalize">
+                <span
+                  class="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700 capitalize"
+                >
                   {user.role}
                 </span>
               </td>
               <td class="px-4 py-3">
                 {#if user.is_active}
-                  <span class="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Active</span>
+                  <span
+                    class="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700"
+                    >Active</span
+                  >
                 {:else}
-                  <span class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">Inactive</span>
+                  <span class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700"
+                    >Inactive</span
+                  >
                 {/if}
               </td>
-              <td class="px-4 py-3 text-gray-500 text-xs">
+              <td class="px-4 py-3 text-xs text-gray-500">
                 {user.last_login ? new Date(user.last_login).toLocaleDateString() : '—'}
               </td>
-              <td class="px-4 py-3 text-gray-500 text-xs">
+              <td class="px-4 py-3 text-xs text-gray-500">
                 {new Date(user.created_at).toLocaleDateString()}
               </td>
               <td class="px-4 py-3">
@@ -173,18 +186,21 @@
                   <!-- Role dropdown -->
                   <div class="relative">
                     <button
-                      onclick={() => (roleDropdownOpen = roleDropdownOpen === user.id ? null : user.id)}
+                      onclick={() =>
+                        (roleDropdownOpen = roleDropdownOpen === user.id ? null : user.id)}
                       class="rounded border border-gray-300 px-2 py-1 text-xs hover:bg-gray-100"
                       title="Change role"
                     >
                       Role
                     </button>
                     {#if roleDropdownOpen === user.id}
-                      <div class="absolute right-0 z-10 mt-1 w-28 rounded-md border border-gray-200 bg-white shadow-lg">
+                      <div
+                        class="absolute right-0 z-10 mt-1 w-28 rounded-md border border-gray-200 bg-white shadow-lg"
+                      >
                         {#each roles as role}
                           <button
                             onclick={() => changeRole(user.id, role)}
-                            class="block w-full px-3 py-1.5 text-left text-xs hover:bg-gray-100 capitalize
+                            class="block w-full px-3 py-1.5 text-left text-xs capitalize hover:bg-gray-100
                               {user.role === role ? 'font-bold text-indigo-600' : 'text-gray-700'}"
                           >
                             {role}
@@ -226,14 +242,20 @@
         <div class="flex gap-2">
           <button
             disabled={page <= 1}
-            onclick={() => { page--; loadUsers(); }}
+            onclick={() => {
+              page--;
+              loadUsers();
+            }}
             class="rounded border border-gray-300 px-3 py-1 disabled:opacity-40"
           >
             Previous
           </button>
           <button
             disabled={page >= totalPages}
-            onclick={() => { page++; loadUsers(); }}
+            onclick={() => {
+              page++;
+              loadUsers();
+            }}
             class="rounded border border-gray-300 px-3 py-1 disabled:opacity-40"
           >
             Next

@@ -106,7 +106,9 @@
       <div class="rounded-xl border border-gray-200 bg-white p-6">
         <p class="text-sm font-medium text-gray-500">Active Rules</p>
         <p class="mt-2 text-3xl font-bold text-gray-900">{metrics.rules.active}</p>
-        <p class="mt-1 text-sm text-gray-400">{metrics.rules.synthesis_pending} synthesis pending</p>
+        <p class="mt-1 text-sm text-gray-400">
+          {metrics.rules.synthesis_pending} synthesis pending
+        </p>
       </div>
 
       <!-- Incidents with embedding -->
