@@ -153,6 +153,64 @@ export interface SynthesisCandidate {
   updated_at: string;
 }
 
+export interface AdminUser {
+  id: string;
+  firebase_uid?: string;
+  email: string;
+  display_name?: string;
+  tenant_id?: string;
+  tenant_name?: string;
+  role: string;
+  is_active: boolean;
+  email_verified: boolean;
+  last_login?: string;
+  created_at: string;
+}
+
+export interface AdminUserUpdate {
+  id: string;
+  email: string;
+  role?: string;
+  is_active?: boolean;
+  tenant_id?: string;
+  tenant_name?: string;
+  updated_at: string;
+}
+
+export interface AdminTenant {
+  id: string;
+  name: string;
+  slug: string;
+  plan_tier: string;
+  is_active: boolean;
+  contributor_count: number;
+  scan_count_30d: number;
+  findings_count_30d: number;
+  created_at: string;
+}
+
+export interface AdminMetricsResponse {
+  users: { total: number; active_30d: number };
+  tenants: { total: number; active: number };
+  scans: { total_30d: number; active_now: number };
+  findings: { total_30d: number; by_severity: Record<string, number> };
+  incidents: { total: number; with_embedding: number; by_category: Record<string, number> };
+  rules: { active: number; auto_disabled: number; synthesis_pending: number };
+  llm_usage_30d: { flash: number; pro: number; claude: number };
+}
+
+export interface AdminAuditLogEntry {
+  id: string;
+  tenant_id?: string;
+  action: string;
+  entity_type: string;
+  entity_id: string;
+  performed_by?: string;
+  performed_by_email?: string;
+  changes?: Record<string, unknown>;
+  created_at: string;
+}
+
 export interface PaginatedResponse<T> {
   items: T[];
   total: number;
@@ -372,6 +430,61 @@ export class ApiClient {
       page?: number;
       per_page?: number;
     }): Promise<PaginatedResponse<AuditLogEntry>> => this.request('GET', '/audit-log', { params }),
+  };
+
+  // -------------------------------------------------------------------------
+  // Admin namespace (platform-wide, admin-only)
+  // -------------------------------------------------------------------------
+
+  readonly admin = {
+    metrics: (): Promise<AdminMetricsResponse> =>
+      this.request('GET', '/admin/metrics'),
+
+    users: {
+      list: (params?: {
+        q?: string;
+        role?: string;
+        tenant_id?: string;
+        page?: number;
+        per_page?: number;
+      }): Promise<PaginatedResponse<AdminUser>> =>
+        this.request('GET', '/admin/users', { params }),
+
+      changeRole: (id: string, role: Role): Promise<AdminUserUpdate> =>
+        this.request('POST', `/admin/users/${id}/role`, { body: { role } }),
+
+      deactivate: (id: string): Promise<AdminUserUpdate> =>
+        this.request('POST', `/admin/users/${id}/deactivate`),
+
+      activate: (id: string): Promise<AdminUserUpdate> =>
+        this.request('POST', `/admin/users/${id}/activate`),
+
+      assignTenant: (id: string, tenantId: string): Promise<AdminUserUpdate> =>
+        this.request('POST', `/admin/users/${id}/assign-tenant`, { body: { tenant_id: tenantId } }),
+    },
+
+    tenants: {
+      list: (params?: {
+        q?: string;
+        plan_tier?: string;
+        is_active?: boolean;
+        page?: number;
+        per_page?: number;
+      }): Promise<PaginatedResponse<AdminTenant>> =>
+        this.request('GET', '/admin/tenants', { params }),
+    },
+
+    auditLog: {
+      list: (params?: {
+        entity_type?: string;
+        action?: string;
+        from?: string;
+        to?: string;
+        page?: number;
+        per_page?: number;
+      }): Promise<PaginatedResponse<AdminAuditLogEntry>> =>
+        this.request('GET', '/admin/audit-log', { params }),
+    },
   };
 
   // -------------------------------------------------------------------------

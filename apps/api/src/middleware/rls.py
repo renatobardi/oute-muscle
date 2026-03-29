@@ -110,6 +110,7 @@ class RLSMiddleware(BaseHTTPMiddleware):
         request.state.user_id = user_id
         request.state.plan = plan
         request.state.role = role
+        request.state.is_admin = role == "admin"
 
         return await call_next(request)
 
@@ -155,9 +156,13 @@ def _decode_jwt(
     plan = payload.get(plan_claim, "free")
     role = payload.get(role_claim, "viewer")
 
-    if not tenant_id or not user_id:
-        logger.debug("JWT missing required claims: tenant_id=%s user_id=%s", tenant_id, user_id)
+    if not user_id:
+        logger.debug("JWT missing user_id claim")
         return None
+
+    # Admin users may not have a tenant_id — that's expected
+    if not tenant_id:
+        tenant_id = ""
 
     return tenant_id, user_id, plan, role
 

@@ -22,6 +22,20 @@ def register_api_key(key: str, tenant_id: str, tier: str) -> None:
     _API_KEY_STORE[key] = {"tenant_id": tenant_id, "tier": tier}
 
 
+async def require_admin(request: Request) -> None:
+    """FastAPI dependency: checks request.state.role == 'admin'.
+
+    Raises:
+        HTTPException: 403 if user is not an admin.
+    """
+    role = getattr(request.state, "role", None)
+    if role != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail={"error": "Admin access required", "code": "FORBIDDEN"},
+        )
+
+
 async def require_api_key(
     request: Request,
     x_api_key: str | None = Header(default=None),

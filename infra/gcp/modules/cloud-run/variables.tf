@@ -28,3 +28,22 @@ variable "memory" {
   type    = string
   default = "512Mi"
 }
+
+variable "admin_emails" {
+  type    = string
+  default = ""
+}
+
+variable "allowed_origins" {
+  type    = string
+  default = "https://muscle.oute.pro,https://oute.pro"
+}
+
+variable "custom_domains" {
+  description = "List of custom domain mappings for Cloud Run services"
+  type = list(object({
+    domain       = string
+    service_name = string
+  }))
+  default = []
+}

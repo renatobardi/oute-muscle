@@ -114,6 +114,11 @@ module "cloud_run" {
   max_instances      = var.cloud_run_max_instances
   cpu                = var.cloud_run_cpu
   memory             = var.cloud_run_memory
+
+  custom_domains = [
+    { domain = "muscle.oute.pro",     service_name = "${local.name_prefix}-web" },
+    { domain = "mcp.muscle.oute.pro", service_name = "${local.name_prefix}-mcp" },
+  ]
 }
 
 module "vertex_ai" {
@@ -152,4 +157,9 @@ output "workload_identity_provider" {
 output "github_actions_service_account" {
   description = "Service account email used by GitHub Actions"
   value       = module.iam.github_actions_service_account_email
+}
+
+output "domain_mappings" {
+  description = "Custom domain mappings for Cloud Run services"
+  value       = module.cloud_run.domain_mappings
 }

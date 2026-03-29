@@ -124,10 +124,10 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
-    # CORS
+    # CORS — origins controlled by ALLOWED_ORIGINS env var (comma-separated)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],  # TODO: restrict via env var in production
+        allow_origins=[o.strip() for o in settings.allowed_origins.split(",") if o.strip()],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -194,6 +194,11 @@ def create_app() -> FastAPI:
     from apps.api.src.routes.synthesis import router as synthesis_router
 
     app.include_router(synthesis_router, prefix="/v1")
+
+    # Admin cockpit API (spec 237)
+    from apps.api.src.routes.admin import router as admin_router
+
+    app.include_router(admin_router, prefix="/v1")
 
     return app
 

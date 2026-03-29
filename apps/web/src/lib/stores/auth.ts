@@ -1,67 +1,97 @@
 /**
- * T140: Auth store — JWT token, user profile, and role helpers.
- * Persists to localStorage on the browser side.
+ * T021: Auth store — Firebase-backed reactive auth state.
+ *
+ * Uses Firebase onAuthStateChanged for reactive state.
+ * Session cookie is managed server-side; this store tracks client-side awareness.
  */
 
-import { writable, derived, get } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import { browser } from '$app/environment';
-import { apiClient } from '$lib/api';
-import type { Role } from '$lib/api/client';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
+export type Role = 'admin' | 'editor' | 'viewer';
+
 export interface AuthUser {
   id: string;
+  firebaseUid: string;
   email: string;
+  displayName: string;
   role: Role;
+  tenantId: string | null;
 }
 
 interface AuthState {
   user: AuthUser | null;
-  token: string | null;
   loading: boolean;
 }
 
 // ---------------------------------------------------------------------------
-// State
+// Store
 // ---------------------------------------------------------------------------
 
 function createAuthStore() {
-  const storedToken = browser ? localStorage.getItem('auth_token') : null;
-  const storedUser = browser ? localStorage.getItem('auth_user') : null;
-
   const { subscribe, set, update } = writable<AuthState>({
-    user: storedUser ? (JSON.parse(storedUser) as AuthUser) : null,
-    token: storedToken,
-    loading: false,
+    user: null,
+    loading: true,
   });
+
+  let unsubscribeFirebase: (() => void) | null = null;
+
+  function init() {
+    if (!browser) return;
+
+    // Lazy import to avoid SSR issues with Firebase client SDK
+    import('firebase/auth').then(({ onAuthStateChanged }) => {
+      import('$lib/firebase').then(({ auth: firebaseAuth }) => {
+        unsubscribeFirebase = onAuthStateChanged(firebaseAuth, (firebaseUser) => {
+          if (firebaseUser) {
+            // User is signed in on the client.
+            // The actual AppUser data comes from the session cookie / server.
+            // Here we store minimal client-side awareness.
+            update((s) => ({
+              ...s,
+              user: s.user ?? {
+                id: '',
+                firebaseUid: firebaseUser.uid,
+                email: firebaseUser.email ?? '',
+                displayName: firebaseUser.displayName ?? firebaseUser.email ?? '',
+                role: 'viewer',
+                tenantId: null,
+              },
+              loading: false,
+            }));
+          } else {
+            set({ user: null, loading: false });
+          }
+        });
+      });
+    });
+  }
+
+  init();
 
   return {
     subscribe,
 
-    /** Persist token + user after successful OAuth callback. */
-    login(token: string, user: AuthUser) {
-      if (browser) {
-        localStorage.setItem('auth_token', token);
-        localStorage.setItem('auth_user', JSON.stringify(user));
-      }
-      apiClient.setToken(token);
-      set({ user, token, loading: false });
+    /** Update local user data (e.g., after session exchange returns server user). */
+    setUser(user: AuthUser) {
+      set({ user, loading: false });
     },
 
-    logout() {
-      if (browser) {
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('auth_user');
-      }
-      apiClient.setToken(null);
-      set({ user: null, token: null, loading: false });
+    clearUser() {
+      set({ user: null, loading: false });
     },
 
     setLoading(loading: boolean) {
       update((s) => ({ ...s, loading }));
+    },
+
+    destroy() {
+      unsubscribeFirebase?.();
+      unsubscribeFirebase = null;
     },
   };
 }
@@ -72,10 +102,7 @@ export const auth = createAuthStore();
 // Derived helpers
 // ---------------------------------------------------------------------------
 
-export const isAuthenticated = derived(
-  auth,
-  ($auth) => $auth.token !== null && $auth.user !== null
-);
+export const isAuthenticated = derived(auth, ($auth) => $auth.user !== null);
 
 export const currentUser = derived(auth, ($auth) => $auth.user);
 
@@ -85,11 +112,3 @@ export const isEditorOrAbove = derived(
   auth,
   ($auth) => $auth.user?.role === 'admin' || $auth.user?.role === 'editor'
 );
-
-/** Returns true if the current user has at least the given role. */
-export function hasRole(role: Role): boolean {
-  const user = get(currentUser);
-  if (!user) return false;
-  const hierarchy: Role[] = ['viewer', 'editor', 'admin'];
-  return hierarchy.indexOf(user.role) >= hierarchy.indexOf(role);
-}

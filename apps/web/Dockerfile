@@ -1,21 +1,24 @@
-# T150: SvelteKit Dockerfile — multi-stage build for production.
-# Stage 1: build the SvelteKit app
+# Multi-stage Dockerfile for SvelteKit with adapter-node
+
+# Stage 1: install dependencies
+FROM node:20-alpine AS deps
+
+WORKDIR /app
+
+COPY apps/web/package.json apps/web/package-lock.json* ./
+RUN npm ci
+
+# Stage 2: build the SvelteKit app
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install deps
-COPY package.json package-lock.json* ./
-RUN npm ci
-
-# Copy source and build
-COPY . .
+COPY --from=deps /app/node_modules ./node_modules
+COPY apps/web/ .
 RUN npm run build
-
-# Prune dev dependencies
 RUN npm prune --omit=dev
 
-# Stage 2: production runtime
+# Stage 3: production runtime
 FROM node:20-alpine AS runtime
 
 WORKDIR /app
@@ -24,7 +27,7 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOST=0.0.0.0
 
-# Copy built output and pruned node_modules
+# Copy built output and production node_modules
 COPY --from=builder /app/build ./build
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json

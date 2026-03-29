@@ -225,3 +225,10 @@ This project uses SpecKit v0.4.3 for structured feature development:
 Design artifacts live in `specs/{feature-name}/`. Key scripts in `.specify/scripts/bash/`:
 - `create-new-feature.sh` — Creates feature branch + spec directory
 - `check-prerequisites.sh` — Validates feature context
+
+## Active Technologies
+- Python 3.12+ (API), TypeScript strict (Web, SvelteKit) + firebase (client SDK), firebase-admin (server SDK), @sveltejs/adapter-node (237-admin-auth-domain)
+- PostgreSQL 16 + pgvector (Cloud SQL) — existing (237-admin-auth-domain)
+
+## Recent Changes
+- 237-admin-auth-domain: Added Python 3.12+ (API), TypeScript strict (Web, SvelteKit) + firebase (client SDK), firebase-admin (server SDK), @sveltejs/adapter-node
