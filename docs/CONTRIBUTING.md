@@ -12,13 +12,12 @@ The setup script checks prerequisites (uv, node, gcloud), installs all dependenc
 
 ## Workflow
 
-This project uses a sequential branch naming scheme (`NNN-short-description`) and Gitflow-style rules:
+This project uses **Trunk-Based CD**: a single `prod` environment, no staging. Every PR merged to `main` deploys to prod automatically.
 
 1. **Create a branch** — pick the next number (`git branch --list | sort -r | head -1`)
 2. **Write tests first** — TDD is mandatory, not optional
 3. **Push and open a PR** — CI must be green before merge
-4. **Merge to main** — staging deploys automatically
-5. **Tag for prod** — `git tag vX.Y.Z && git push origin vX.Y.Z`
+4. **Merge to main** — prod deploys automatically
 
 ### Branch naming
 

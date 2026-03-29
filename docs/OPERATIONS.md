@@ -49,12 +49,13 @@ GitHub PR → GitHub Actions (CI) → POST /v1/scans → Cloud Run (API)
 
 ---
 
-## Ambientes e URLs
+## Ambiente e URL
+
+Ambiente único: **prod** — Trunk-Based CD. Merge em `main` deploya automaticamente.
 
 | Ambiente | API URL | Trigger de deploy |
 |----------|---------|-------------------|
-| Staging | `https://oute-staging-api-ujzimacvza-uc.a.run.app` | Push em `main` |
-| Prod | `https://oute-prod-api-ujzimacvza-uc.a.run.app` | Tag `v*.*.*` |
+| Prod | `https://oute-prod-api-ujzimacvza-uc.a.run.app` | Merge em `main` |
 
 **Console GCP**: https://console.cloud.google.com/run?project=oute-488706
 
@@ -124,9 +125,6 @@ jsonPayload.event="rate_limit_exceeded"
 ```bash
 # Prod — liveness
 curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/live
-
-# Staging — liveness
-curl https://oute-staging-api-ujzimacvza-uc.a.run.app/health/live
 
 # Readiness (verifica DB + LLM)
 curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/ready
@@ -508,7 +506,6 @@ done
 | Secret | Conteúdo | Usado por |
 |--------|----------|-----------|
 | `oute-prod-db-password` | Senha do `muscle_app` no Cloud SQL | Cloud Run (prod API) |
-| `oute-staging-db-password` | Senha do `muscle_app` no Cloud SQL | Cloud Run (staging API) |
 
 ### Acessar um segredo
 
@@ -835,15 +832,12 @@ alembic -c packages/db/alembic.ini current
 |---------|--------------|--------|
 | Projeto | `oute-488706` | https://console.cloud.google.com/home/dashboard?project=oute-488706 |
 | Cloud Run (prod) | `oute-prod-api` | https://console.cloud.google.com/run/detail/us-central1/oute-prod-api/metrics?project=oute-488706 |
-| Cloud Run (staging) | `oute-staging-api` | https://console.cloud.google.com/run/detail/us-central1/oute-staging-api/metrics?project=oute-488706 |
 | Cloud SQL | `oute-postgres` | https://console.cloud.google.com/sql/instances/oute-postgres/overview?project=oute-488706 |
 | Artifact Registry (prod) | `oute-prod-docker` | `us-central1-docker.pkg.dev/oute-488706/oute-prod-docker` |
-| Artifact Registry (staging) | `oute-staging-docker` | `us-central1-docker.pkg.dev/oute-488706/oute-staging-docker` |
 | Secret Manager | — | https://console.cloud.google.com/security/secret-manager?project=oute-488706 |
-| Terraform state | `oute-terraform-state` | `gs://oute-terraform-state/oute-muscle/` |
+| Terraform state | `oute-terraform-state` | `gs://oute-terraform-state/oute-muscle/prod/` |
 | Cloud Logging | — | https://console.cloud.google.com/logs/query?project=oute-488706 |
 | Vertex AI | — | https://console.cloud.google.com/vertex-ai?project=oute-488706 |
 | IAM | — | https://console.cloud.google.com/iam-admin/iam?project=oute-488706 |
 | WIF Pool (prod) | `oute-prod-gh-pool` | https://console.cloud.google.com/iam-admin/workload-identity-pools?project=oute-488706 |
 | GH Actions SA (prod) | `oute-prod-gh-actions@oute-488706.iam.gserviceaccount.com` | — |
-| GH Actions SA (staging) | `oute-staging-gh-actions@oute-488706.iam.gserviceaccount.com` | — |

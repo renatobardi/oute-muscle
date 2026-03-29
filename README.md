@@ -135,18 +135,14 @@ Rule ID format: `{category}-{NNN}` (e.g., `unsafe-regex-001`). Every rule requir
 
 ## Deployment
 
-Two environments on GCP — **staging** and **prod** — both on Cloud Run.
+Single environment on GCP — **prod** on Cloud Run. Trunk-Based CD.
 
-- Staging deploys automatically on every push to `main`
-- Prod deploys on version tags (`v*.*.*`)
+- Every PR merged to `main` deploys to prod automatically
+- No staging, no tags, no manual steps
 
 ```bash
-# Bootstrap a new environment (one-time)
-bash scripts/deploy-bootstrap.sh staging
-bash scripts/deploy-bootstrap.sh prod
-
-# Ship a new release to prod
-git tag v0.2.0 && git push origin v0.2.0
+# Bootstrap prod infrastructure (one-time)
+bash scripts/deploy-bootstrap.sh
 ```
 
 See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the full runbook.

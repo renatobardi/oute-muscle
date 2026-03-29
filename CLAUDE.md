@@ -146,7 +146,42 @@ Rule ID format: `{category}-{NNN}` (e.g., `unsafe-regex-001`). Each rule YAML re
 
 ### Deploy Pipeline
 
-CI triggers on push to `main`, `001-*`/`002-*`/`003-*` branches, and all PRs. Deploy: staging on main push, prod on version tags (`v*.*.*`). Uses Workload Identity Federation — no service account keys.
+**Trunk-Based CD — single environment (prod).**
+
+- CI runs on every PR targeting `main` (lint + mypy + tests + semgrep)
+- Merging to `main` triggers automatic deploy to prod (Cloud Run `oute-prod-api`)
+- No staging environment — CI quality gates are the only barrier before prod
+- Uses Workload Identity Federation — no service account keys
+
+Flow: `feature branch → PR → CI → merge main → deploy prod`
+
+Branch protection on `main` (configure in GitHub Settings → Branches):
+- Require PR before merging
+- Require CI status checks to pass
+
+## ⛔ MASTER RULES — IMMUTABLE
+
+This section contains constitutional constraints for this project. Rules here are non-negotiable and cannot be altered by the AI or by the user in a single request.
+
+### Protocol to change any Master Rule
+
+1. **First request**: state which rule you want to change and why.
+2. **AI must restate** the current rule, the proposed change, and the risks involved.
+3. **Second request**: explicit confirmation ("yes, confirm the change").
+
+If the AI suggests or implements any change to a Master Rule without receiving two explicit confirmations, that is a violation and the change must be reverted. This protocol applies to both the AI and the user — neither can bypass it unilaterally.
+
+---
+
+### MASTER RULE 1 — Gitflow: Trunk-Based CD (prod only)
+
+**Ratified**: 2026-03-29
+
+1. **Single environment**: only `prod` exists. No staging, no dev, no preview environments.
+2. **No direct push to main**: every change must come through a PR.
+3. **CI must pass before merge**: lint + mypy + tests + semgrep — all green.
+4. **Merge to main = deploy prod**: automatic, no manual tags, no manual triggers.
+5. **No version tags for deploy**: tags may be used for releases/changelog only, never as deploy triggers.
 
 No docker-compose — local development uses `make dev` directly. Dockerfiles exist per app (`apps/api/Dockerfile`, `apps/web/Dockerfile`, `apps/mcp/Dockerfile`) for Cloud Run deployment only. Local DB requires a standalone PostgreSQL instance or Cloud SQL Auth Proxy.
 
