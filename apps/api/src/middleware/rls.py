@@ -128,9 +128,9 @@ def _decode_jwt(
 
     Expected claims:
       sub          → user_id
-      https://outemuscle.com/tenant_id  → tenant_id
-      https://outemuscle.com/plan       → plan
-      https://outemuscle.com/role       → role
+      https://muscle.oute.pro/tenant_id  → tenant_id
+      https://muscle.oute.pro/plan       → plan
+      https://muscle.oute.pro/role       → role
     """
     try:
         payload = jwt.decode(
@@ -146,9 +146,9 @@ def _decode_jwt(
         logger.debug("Invalid JWT: %s", exc)
         return None
 
-    tenant_claim = "https://outemuscle.com/tenant_id"
-    plan_claim = "https://outemuscle.com/plan"
-    role_claim = "https://outemuscle.com/role"
+    tenant_claim = "https://muscle.oute.pro/tenant_id"
+    plan_claim = "https://muscle.oute.pro/plan"
+    role_claim = "https://muscle.oute.pro/role"
 
     tenant_id = payload.get(tenant_claim)
     user_id = payload.get("sub")

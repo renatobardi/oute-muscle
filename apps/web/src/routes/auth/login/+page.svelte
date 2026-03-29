@@ -7,7 +7,7 @@
   import { onMount } from 'svelte';
 
   const OAUTH_AUTH_URL =
-    import.meta.env.VITE_MCP_AUTH_URL ?? 'https://mcp.outemuscle.com/oauth/authorize';
+    import.meta.env.VITE_MCP_AUTH_URL ?? 'https://mcp.muscle.oute.pro/oauth/authorize';
   const CLIENT_ID = import.meta.env.VITE_OAUTH_CLIENT_ID ?? 'oute-dashboard';
   const REDIRECT_URI =
     typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : '';
@@ -83,7 +83,7 @@
 
     <p class="mt-6 text-center text-xs text-gray-400">
       By continuing you agree to our
-      <a href="https://outemuscle.com/terms" class="underline">Terms of Service</a>.
+      <a href="https://muscle.oute.pro/terms" class="underline">Terms of Service</a>.
     </p>
   </div>
 </div>

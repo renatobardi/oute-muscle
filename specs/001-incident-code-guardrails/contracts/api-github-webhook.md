@@ -88,7 +88,7 @@ Tenant provisioning and deprovisioning.
 **Recommended Action**: Replace with a linear-time regex using RE2 engine, or add a timeout wrapper.
 
 ---
-*Oute Muscle — Layer 2 Advisory (non-blocking) | [View incident details](https://app.outemuscle.com/incidents/...)*
+*Oute Muscle — Layer 2 Advisory (non-blocking) | [View incident details](https://app.muscle.oute.pro/incidents/...)*
 ```
 
 **Anchoring strategy**: Layer 2 advisories are posted as inline PR review comments when the matched pattern can be tied to a specific file and line range in the diff (using `file_path` + `start_line`). When the advisory is a general observation not tied to a specific line (e.g., architectural concern across multiple files), it is posted as a top-level PR comment instead.

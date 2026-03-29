@@ -1,6 +1,6 @@
 # REST API Contract
 
-**Base URL**: `https://api.outemuscle.com/v1`
+**Base URL**: `https://muscle.oute.pro/api/v1`
 **Auth**: Bearer token (JWT) for dashboard users, API key (`X-API-Key` header) for CI/CD integrations.
 **Content-Type**: `application/json` (default), `application/sarif+json` (via `Accept` header)
 **Rate Limiting**: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset` headers on every response.

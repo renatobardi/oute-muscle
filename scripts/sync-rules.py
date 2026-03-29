@@ -9,7 +9,7 @@ Reads all YAML rule files from packages/semgrep-rules/ and either:
 
 Usage:
   python scripts/sync-rules.py --target stdout
-  python scripts/sync-rules.py --target api --api-url https://api.oute.me --api-key $API_KEY
+  python scripts/sync-rules.py --target api --api-url https://muscle.oute.pro/api --api-key $API_KEY
   python scripts/sync-rules.py --target github --repo owner/repo --token $GITHUB_TOKEN
 
 Exit codes:
@@ -228,7 +228,7 @@ def main() -> None:
     parser.add_argument("--rules-dir", type=Path, default=RULES_DIR)
 
     # API target
-    parser.add_argument("--api-url", default="https://api.oute.me")
+    parser.add_argument("--api-url", default="https://muscle.oute.pro/api")
     parser.add_argument("--api-key", default="")
 
     # GitHub target

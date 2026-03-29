@@ -181,7 +181,7 @@
               <td class="px-4 py-3">
                 <a
                   href="{import.meta.env.VITE_API_BASE_URL ??
-                    'https://api.outemuscle.com/v1'}/rules/{rule.id}/yaml"
+                    'https://muscle.oute.pro/api/v1'}/rules/{rule.id}/yaml"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="text-xs text-indigo-600 hover:underline"

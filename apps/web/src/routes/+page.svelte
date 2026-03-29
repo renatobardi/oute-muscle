@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * Landing page — oute.me
+   * Landing page — muscle.oute.pro
    * Dark, developer-focused, Vercel/Linear aesthetic.
    * Captures beta waitlist emails via POST /v1/waitlist.
    */

@@ -319,7 +319,7 @@ async def ingest_url_post(
         async with httpx.AsyncClient(follow_redirects=True, timeout=10.0) as client:
             resp = await client.get(
                 request.url,
-                headers={"User-Agent": "OuteMuscle-Ingest/1.0 (+https://oute.me)"},
+                headers={"User-Agent": "OuteMuscle-Ingest/1.0 (+https://muscle.oute.pro)"},
             )
             resp.raise_for_status()
             html_body = resp.text
