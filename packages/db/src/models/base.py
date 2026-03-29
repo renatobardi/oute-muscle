@@ -21,6 +21,8 @@ class Base(DeclarativeBase):
     Provides common fields (id, created_at, updated_at) and RLS support.
     """
 
+    __allow_unmapped__ = True
+
     @declared_attr
     def __tablename__(cls) -> str:  # noqa: N805
         """Convert class name to snake_case table name."""
