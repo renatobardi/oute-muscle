@@ -66,9 +66,9 @@ class DIContainer:
             self.llm_claude = NullLLMAdapter()  # type: ignore[assignment]
 
         logger.info(
-            "di_container_initialized",
-            gcp_configured=bool(gcp_project),
-            database_url=settings.database_url[:30] + "...",
+            "di_container_initialized gcp_configured=%s database_url=%s...",
+            bool(gcp_project),
+            settings.database_url[:30],
         )
 
     async def close(self) -> None:
@@ -94,7 +94,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     global _container
 
     configure_logging()
-    logger.info("starting_oute_muscle_api", version="0.1.0")
+    logger.info("starting_oute_muscle_api version=0.1.0")
 
     _container = DIContainer()
     logger.info("startup_complete")
@@ -136,7 +136,7 @@ def create_app() -> FastAPI:
     # Global exception handler
     @app.exception_handler(Exception)
     async def global_exception_handler(request, exc):  # type: ignore[no-untyped-def]
-        logger.exception("unhandled_exception", path=str(request.url.path))
+        logger.exception("unhandled_exception path=%s", request.url.path)
         return JSONResponse(
             status_code=500,
             content={"error": "Internal server error", "code": "INTERNAL_SERVER_ERROR"},
