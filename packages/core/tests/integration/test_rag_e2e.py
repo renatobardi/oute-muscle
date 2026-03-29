@@ -21,8 +21,8 @@ async def test_diff_in_advisory_out() -> None:
     """Submit a diff, verify advisory is generated with incident reference."""
     import uuid
 
-    from packages.core.src.adapters.vertex_embedding import VertexAIEmbedding
-    from packages.core.src.adapters.vertex_llm import VertexGeminiFlash
+    from apps.api.src.adapters.vertex_embedding import VertexAIEmbedding
+    from apps.api.src.adapters.vertex_llm import VertexGeminiFlash
     from packages.core.src.domain.advisory.llm_router import LLMRouter
     from packages.core.src.domain.advisory.rag_pipeline import RAGPipeline
     from packages.core.src.domain.incidents.enums import (
@@ -46,11 +46,13 @@ async def test_diff_in_advisory_out() -> None:
     scan_id = uuid.uuid4()
 
     # Initialize real adapters
-    embedding = VertexAIEmbedding()
+    project_id = os.environ["GOOGLE_CLOUD_PROJECT"]
+    embedding = VertexAIEmbedding(project_id=project_id)
+    flash = VertexGeminiFlash(project_id=project_id)
     router = LLMRouter(
-        flash=VertexGeminiFlash(),
-        pro=VertexGeminiFlash(),  # Use Flash for all in test
-        claude=VertexGeminiFlash(),
+        flash=flash,
+        pro=flash,  # Use Flash for all in test
+        claude=flash,
     )
 
     # In real scenario, vector_search would use DB
@@ -79,7 +81,7 @@ async def test_diff_in_advisory_out() -> None:
     assert advisory.scan_id == scan_id
     assert len(advisory.analysis_text) > 0
     assert advisory.llm_model_used in [
-        "gemini-2.5-flash",
-        "gemini-2.5-pro",
-        "claude-sonnet-4@20251101",
+        "gemini-2.5-flash-preview-04-17",
+        "gemini-2.5-pro-preview-03-25",
+        "claude-sonnet-4@20250514",
     ]

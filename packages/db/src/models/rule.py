@@ -54,6 +54,10 @@ class SemgrepRule(Base):
         nullable=True,
     )
 
+    # False positive tracking (FR-028: auto-disable at threshold 3)
+    false_positive_count = Column(Integer, nullable=False, default=0)
+    auto_disabled = Column("auto_disabled", type_=None, default=False, nullable=False)
+
     __table_args__ = (
         CheckConstraint(
             "sequence_number >= 1",

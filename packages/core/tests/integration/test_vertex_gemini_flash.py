@@ -19,9 +19,10 @@ pytestmark = pytest.mark.skipif(
 @pytest.mark.asyncio
 async def test_flash_generate_returns_string() -> None:
     """Basic generation with Flash returns non-empty string."""
-    from packages.core.src.adapters.vertex_llm import VertexGeminiFlash
+    from apps.api.src.adapters.vertex_llm import VertexGeminiFlash
 
-    adapter = VertexGeminiFlash()
+    project_id = os.environ["GOOGLE_CLOUD_PROJECT"]
+    adapter = VertexGeminiFlash(project_id=project_id)
     result = await adapter.generate("Say hello in one word.")
 
     assert isinstance(result, str)
@@ -31,9 +32,9 @@ async def test_flash_generate_returns_string() -> None:
 @pytest.mark.asyncio
 async def test_flash_model_name() -> None:
     """Flash adapter uses correct model identifier."""
-    from packages.core.src.adapters.vertex_llm import VertexGeminiFlash
+    from apps.api.src.adapters.vertex_llm import VertexGeminiFlash
 
-    assert VertexGeminiFlash.MODEL == "gemini-2.5-flash"
+    assert VertexGeminiFlash.MODEL == "gemini-2.5-flash-preview-04-17"
 
 
 @pytest.mark.asyncio
@@ -41,12 +42,12 @@ async def test_flash_timeout_respected() -> None:
     """Flash respects 30-second timeout (mock)."""
     from unittest.mock import patch
 
-    from packages.core.src.adapters.vertex_llm import VertexGeminiFlash
+    from apps.api.src.adapters.vertex_llm import VertexGeminiFlash
     from packages.core.src.ports.llm import LLMTimeoutError
 
-    adapter = VertexGeminiFlash()
+    project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "test-project")
+    adapter = VertexGeminiFlash(project_id=project_id)
 
-    # Mock the actual API call to simulate timeout
     with patch.object(adapter, "generate", side_effect=LLMTimeoutError("timeout")):
         with pytest.raises(LLMTimeoutError):
             await adapter.generate("prompt")

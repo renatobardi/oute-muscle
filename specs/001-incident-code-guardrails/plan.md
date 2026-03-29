@@ -71,29 +71,40 @@ apps/
 │   │   ├── main.py               # FastAPI app entry point
 │   │   ├── config.py             # Settings from Secret Manager
 │   │   ├── dependencies.py       # DI container for ports/adapters
+│   │   ├── adapters/             # Vertex AI + synthesis adapters (depend on GCP SDKs)
+│   │   │   ├── vertex_embedding.py   # EmbeddingPort implementation (text-embedding-005)
+│   │   │   ├── vertex_llm.py        # LLM adapters (Gemini Flash/Pro + Claude Sonnet)
+│   │   │   ├── pg_rule_repo.py      # RuleRepoPort implementation
+│   │   │   └── pg_candidate_repo.py  # SynthesisCandidate persistence
+│   │   ├── services/             # Application services
+│   │   │   └── false_positive.py # False positive reporting + auto-disable
 │   │   ├── middleware/
 │   │   │   ├── auth.py           # JWT + API key validation
 │   │   │   ├── rls.py            # Tenant context injection for RLS
 │   │   │   ├── rate_limit.py     # Per-tier rate limiting
+│   │   │   ├── webhook_auth.py   # HMAC-SHA256 webhook signature verification
 │   │   │   └── correlation.py    # Request tracing correlation IDs
 │   │   ├── routes/
 │   │   │   ├── incidents.py      # CRUD + search endpoints
-│   │   │   ├── rules.py          # Rule management endpoints
 │   │   │   ├── scans.py          # Scan trigger + results
 │   │   │   ├── webhooks.py       # GitHub webhook handler (HMAC-SHA256)
 │   │   │   ├── tenants.py        # Tenant + user management
-│   │   │   ├── auth.py           # OAuth 2.1 + session endpoints
+│   │   │   ├── synthesis.py      # Rule synthesis candidates
+│   │   │   ├── findings.py       # Findings + false positive reporting
+│   │   │   ├── audit.py          # Audit log (Enterprise)
+│   │   │   ├── waitlist.py       # Waitlist endpoints
+│   │   │   ├── sarif.py          # SARIF 2.1.0 formatter (utility, not router)
 │   │   │   └── health.py         # Health + readiness probes
 │   │   └── workers/
 │   │       ├── rag_worker.py     # RAG advisory pipeline (Cloud Run Job)
-│   │       └── synthesis.py      # Rule synthesis pipeline (Cloud Tasks)
+│   │       ├── synthesis.py      # Rule synthesis pipeline (Cloud Tasks)
+│   │       ├── retention_purge.py # Findings retention auto-purge (Free 90d, Team 1y, Enterprise 2y)
+│   │       └── synthesis_archive.py # Auto-archive pending candidates >30 days
 │   ├── tests/
 │   │   ├── unit/
-│   │   ├── integration/
-│   │   └── conftest.py
+│   │   └── integration/
 │   ├── Dockerfile
-│   ├── pyproject.toml
-│   └── alembic.ini               # Points to packages/db migrations
+│   └── pyproject.toml
 │
 ├── web/                          # SvelteKit dashboard
 │   ├── src/
@@ -107,7 +118,6 @@ apps/
 │   │   │   ├── auth/             # Login, callback, register
 │   │   │   └── +layout.svelte
 │   │   ├── lib/
-│   │   │   ├── components/       # shadcn-svelte + custom components
 │   │   │   ├── api/              # API client (typed fetch wrappers)
 │   │   │   └── stores/           # Svelte stores (auth, tenant context)
 │   │   └── app.html
@@ -152,17 +162,12 @@ packages/
 │   │   │   ├── rule_repo.py      # Rule repository port
 │   │   │   ├── vector_search.py  # Vector search port
 │   │   │   └── github.py         # GitHub API port
-│   │   └── adapters/             # Adapter implementations
-│   │       ├── vertex_llm.py     # Vertex AI adapter (Gemini Flash/Pro + Claude)
-│   │       ├── vertex_embedding.py
-│   │       ├── pg_incident_repo.py
-│   │       ├── pg_rule_repo.py
-│   │       ├── pg_vector_search.py
+│   │   └── adapters/             # Only GitHub adapter here (no heavy infra deps)
 │   │       └── github_adapter.py # PyGithub adapter
 │   ├── tests/
 │   └── pyproject.toml
 │
-├── db/                           # Database models + migrations
+├── db/                           # Database models + migrations + DB adapters
 │   ├── src/
 │   │   ├── models/               # SQLAlchemy models with RLS
 │   │   │   ├── incident.py
@@ -172,7 +177,14 @@ packages/
 │   │   │   ├── finding.py
 │   │   │   ├── scan.py
 │   │   │   ├── audit_log.py
+│   │   │   ├── advisory.py
+│   │   │   ├── synthesis_candidate.py
 │   │   │   └── base.py           # RLS-aware base model
+│   │   ├── adapters/             # PostgreSQL adapters (depend on SQLAlchemy + pgvector)
+│   │   │   ├── pg_incident_repo.py   # IncidentRepoPort implementation
+│   │   │   ├── pg_vector_search.py   # VectorSearchPort implementation
+│   │   │   ├── pg_advisory_repo.py   # Advisory persistence
+│   │   │   └── pg_scan_repo.py       # Scan + Finding persistence
 │   │   ├── migrations/           # Alembic migrations
 │   │   │   └── versions/
 │   │   └── session.py            # asyncpg session factory with tenant context
@@ -203,7 +215,6 @@ infra/
 └── gcp/
     ├── main.tf                   # Cloud Run, Cloud SQL, Vertex AI, Secret Manager
     ├── variables.tf
-    ├── outputs.tf
     ├── modules/
     │   ├── cloud-run/
     │   ├── cloud-sql/
@@ -212,9 +223,7 @@ infra/
     │   ├── artifact-registry/
     │   └── iam/                  # Workload Identity Federation
     └── environments/
-        ├── dev.tfvars
-        ├── staging.tfvars
-        └── prod.tfvars
+        └── prod/terraform.tfvars
 
 scripts/
 ├── seed-knowledge-base.py        # Ingest danluu/post-mortems + VOID
@@ -224,7 +233,7 @@ scripts/
 .github/
 ├── workflows/
 │   ├── ci.yml                    # Lint + test + build (all apps/packages)
-│   ├── deploy.yml                # Deploy to Cloud Run (staging/prod)
+│   ├── deploy.yml                # Deploy to Cloud Run (prod only, Trunk-Based CD)
 │   └── semgrep-scan.yml          # Semgrep scan + SARIF upload
 └── dependabot.yml
 ```

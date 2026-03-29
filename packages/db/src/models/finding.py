@@ -47,5 +47,9 @@ class Finding(Base):
     message = Column(Text, nullable=False)
     remediation = Column(Text, nullable=False)
 
+    # False positive tracking (FR-028)
+    status = Column(String(50), nullable=False, default="open")  # open, false_positive
+    false_positive_count = Column(Integer, nullable=False, default=0)
+
     def __repr__(self) -> str:
         return f"<Finding(id={self.id}, rule_id={self.rule_id}, file_path={self.file_path}:{self.start_line})>"

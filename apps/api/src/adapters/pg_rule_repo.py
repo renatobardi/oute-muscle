@@ -188,6 +188,50 @@ class PostgreSQLRuleRepo:
 
         return []
 
+    async def increment_false_positive(
+        self, rule_id: str, *, tenant_id: uuid.UUID | None = None
+    ) -> SemgrepRuleModel | None:
+        """Increment false_positive_count; auto-disable at threshold 3 (FR-028).
+
+        Args:
+            rule_id: The rule string ID.
+            tenant_id: Optional tenant scope (unused — rules are global).
+
+        Returns:
+            Updated SemgrepRuleModel or None if not found.
+        """
+        from sqlalchemy import select
+
+        async for session in self._session_factory.get_session():
+            try:
+                result = await session.execute(
+                    select(SemgrepRuleModel).where(SemgrepRuleModel.id == rule_id)
+                )
+                rule = result.scalar_one_or_none()
+                if rule is None:
+                    return None
+
+                rule.false_positive_count = (rule.false_positive_count or 0) + 1
+                if rule.false_positive_count >= 3:
+                    rule.auto_disabled = True
+                    rule.is_active = False
+
+                await session.commit()
+                await session.refresh(rule)
+                logger.info(
+                    "rule_repo.increment_false_positive: %s count=%d auto_disabled=%s",
+                    rule_id,
+                    rule.false_positive_count,
+                    rule.auto_disabled,
+                )
+                return rule
+            except Exception as exc:
+                await session.rollback()
+                logger.error("rule_repo.increment_false_positive %s failed: %s", rule_id, exc)
+                raise
+
+        return None
+
     async def next_sequence_number(
         self,
         category: str,
