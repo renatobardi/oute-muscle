@@ -13,7 +13,7 @@ Coverage:
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
@@ -189,6 +189,12 @@ class TestFalsePositiveEndpoint:
         """POST /findings/{id}/false-positive returns 200 for an editor."""
         from httpx import ASGITransport, AsyncClient
 
+        from apps.api.src.routes.findings import (
+            get_service,
+            get_tenant_id,
+            get_user_id,
+            require_editor,
+        )
         from apps.api.src.services.false_positive import FalsePositiveService
 
         finding = FakeFinding(false_positive_count=1, status="false_positive")
@@ -197,14 +203,14 @@ class TestFalsePositiveEndpoint:
 
         app = self._make_app(service)
 
+        # Use dependency_overrides — patching module names doesn't affect Depends() refs
+        app.dependency_overrides[require_editor] = lambda: None
+        app.dependency_overrides[get_tenant_id] = lambda: "tenant-abc"
+        app.dependency_overrides[get_user_id] = lambda: "user-editor"
+        app.dependency_overrides[get_service] = lambda: service
+
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-            # Inject auth state via middleware override
-            with (
-                patch("apps.api.src.routes.findings.get_tenant_id", return_value="tenant-abc"),
-                patch("apps.api.src.routes.findings.get_user_id", return_value="user-editor"),
-                patch("apps.api.src.routes.findings.require_editor"),
-            ):
-                resp = await client.post("/findings/finding-1/false-positive")
+            resp = await client.post("/findings/finding-1/false-positive")
 
         assert resp.status_code == 200
         data = resp.json()
@@ -216,6 +222,12 @@ class TestFalsePositiveEndpoint:
         """POST /findings/{id}/false-positive returns 404 when finding missing."""
         from httpx import ASGITransport, AsyncClient
 
+        from apps.api.src.routes.findings import (
+            get_service,
+            get_tenant_id,
+            get_user_id,
+            require_editor,
+        )
         from apps.api.src.services.false_positive import FalsePositiveService, FindingNotFoundError
 
         service = AsyncMock(spec=FalsePositiveService)
@@ -223,13 +235,13 @@ class TestFalsePositiveEndpoint:
 
         app = self._make_app(service)
 
+        app.dependency_overrides[require_editor] = lambda: None
+        app.dependency_overrides[get_tenant_id] = lambda: "tenant-abc"
+        app.dependency_overrides[get_user_id] = lambda: "user-editor"
+        app.dependency_overrides[get_service] = lambda: service
+
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-            with (
-                patch("apps.api.src.routes.findings.get_tenant_id", return_value="tenant-abc"),
-                patch("apps.api.src.routes.findings.get_user_id", return_value="user-editor"),
-                patch("apps.api.src.routes.findings.require_editor"),
-            ):
-                resp = await client.post("/findings/nonexistent/false-positive")
+            resp = await client.post("/findings/nonexistent/false-positive")
 
         assert resp.status_code == 404
 
@@ -239,21 +251,22 @@ class TestFalsePositiveEndpoint:
         from fastapi import HTTPException
         from httpx import ASGITransport, AsyncClient
 
+        from apps.api.src.routes.findings import get_tenant_id, get_user_id, require_editor
+
         finding = FakeFinding()
         service = AsyncMock()
         service.report.return_value = finding
 
         app = self._make_app(service)
 
+        def _reject_viewer():
+            raise HTTPException(status_code=403, detail="FORBIDDEN")
+
+        app.dependency_overrides[require_editor] = _reject_viewer
+        app.dependency_overrides[get_tenant_id] = lambda: "tenant-abc"
+        app.dependency_overrides[get_user_id] = lambda: "user-viewer"
+
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-            with (
-                patch("apps.api.src.routes.findings.get_tenant_id", return_value="tenant-abc"),
-                patch("apps.api.src.routes.findings.get_user_id", return_value="user-viewer"),
-                patch(
-                    "apps.api.src.routes.findings.require_editor",
-                    side_effect=HTTPException(status_code=403, detail="FORBIDDEN"),
-                ),
-            ):
-                resp = await client.post("/findings/finding-1/false-positive")
+            resp = await client.post("/findings/finding-1/false-positive")
 
         assert resp.status_code == 403

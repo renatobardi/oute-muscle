@@ -15,8 +15,6 @@ from typing import Annotated
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from apps.api.src.main import get_container
-
 # ---------------------------------------------------------------------------
 # Database session — one per request, tenant-scoped
 # ---------------------------------------------------------------------------
@@ -24,6 +22,8 @@ from apps.api.src.main import get_container
 
 async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
     """Yield a tenant-scoped AsyncSession for the current request."""
+    from apps.api.src.main import get_container  # lazy to avoid circular import
+
     container = get_container()
     async for session in container.session_factory.get_session():
         yield session
@@ -38,6 +38,7 @@ def get_incident_service(
     session: Annotated[AsyncSession, Depends(get_db_session)],
 ):
     """Construct IncidentService with per-request DB session."""
+    from apps.api.src.main import get_container  # lazy to avoid circular import
     from packages.core.src.domain.incidents.service import IncidentService
     from packages.db.src.adapters.pg_incident_repo import PostgreSQLIncidentRepo
     from packages.db.src.adapters.pg_vector_search import PostgreSQLVectorSearch
