@@ -46,6 +46,7 @@ function createAuthStore() {
     // Lazy import to avoid SSR issues with Firebase client SDK
     import('firebase/auth').then(({ onAuthStateChanged }) => {
       import('$lib/firebase').then(({ auth: firebaseAuth }) => {
+        if (!firebaseAuth) return;
         unsubscribeFirebase = onAuthStateChanged(firebaseAuth, (firebaseUser) => {
           if (firebaseUser) {
             // User is signed in on the client.

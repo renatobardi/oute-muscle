@@ -2,11 +2,11 @@
  * T007: Firebase client SDK singleton.
  *
  * Shared Firebase project oute-488706 (same user pool as oute.me).
- * Client-side only — never import this from server-side code.
+ * Client-side only — guarded by `browser` check for SSR safety.
  */
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, type Auth } from 'firebase/auth';
-
+import { browser } from '$app/environment';
 import { env } from '$env/dynamic/public';
 
 const firebaseConfig = {
@@ -22,6 +22,7 @@ function getFirebaseClient(): FirebaseApp {
   return initializeApp(firebaseConfig);
 }
 
-export const app: FirebaseApp = getFirebaseClient();
-export const auth: Auth = getAuth(app);
+// Only initialize on client-side (SSR-safe)
+export const app: FirebaseApp | null = browser ? getFirebaseClient() : null;
+export const auth: Auth | null = browser && app ? getAuth(app) : null;
 export const googleProvider = new GoogleAuthProvider();
