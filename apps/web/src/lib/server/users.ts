@@ -5,7 +5,7 @@
  * Real DB integration via FastAPI will replace the in-memory map later.
  */
 
-import { ADMIN_EMAILS } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 export type UserRole = 'admin' | 'editor' | 'viewer';
 
@@ -24,11 +24,11 @@ const users = new Map<string, AppUser>();
 
 /** Emails that receive admin role on first login. */
 function getAdminEmails(): Set<string> {
-  const raw = ADMIN_EMAILS ?? '';
+  const raw = env.ADMIN_EMAILS ?? '';
   return new Set(
     raw
       .split(',')
-      .map((e) => e.trim().toLowerCase())
+      .map((e: string) => e.trim().toLowerCase())
       .filter(Boolean)
   );
 }

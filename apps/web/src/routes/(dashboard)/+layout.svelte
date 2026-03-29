@@ -27,7 +27,8 @@
   }
 
   async function handleLogout() {
-    auth.logout();
+    auth.clearUser();
+    await fetch('/api/auth/session', { method: 'DELETE' });
     await goto('/auth/login');
   }
 </script>

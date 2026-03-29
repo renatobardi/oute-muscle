@@ -7,18 +7,13 @@
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, type Auth } from 'firebase/auth';
 
-import {
-  PUBLIC_FIREBASE_API_KEY,
-  PUBLIC_FIREBASE_AUTH_DOMAIN,
-  PUBLIC_FIREBASE_PROJECT_ID,
-  PUBLIC_FIREBASE_APP_ID,
-} from '$env/static/public';
+import { env } from '$env/dynamic/public';
 
 const firebaseConfig = {
-  apiKey: PUBLIC_FIREBASE_API_KEY,
-  authDomain: PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: PUBLIC_FIREBASE_PROJECT_ID,
-  appId: PUBLIC_FIREBASE_APP_ID,
+  apiKey: env.PUBLIC_FIREBASE_API_KEY ?? '',
+  authDomain: env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? 'oute-488706.firebaseapp.com',
+  projectId: env.PUBLIC_FIREBASE_PROJECT_ID ?? 'oute-488706',
+  appId: env.PUBLIC_FIREBASE_APP_ID ?? '',
 };
 
 function getFirebaseClient(): FirebaseApp {
