@@ -41,7 +41,7 @@ GitHub PR → GitHub Actions (CI) → POST /v1/scans → Cloud Run (API)
 
 **Stack de produção:**
 - API: Cloud Run (`oute-prod-api`), mín 1 instância, máx 20
-- DB: Cloud SQL `oute-postgres`, PostgreSQL 16, instância `db-g1-small`
+- DB: Cloud SQL `oute-postgres`, PostgreSQL 16, instância `db-f1-micro`, database `oute_muscle_prod`, user `muscle_app`
 - LLM: Vertex AI (Gemini 2.5 Flash/Pro) + Anthropic Claude Sonnet 4
 - Workers: background tasks rodando dentro do processo da API (asyncio)
 - Imagens: Artifact Registry `oute-prod-docker`

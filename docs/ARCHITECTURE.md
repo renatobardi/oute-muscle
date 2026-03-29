@@ -205,7 +205,7 @@ merge main → deploy prod (automatic)
 `packages/core/` contains all business logic with zero framework deps. This means domain logic is testable without a database, HTTP server, or LLM client. Adapters are swappable — critical when the LLM landscape is moving fast.
 
 **Why a shared Cloud SQL instance?**
-Cost. A separate instance per environment would be ~$50/month each. The shared `oute-postgres` instance hosts two separate databases with separate users. RLS ensures data isolation within each database.
+Cost. The `oute-postgres` instance (`db-f1-micro`) hosts the `oute_muscle_prod` database. A dedicated instance per project would add ~$50/month. RLS ensures tenant data isolation within the database.
 
 **Why Semgrep for L1 instead of building custom AST analysis?**
 Semgrep handles multi-language parsing, has a large existing rule ecosystem, integrates natively with GitHub, and produces SARIF output. Building equivalent AST analysis for 10+ languages would be months of work.
