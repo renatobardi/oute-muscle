@@ -173,9 +173,9 @@
 - [x] T054 [US7] Verify Table horizontal scroll with visible scroll indicator on viewports < 768px
 - [x] T055 [US7] Verify Modal full-screen rendering on viewports < 640px
 - [x] T056 [US7] Audit touch targets >= 44x44px on all interactive elements at mobile viewports
-- [ ] T057 [US7] Run Lighthouse accessibility audit on /auth/login, /(dashboard) index, and /admin index -- verify score >= 90
+- [ ] T057 [US7] Run Lighthouse accessibility audit on /auth/login, /(dashboard) index, and /admin index -- verify score >= 90 (DEFERRED: requires running app with Firebase ADC — validate post-deploy)
 - [x] T058 [US7] Run existing frontend tests: `cd apps/web && npx vitest run`
-- [ ] T059 [US7] Run existing e2e tests: `cd apps/web && npx playwright test`
+- [ ] T059 [US7] Run existing e2e tests: `cd apps/web && npx playwright test` (DEFERRED: requires running app with Firebase ADC — validate post-deploy)
 - [x] T060 [US7] Run svelte-check and ESLint on full apps/web codebase
 
 **Checkpoint**: All pages functional at 320px. Accessibility >= 90. All existing tests pass. No type errors. No lint errors.
