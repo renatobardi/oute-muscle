@@ -240,9 +240,9 @@ jobs:
             --format='value(status.url)')
           echo "Service URL: $SERVICE_URL"
           for i in $(seq 1 12); do
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$SERVICE_URL")
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$SERVICE_URL/auth/login")
             if [[ "$STATUS" == "200" ]]; then
-              echo "✓ Web service healthy"
+              echo "✓ Web service healthy (login page responds 200)"
               exit 0
             fi
             echo "Attempt $i: status=$STATUS — waiting 5s..."
