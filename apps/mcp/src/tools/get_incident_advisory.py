@@ -45,10 +45,10 @@ async def get_incident_advisory(
 
     Returns:
         Dict with keys:
-            advisory_text   – LLM-generated advisory (markdown)
-            confidence      – float in [0.0, 1.0]
-            incident_ids    – list of matched incident UUID strings
-            model_used      – model identifier string
+            advisory_text   - LLM-generated advisory (markdown)
+            confidence      - float in [0.0, 1.0]
+            incident_ids    - list of matched incident UUID strings
+            model_used      - model identifier string
 
     Raises:
         QuotaExceededError: If the user has exceeded their advisory quota.
@@ -164,9 +164,7 @@ async def _run_rag(
     try:
         async for session in session_factory.get_session(tenant_id=tenant_id):
             pipeline = RAGPipeline(
-                embedding_port=VertexAIEmbedding(
-                    project_id=gcp_project, location=vertex_location
-                ),
+                embedding_port=VertexAIEmbedding(project_id=gcp_project, location=vertex_location),
                 vector_search_port=PostgreSQLVectorSearch(session),
                 llm_router=LLMRouter(
                     flash=VertexGeminiFlash(project_id=gcp_project, location=vertex_location),

@@ -73,9 +73,7 @@ class PostgreSQLIncidentRepo:
                 select(IncidentModel).where(IncidentModel.source_url == incident.source_url)
             )
             if existing.scalar_one_or_none() is not None:
-                raise DuplicateSourceUrlError(
-                    f"source_url already exists: {incident.source_url}"
-                )
+                raise DuplicateSourceUrlError(f"source_url already exists: {incident.source_url}")
 
         model = IncidentModel(
             id=incident.id,

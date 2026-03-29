@@ -57,9 +57,7 @@ class DIContainer:
             self.llm_pro = VertexGeminiPro(
                 project_id=gcp_project, location=settings.vertex_location
             )
-            self.llm_claude = VertexClaudeSonnet(
-                project_id=gcp_project, location="us-east5"
-            )
+            self.llm_claude = VertexClaudeSonnet(project_id=gcp_project, location="us-east5")
         else:
             from apps.api.src.adapters.vertex_llm import NullLLMAdapter
 
@@ -129,8 +127,8 @@ def create_app() -> FastAPI:
 
     # Middleware stack — add_middleware in reverse execution order
     # (last added = outermost = first to process the request)
-    from apps.api.src.middleware.rate_limit import RateLimitMiddleware
     from apps.api.src.middleware.correlation import CorrelationMiddleware
+    from apps.api.src.middleware.rate_limit import RateLimitMiddleware
 
     app.add_middleware(RateLimitMiddleware)
     app.add_middleware(CorrelationMiddleware)

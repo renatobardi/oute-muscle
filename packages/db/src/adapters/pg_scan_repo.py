@@ -7,7 +7,7 @@ request lifecycle — no Depends() available, sessions are created directly.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -78,11 +78,7 @@ class PostgreSQLScanRepo:
         if duration_ms is not None:
             values["duration_ms"] = duration_ms
 
-        stmt = (
-            update(ScanModel)
-            .where(ScanModel.id == scan_id)
-            .values(**values)
-        )
+        stmt = update(ScanModel).where(ScanModel.id == scan_id).values(**values)
         await self._session.execute(stmt)
         await self._session.commit()
 

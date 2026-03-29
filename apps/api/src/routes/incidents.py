@@ -93,7 +93,7 @@ class IncidentResponse(BaseModel):
     model_config = {"from_attributes": True}
 
     @classmethod
-    def from_entity(cls, incident: Incident) -> "IncidentResponse":
+    def from_entity(cls, incident: Incident) -> IncidentResponse:
         return cls(
             id=str(incident.id),
             tenant_id=str(incident.tenant_id) if incident.tenant_id else None,
@@ -280,7 +280,7 @@ async def get_incident(
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=f"Invalid incident ID format: {incident_id}",
-        )
+        ) from None
 
     incident = await service.incident_repo.get_by_id(iid)
     if incident is None:
@@ -306,7 +306,7 @@ async def update_incident(
     try:
         iid = uuid.UUID(incident_id)
     except ValueError:
-        raise HTTPException(status_code=422, detail=f"Invalid ID: {incident_id}")
+        raise HTTPException(status_code=422, detail=f"Invalid ID: {incident_id}") from None
 
     existing = await service.incident_repo.get_by_id(iid)
     if existing is None:
@@ -355,7 +355,7 @@ async def delete_incident(
     try:
         iid = uuid.UUID(incident_id)
     except ValueError:
-        raise HTTPException(status_code=422, detail=f"Invalid ID: {incident_id}")
+        raise HTTPException(status_code=422, detail=f"Invalid ID: {incident_id}") from None
 
     try:
         await service.soft_delete_incident(
