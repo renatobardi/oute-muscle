@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Component } from 'svelte';
   import { page } from '$app/stores';
   import { Menu, X, LogOut } from 'lucide-svelte';
   import Badge from './Badge.svelte';

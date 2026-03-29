@@ -7,7 +7,7 @@
   import { goto } from '$app/navigation';
   import { apiClient, type Incident, type Category, type Severity, ApiError } from '$lib/api';
   import { isEditorOrAbove } from '$lib/stores/auth';
-  import { Button, Card, Badge, Modal, PageHeader, LoadingSkeleton } from '$components/ui';
+  import { Button, Card, Modal, PageHeader, LoadingSkeleton } from '$components/ui';
 
   const id = $derived($page.params.id);
 

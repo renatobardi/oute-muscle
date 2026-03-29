@@ -5,7 +5,7 @@
   import { onMount } from 'svelte';
   import { apiClient, type Rule, type Category, ApiError } from '$lib/api';
   import { isAdmin } from '$lib/stores/auth';
-  import { PageHeader, Badge, Button, Select, LoadingSkeleton, EmptyState } from '$components/ui';
+  import { PageHeader, Badge, Select, LoadingSkeleton, EmptyState } from '$components/ui';
   import { ShieldCheck } from 'lucide-svelte';
 
   let rules = $state<Rule[]>([]);

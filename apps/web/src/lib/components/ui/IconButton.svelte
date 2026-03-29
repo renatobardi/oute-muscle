@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Component } from 'svelte';
   import type { HTMLButtonAttributes } from 'svelte/elements';
 
   interface Props extends HTMLButtonAttributes {
@@ -11,6 +10,7 @@
     disabled?: boolean;
   }
 
+  // svelte-ignore custom_element_props_identifier
   let {
     icon,
     label,

@@ -16,6 +16,7 @@
     class?: string;
   }
 
+  // svelte-ignore custom_element_props_identifier
   let {
     variant = 'primary',
     size = 'md',

@@ -6,7 +6,7 @@
   import { apiClient, type AuditLogEntry, ApiError } from '$lib/api';
   import { isEnterprise } from '$lib/stores/tenant';
   import { goto } from '$app/navigation';
-  import { PageHeader, Badge, Button, Select, Input, LoadingSkeleton, EmptyState } from '$components/ui';
+  import { PageHeader, Badge, Button, Select, LoadingSkeleton, EmptyState } from '$components/ui';
   import { ScrollText } from 'lucide-svelte';
 
   let entries = $state<AuditLogEntry[]>([]);

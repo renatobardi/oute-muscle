@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Component } from 'svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
   import { AlertCircle } from 'lucide-svelte';
   import { twMerge } from 'tailwind-merge';
@@ -16,6 +15,7 @@
     class?: string;
   }
 
+  // svelte-ignore custom_element_props_identifier
   let {
     label,
     type = 'text',

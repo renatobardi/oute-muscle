@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Component, Snippet } from 'svelte';
+  import type { Snippet } from 'svelte';
 
   interface Props {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
