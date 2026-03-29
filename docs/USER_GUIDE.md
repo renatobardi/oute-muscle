@@ -414,7 +414,7 @@ Documentação interativa (Swagger): `/docs` (disponível localmente em desenvol
 
 ### Autenticação
 
-Todas as rotas (exceto `/health`, `/health/ready`, `/health/startup`, `POST /v1/waitlist`) exigem o header:
+Todas as rotas (exceto `/health/live`, `/health/ready`, `/health/startup`, `POST /v1/waitlist`) exigem o header:
 
 ```
 X-API-Key: sk-...
@@ -445,5 +445,10 @@ Resposta sempre inclui `total`, `page`, `per_page`.
 
 ### Rate limits
 
-- `POST /v1/scans`: 60 req/min por tenant
-- Demais endpoints: 300 req/min por tenant
+Limites por plano (requests/minuto):
+
+| Plano | Requests/min | Burst |
+|-------|-------------|-------|
+| Free | 30 | 60 |
+| Team | 120 | 240 |
+| Enterprise | 600 | 1200 |

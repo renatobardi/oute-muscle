@@ -115,21 +115,20 @@ jsonPayload.event="rate_limit_exceeded"
 
 | Endpoint | Uso | Resposta esperada |
 |----------|-----|------------------|
-| `GET /health` | Liveness simples | `{"status":"ok"}` — 200 |
-| `GET /health/live` | Cloud Run liveness probe | JSON completo — 200 se processo vivo |
+| `GET /health/live` | Cloud Run liveness probe | 200 sempre (processo vivo) |
 | `GET /health/ready` | Cloud Run readiness probe | 200 se DB + LLM OK; 503 se não |
-| `GET /health/startup` | Cloud Run startup probe | 200 após migrations completas |
+| `GET /health/startup` | Cloud Run startup probe | 200 após boot completo; 503 se não |
 
 ### Verificação rápida
 
 ```bash
-# Prod
-curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health
+# Prod — liveness
+curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/live
 
-# Staging
-curl https://oute-staging-api-ujzimacvza-uc.a.run.app/health
+# Staging — liveness
+curl https://oute-staging-api-ujzimacvza-uc.a.run.app/health/live
 
-# Readiness (verifica DB)
+# Readiness (verifica DB + LLM)
 curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/ready
 ```
 
@@ -239,7 +238,7 @@ gcloud logging read \
 
 ```bash
 # 1. Verificar se o container está respondendo
-curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health
+curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/live
 
 # 2. Ver logs de erro recentes
 gcloud logging read \
@@ -360,17 +359,17 @@ DATABASE_URL="postgresql+asyncpg://muscle_app:PASSWORD@127.0.0.1:5433/oute_muscl
 |--------|-----------|-----------|
 | `tenants` | Organizações | Sem RLS (tabela mestre) |
 | `users` | Usuários por tenant | RLS por `tenant_id` |
-| `incidents` | Incidentes documentados | RLS por `tenant_id` |
-| `rules` | Regras Semgrep ativas | RLS por `tenant_id` |
-| `scans` | Histórico de scans | RLS por `tenant_id` |
+| `incidents` | Incidentes documentados, embedding vector | RLS por `tenant_id` |
+| `semgrep_rules` | Regras Semgrep (yaml_content, test_file) | RLS por `tenant_id` |
+| `scans` | Histórico de scans, risk_score | RLS por `tenant_id` |
 | `findings` | Findings por scan | RLS por `tenant_id` |
+| `advisories` | Resultados L2 RAG (confidence, reasoning) | RLS por `tenant_id` |
 | `synthesis_candidates` | Candidatos L3 pendentes | RLS por `tenant_id` |
-| `audit_log` | Trilha de auditoria | RLS por `tenant_id` |
-| `waitlist` | Emails do beta | Sem RLS (pré-tenant) |
+| `audit_log_entries` | Trilha de auditoria (changes JSONB) | RLS por `tenant_id` |
 
 ### Row-Level Security
 
-Todas as tabelas de dados (exceto `tenants`, `waitlist`) têm RLS ativo. O middleware seta `app.current_tenant_id` no início de cada request. Verificação:
+Todas as tabelas de dados (exceto `tenants`) têm RLS ativo. O middleware seta `app.tenant_id` no início de cada request via `SET LOCAL`. Verificação:
 
 ```sql
 -- Verificar RLS ativo
@@ -378,9 +377,9 @@ SELECT tablename, rowsecurity FROM pg_tables
 WHERE schemaname = 'public' AND rowsecurity = true;
 
 -- Simular query como tenant específico
-SET app.current_tenant_id = 'TENANT_UUID';
+SET app.tenant_id = 'TENANT_UUID';
 SELECT * FROM incidents LIMIT 5;
-RESET app.current_tenant_id;
+RESET app.tenant_id;
 ```
 
 ### Queries úteis de administração
@@ -464,12 +463,12 @@ LIMIT 100;
 
 Os workers rodam dentro do processo da API (asyncio tasks). Em caso de crash do container, os jobs em andamento são interrompidos e re-tentados na próxima invocação.
 
-| Worker | Arquivo | Função |
-|--------|---------|--------|
-| `rag_worker` | `apps/api/src/workers/rag_worker.py` | Indexa incidentes no pgvector para L2 |
-| `synthesis` | `apps/api/src/workers/synthesis.py` | Gera candidatos L3 via Vertex AI |
-| `synthesis_archive` | `apps/api/src/workers/synthesis_archive.py` | Arquiva candidatos antigos |
-| `retention_purge` | `apps/api/src/workers/retention_purge.py` | Remove dados expirados por política de retenção |
+| Worker | Arquivo | Função | Trigger |
+|--------|---------|--------|---------|
+| `synthesis` | `apps/api/src/workers/synthesis.py` | Gera candidatos L3 via Vertex AI, valida com `semgrep --test` | Cloud Tasks HTTP |
+| `rag_worker` | `apps/api/src/workers/rag_worker.py` | Pipeline RAG L2: embed diff → vector search → LLM → Advisory | Cloud Run Job |
+| `retention_purge` | `apps/api/src/workers/retention_purge.py` | Remove findings expirados (Free: 90d, Team: 365d, Enterprise: 730d) | Cloud Scheduler |
+| `synthesis_archive` | `apps/api/src/workers/synthesis_archive.py` | Arquiva candidatos pendentes há mais de 30 dias | Cloud Scheduler |
 
 ### Monitorar workers
 
@@ -605,13 +604,13 @@ Os limites atuais estão hardcoded no middleware `rate_limit`. Para alterar:
 1. Editar `apps/api/src/middleware/rate_limit.py`
 2. Fazer commit e deploy
 
-Configuração sugerida por plano:
+Limites atuais (hardcoded em `rate_limit.py`):
 
-| Plano | Scans/min | Requests/min |
-|-------|-----------|-------------|
-| Free | 10 | 60 |
-| Team | 60 | 300 |
-| Enterprise | 300 | 1000 |
+| Plano | Requests/min | Burst Limit | Burst Window |
+|-------|-------------|-------------|--------------|
+| Free | 30 | 60 | 10s |
+| Team | 120 | 240 | 10s |
+| Enterprise | 600 | 1200 | 10s |
 
 ---
 
@@ -638,7 +637,7 @@ git push origin v0.1.1
 gh run watch $(gh run list --workflow=deploy.yml --limit=1 --json databaseId -q '.[0].databaseId')
 
 # 6. Smoke test
-curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health
+curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/live
 ```
 
 ### Manutenção programada (janela de manutenção)
@@ -805,7 +804,7 @@ gcloud run services update-traffic oute-prod-api \
   --to-revisions=oute-prod-api-00003-xyz=100
 
 # 4. Verificar que a revisão boa está respondendo
-curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health
+curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/live
 
 # 5. Documentar o rollback e abrir issue de investigação
 ```

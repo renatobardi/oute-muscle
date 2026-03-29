@@ -71,14 +71,14 @@ make format        # ruff format + prettier
 
 ### Testing requirements
 
-- **Minimum coverage: 80%** — enforced by CI (`make test-cov`)
+- **Minimum coverage: 40%** — enforced locally by `make test-cov` (target is 80%, threshold being raised incrementally)
 - All new routes must have integration tests
 - All Semgrep rules must have test files in the same directory
 - No mocking the database in integration tests — use a real DB
 
 ```bash
 make test          # run all tests
-make test-cov      # with coverage report (fails under 80%)
+make test-cov      # with coverage report (fails under 40%)
 make test-rules    # semgrep --test on all rules
 ```
 
@@ -86,7 +86,7 @@ make test-rules    # semgrep --test on all rules
 
 Every rule must link to a real documented incident.
 
-1. Create the rule file: `packages/semgrep-rules/{category}/{category}-{NNN}.yml`
+1. Create the rule file: `packages/semgrep-rules/rules/{category}/{category}-{NNN}.yaml`
 
 ```yaml
 rules:
@@ -104,7 +104,7 @@ rules:
       created: 2026-03-28
 ```
 
-2. Create the test file: `packages/semgrep-rules/{category}/{category}-{NNN}.test.py`
+2. Create the test file: `packages/semgrep-rules/rules/{category}/{category}-{NNN}.test.py`
 
 ```python
 # ruleid: unsafe-regex-002
@@ -116,7 +116,7 @@ re.compile(r"^[a-z]{1,100}$")
 
 3. Run the tests: `make test-rules`
 
-4. Add the rule to `packages/semgrep-rules/semgrep.yml` if it should run in CI scans.
+4. Register the rule in `packages/semgrep-rules/metadata/registry.json`.
 
 ## Adding a database migration
 
@@ -127,11 +127,7 @@ make migrate-gen MSG="add_column_foo_to_bar"
 # Or write manually in packages/db/src/migrations/versions/
 ```
 
-Migration files are excluded from `.gitignore` by design to force explicit review. Add them with `-f`:
-
-```bash
-git add -f packages/db/src/migrations/versions/003_your_migration.py
-```
+Migration files are tracked in git normally (not ignored). Just `git add` as usual.
 
 Always include both `upgrade()` and `downgrade()` implementations.
 
@@ -143,7 +139,7 @@ These are non-negotiable — the CI/CD pipeline enforces most of them:
 2. **Hexagonal boundaries** — `packages/core/` must not import from `apps/` or `packages/db/`
 3. **Port/adapter discipline** — new external dependencies require a port interface first
 4. **Incremental complexity** — L1 must work before L2, L2 before L3. New abstractions require 2 concrete implementations
-5. **TDD** — tests before implementation, 80% coverage minimum
+5. **TDD** — tests before implementation, coverage threshold at 40% (target 80%)
 6. **No service account keys** — all GCP auth via Workload Identity Federation
 7. **RLS everywhere** — all tenant-scoped tables must have RLS policies
 
@@ -166,7 +162,7 @@ Run manually: `pre-commit run --all-files`
 Before opening a PR, verify:
 
 - [ ] Tests pass locally (`make test`)
-- [ ] Coverage >= 80% (`make test-cov`)
+- [ ] Coverage >= 40% (`make test-cov`)
 - [ ] Types check clean (`make type-check`)
 - [ ] Linting passes (`make lint`)
 - [ ] If adding a Semgrep rule: test file exists and `make test-rules` passes
