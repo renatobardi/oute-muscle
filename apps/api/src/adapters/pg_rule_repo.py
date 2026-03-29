@@ -75,7 +75,9 @@ class PostgreSQLRuleRepo:
                 )
                 row = existing.scalar_one_or_none()
                 if row is not None:
-                    logger.info("rule_repo.create: rule %s already exists, returning existing", rule_id)
+                    logger.info(
+                        "rule_repo.create: rule %s already exists, returning existing", rule_id
+                    )
                     return row
 
                 row = SemgrepRuleModel(

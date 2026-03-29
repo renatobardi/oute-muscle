@@ -18,6 +18,8 @@ pytest.importorskip("packages.core.src.domain.scanning.entities")
 from packages.core.src.domain.incidents.enums import RiskLevel
 from packages.core.src.domain.scanning.entities import Advisory
 
+pytestmark = pytest.mark.integration
+
 
 @pytest.fixture
 def skip_if_no_github_app() -> None:

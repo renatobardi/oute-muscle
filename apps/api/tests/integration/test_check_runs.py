@@ -18,6 +18,8 @@ pytest.importorskip("packages.core.src.domain.scanning.entities")
 from packages.core.src.domain.incidents.enums import IncidentSeverity
 from packages.core.src.domain.scanning.entities import Finding
 
+pytestmark = pytest.mark.integration
+
 
 @pytest.fixture
 def skip_if_no_github_app() -> None:
