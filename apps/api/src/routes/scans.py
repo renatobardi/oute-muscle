@@ -273,7 +273,7 @@ async def create_scan(
 
     scan_uuid = uuid.uuid4()
     scan_id = str(scan_uuid)
-    tier = tenant.get("tier", "free")
+    _tier = tenant.get("tier", "free")  # reserved for L2/L3 tier gating
     t0 = monotonic()
 
     # Resolve tenant UUID — API key tenants may not be in DB yet
@@ -319,9 +319,11 @@ async def create_scan(
                 scan_uuid,
                 findings_count=len(findings),
                 risk_level=risk_level,
-                risk_score={"low": 10, "medium": 40, "high": 70, "critical": 90}.get(risk_level, 10),
+                risk_score={"low": 10, "medium": 40, "high": 70, "critical": 90}.get(
+                    risk_level, 10
+                ),
                 duration_ms=duration_ms,
-                completed_at=datetime.now(tz=timezone.utc),
+                completed_at=datetime.now(tz=datetime.UTC),
             )
             await session.commit()
         except Exception as exc:

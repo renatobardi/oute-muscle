@@ -111,7 +111,9 @@ class PostgreSQLScanRepo:
         for f in findings:
             incident_id_str = f.get("incident_id") or ""
             try:
-                incident_id: uuid.UUID | None = uuid.UUID(incident_id_str) if incident_id_str else None
+                incident_id: uuid.UUID | None = (
+                    uuid.UUID(incident_id_str) if incident_id_str else None
+                )
             except ValueError:
                 incident_id = None
 

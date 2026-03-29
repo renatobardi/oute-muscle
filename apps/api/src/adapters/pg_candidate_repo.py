@@ -53,9 +53,7 @@ class PostgreSQLCandidateRepo:
 
         async for session in self._session_factory.get_session():
             try:
-                base = select(SynthesisCandidate).where(
-                    SynthesisCandidate.tenant_id == tenant_uuid
-                )
+                base = select(SynthesisCandidate).where(SynthesisCandidate.tenant_id == tenant_uuid)
                 if status_filter is not None:
                     base = base.where(SynthesisCandidate.status == str(status_filter))
 
@@ -157,9 +155,7 @@ class PostgreSQLCandidateRepo:
         async for session in self._session_factory.get_session():
             try:
                 await session.execute(
-                    update(SynthesisCandidate)
-                    .where(SynthesisCandidate.id == cid)
-                    .values(**values)
+                    update(SynthesisCandidate).where(SynthesisCandidate.id == cid).values(**values)
                 )
                 await session.commit()
             except Exception as exc:
