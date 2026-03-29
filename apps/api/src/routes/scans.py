@@ -7,9 +7,15 @@ Endpoints:
 
 from __future__ import annotations
 
+import asyncio
 import json
+import logging
+import os
+import pathlib
+import tempfile
 import uuid
 from datetime import datetime, timezone
+from time import monotonic
 from typing import Any
 
 from fastapi import APIRouter, Depends, Query, Request, Response
@@ -17,6 +23,11 @@ from pydantic import BaseModel, Field
 
 from apps.api.src.middleware.auth import require_api_key
 from apps.api.src.routes.sarif import findings_to_sarif
+
+logger = logging.getLogger(__name__)
+
+# Path to bundled Semgrep rules
+_RULES_PATH = pathlib.Path(__file__).parents[5] / "packages" / "semgrep-rules" / "rules"
 
 # ── Request / Response schemas ──────────────────────────────────────────────
 
@@ -90,32 +101,93 @@ def _compute_risk_level(findings: list[dict[str, Any]]) -> str:
     return "low"
 
 
-def _run_l1_stub(diff: str, tenant_id: str) -> list[dict[str, Any]]:
-    """L1 Semgrep stub — returns sample finding when diff is non-empty.
+async def _run_l1_semgrep(diff: str, tenant_id: str) -> list[dict[str, Any]]:
+    """L1 real Semgrep scan on a unified diff.
+
+    Writes the diff to a temp file (as Python source for now), invokes
+    semgrep with the bundled rules, and returns structured findings.
 
     Args:
-        diff: Unified diff string
-        tenant_id: Tenant identifier
+        diff: Unified diff string (unified format).
+        tenant_id: Tenant identifier (reserved for per-tenant rule filtering).
 
     Returns:
-        List of findings from L1 (stub returns one finding for non-empty diff)
+        List of finding dicts matching FindingResponse schema.
     """
     if not diff.strip():
         return []
-    return [
-        {
-            "rule_id": "unsafe-regex-001",
-            "incident_id": "00000000-0000-0000-0000-000000000001",
-            "incident_url": "https://outemuscle.com/incidents/00000000-0000-0000-0000-000000000001",
-            "file_path": "src/utils.py",
-            "start_line": 1,
-            "end_line": 1,
-            "severity": "high",
-            "category": "unsafe-regex",
-            "message": "Potential unsafe regex pattern detected",
-            "remediation": "Use RE2 or add a timeout to regex execution",
-        }
+
+    if not _RULES_PATH.exists():
+        logger.warning("Semgrep rules path not found: %s — returning empty findings", _RULES_PATH)
+        return []
+
+    # Write diff lines that start with '+' (added lines) into a temp Python file
+    added_lines = [
+        line[1:] for line in diff.splitlines() if line.startswith("+") and not line.startswith("+++")
     ]
+    code_snippet = "\n".join(added_lines)
+
+    if not code_snippet.strip():
+        return []
+
+    try:
+        with tempfile.NamedTemporaryFile(suffix=".py", mode="w", delete=False) as tmp:
+            tmp.write(code_snippet)
+            tmp_path = tmp.name
+
+        cmd = [
+            "semgrep",
+            "--config", str(_RULES_PATH),
+            "--json",
+            "--no-git-ignore",
+            "--quiet",
+            tmp_path,
+        ]
+        proc = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        try:
+            stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=30.0)
+        except asyncio.TimeoutError:
+            proc.kill()
+            logger.warning("Semgrep timed out after 30s for tenant %s", tenant_id)
+            return []
+        finally:
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+
+        if proc.returncode not in (0, 1):  # semgrep returns 1 when findings exist
+            logger.error("Semgrep exited %d: %s", proc.returncode, stderr.decode()[:500])
+            return []
+
+        output = json.loads(stdout.decode() or "{}")
+        findings: list[dict[str, Any]] = []
+        for result in output.get("results", []):
+            meta = result.get("extra", {}).get("metadata", {})
+            findings.append({
+                "rule_id": result.get("check_id", "unknown"),
+                "incident_id": meta.get("incident_id", ""),
+                "incident_url": meta.get("incident_url", ""),
+                "file_path": result.get("path", "diff"),
+                "start_line": result.get("start", {}).get("line", 1),
+                "end_line": result.get("end", {}).get("line", 1),
+                "severity": meta.get("severity", result.get("extra", {}).get("severity", "warning")).lower(),
+                "category": meta.get("category", "unknown"),
+                "message": result.get("extra", {}).get("message", ""),
+                "remediation": meta.get("remediation", ""),
+            })
+        return findings
+
+    except FileNotFoundError:
+        logger.warning("Semgrep not installed — returning empty findings for tenant %s", tenant_id)
+        return []
+    except json.JSONDecodeError as exc:
+        logger.error("Failed to parse Semgrep JSON output: %s", exc)
+        return []
 
 
 @router.get("", status_code=200)
@@ -167,17 +239,18 @@ async def create_scan(
     """
     scan_id = str(uuid.uuid4())
     tier = tenant.get("tier", "free")
+    t0 = monotonic()
 
-    # Layer 1 — always run
-    findings = _run_l1_stub(body.diff, tenant["tenant_id"])
+    # Layer 1 — always run (real Semgrep subprocess)
+    findings = await _run_l1_semgrep(body.diff, tenant["tenant_id"])
 
-    # Layer 2 — team+ only
+    # Layer 2 — team+ only (RAG pipeline; gracefully empty if GCP not configured)
     advisories: list[dict[str, Any]] = []
     if tier in ("team", "enterprise"):
-        pass  # RAG pipeline stub — returns empty until Phase 5 wired
+        pass  # RAG enqueued async via Cloud Tasks in webhook path; REST API returns L1 only for now
 
     risk_level = _compute_risk_level(findings)
-    duration_ms = 0
+    duration_ms = int((monotonic() - t0) * 1000)
 
     accept = request.headers.get("accept", "application/json")
     if "application/sarif+json" in accept:
