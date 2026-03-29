@@ -21,18 +21,16 @@
   }: MetricCardProps = $props();
 
   const borderClass = $derived(
-    highlight
-      ? 'border-2 border-primary-500'
-      : 'border border-light-border'
+    highlight ? 'border-2 border-primary-500' : 'border border-light-border'
   );
 </script>
 
-<div class="bg-light-bg rounded-xl shadow-sm p-6 {borderClass}">
-  <p class="text-sm font-medium text-light-text-secondary">{label}</p>
-  <p class="text-2xl font-bold text-light-text mt-1">{value}</p>
+<div class="bg-light-bg rounded-xl p-6 shadow-sm {borderClass}">
+  <p class="text-light-text-secondary text-sm font-medium">{label}</p>
+  <p class="text-light-text mt-1 text-2xl font-bold">{value}</p>
 
   {#if trend}
-    <div class="flex items-center gap-1 mt-2 text-sm">
+    <div class="mt-2 flex items-center gap-1 text-sm">
       {#if trend === 'up'}
         <span class="text-success-text"><TrendingUp size={16} /></span>
       {:else if trend === 'down'}

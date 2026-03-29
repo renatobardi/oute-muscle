@@ -5,7 +5,15 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { apiClient, type Incident, type Category, type Severity, ApiError } from '$lib/api';
-  import { PageHeader, Badge, Button, Input, Select, LoadingSkeleton, EmptyState } from '$components/ui';
+  import {
+    PageHeader,
+    Badge,
+    Button,
+    Input,
+    Select,
+    LoadingSkeleton,
+    EmptyState,
+  } from '$components/ui';
   import { Zap, Plus, Link } from 'lucide-svelte';
 
   let incidents = $state<Incident[]>([]);
@@ -85,14 +93,14 @@
     {#snippet actions()}
       <a
         href="/incidents/ingest"
-        class="inline-flex items-center gap-2 rounded-md border border-light-border bg-light-bg px-3.5 py-2 text-sm font-medium text-light-text hover:bg-light-bg-hover transition-colors"
+        class="border-light-border bg-light-bg text-light-text hover:bg-light-bg-hover inline-flex items-center gap-2 rounded-md border px-3.5 py-2 text-sm font-medium transition-colors"
       >
         <Link size={16} />
         Ingest from URL
       </a>
       <a
         href="/incidents/new"
-        class="inline-flex items-center gap-2 rounded-md bg-primary-500 px-3.5 py-2 text-sm font-medium text-white hover:bg-primary-600 transition-colors"
+        class="bg-primary-500 hover:bg-primary-600 inline-flex items-center gap-2 rounded-md px-3.5 py-2 text-sm font-medium text-white transition-colors"
       >
         <Plus size={16} />
         New incident
@@ -111,7 +119,7 @@
       />
     </div>
 
-    <label class="flex items-center gap-2 text-sm text-light-text-secondary">
+    <label class="text-light-text-secondary flex items-center gap-2 text-sm">
       <input type="checkbox" bind:checked={semantic} onchange={onFilterChange} />
       Semantic search
     </label>
@@ -120,29 +128,39 @@
       options={categoryOptions}
       value={filterCategory}
       placeholder="All categories"
-      onchange={(v) => { filterCategory = v; onFilterChange(); }}
+      onchange={(v) => {
+        filterCategory = v;
+        onFilterChange();
+      }}
     />
 
     <Select
       options={severityOptions}
       value={filterSeverity}
       placeholder="All severities"
-      onchange={(v) => { filterSeverity = v; onFilterChange(); }}
+      onchange={(v) => {
+        filterSeverity = v;
+        onFilterChange();
+      }}
     />
   </div>
 
   <!-- Error -->
   {#if error}
-    <div class="mb-4 rounded-lg bg-error-light border border-error-border p-3 text-sm text-error-text">{error}</div>
+    <div
+      class="bg-error-light border-error-border text-error-text mb-4 rounded-lg border p-3 text-sm"
+    >
+      {error}
+    </div>
   {/if}
 
   <!-- Table -->
   {#if loading}
-    <div class="bg-light-bg rounded-xl border border-light-border p-6">
+    <div class="bg-light-bg border-light-border rounded-xl border p-6">
       <LoadingSkeleton variant="table-row" rows={5} />
     </div>
   {:else if incidents.length === 0}
-    <div class="bg-light-bg rounded-xl border border-light-border">
+    <div class="bg-light-bg border-light-border rounded-xl border">
       <EmptyState
         icon={Zap}
         title="No incidents found"
@@ -150,29 +168,44 @@
       />
     </div>
   {:else}
-    <div class="overflow-hidden rounded-xl border border-light-border bg-light-bg">
+    <div class="border-light-border bg-light-bg overflow-hidden rounded-xl border">
       <table class="w-full text-sm">
-        <thead class="border-b border-light-border">
+        <thead class="border-light-border border-b">
           <tr>
-            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Title</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Category</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Severity</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Languages</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Rule</th>
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Title</th
+            >
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Category</th
+            >
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Severity</th
+            >
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Languages</th
+            >
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Rule</th
+            >
           </tr>
         </thead>
-        <tbody class="divide-y divide-light-border">
+        <tbody class="divide-light-border divide-y">
           {#each incidents as incident}
             <tr
-              class="cursor-pointer hover:bg-light-bg-hover transition-colors"
+              class="hover:bg-light-bg-hover cursor-pointer transition-colors"
               onclick={() => goto(`/incidents/${incident.id}`)}
             >
-              <td class="px-4 py-3 font-medium text-light-text">{incident.title}</td>
-              <td class="px-4 py-3 text-light-text-secondary">{incident.category}</td>
+              <td class="text-light-text px-4 py-3 font-medium">{incident.title}</td>
+              <td class="text-light-text-secondary px-4 py-3">{incident.category}</td>
               <td class="px-4 py-3">
                 <Badge severity={incident.severity} />
               </td>
-              <td class="px-4 py-3 text-light-text-secondary"
+              <td class="text-light-text-secondary px-4 py-3"
                 >{incident.affected_languages.join(', ') || '—'}</td
               >
               <td class="px-4 py-3">
@@ -196,7 +229,7 @@
 
     <!-- Pagination -->
     {#if totalPages > 1}
-      <div class="mt-4 flex items-center justify-between text-sm text-light-text-secondary">
+      <div class="text-light-text-secondary mt-4 flex items-center justify-between text-sm">
         <span>Page {page} of {totalPages}</span>
         <div class="flex gap-2">
           <Button
@@ -206,8 +239,8 @@
             onclick={() => {
               page--;
               loadIncidents();
-            }}
-          >Previous</Button>
+            }}>Previous</Button
+          >
           <Button
             variant="secondary"
             size="sm"
@@ -215,8 +248,8 @@
             onclick={() => {
               page++;
               loadIncidents();
-            }}
-          >Next</Button>
+            }}>Next</Button
+          >
         </div>
       </div>
     {/if}

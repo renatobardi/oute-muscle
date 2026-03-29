@@ -80,31 +80,45 @@
       options={categoryOptions}
       value={filterCategory}
       placeholder="All categories"
-      onchange={(v) => { filterCategory = v; load(); }}
+      onchange={(v) => {
+        filterCategory = v;
+        load();
+      }}
     />
 
     <Select
       options={statusOptions}
       value={filterEnabled}
       placeholder="All statuses"
-      onchange={(v) => { filterEnabled = v; load(); }}
+      onchange={(v) => {
+        filterEnabled = v;
+        load();
+      }}
     />
   </div>
 
   {#if toastError}
-    <div class="mb-4 rounded-lg bg-error-light border border-error-border p-3 text-sm text-error-text">{toastError}</div>
+    <div
+      class="bg-error-light border-error-border text-error-text mb-4 rounded-lg border p-3 text-sm"
+    >
+      {toastError}
+    </div>
   {/if}
 
   {#if error}
-    <div class="mb-4 rounded-lg bg-error-light border border-error-border p-3 text-sm text-error-text">{error}</div>
+    <div
+      class="bg-error-light border-error-border text-error-text mb-4 rounded-lg border p-3 text-sm"
+    >
+      {error}
+    </div>
   {/if}
 
   {#if loading}
-    <div class="bg-light-bg rounded-xl border border-light-border p-6">
+    <div class="bg-light-bg border-light-border rounded-xl border p-6">
       <LoadingSkeleton variant="table-row" rows={5} />
     </div>
   {:else if rules.length === 0}
-    <div class="bg-light-bg rounded-xl border border-light-border">
+    <div class="bg-light-bg border-light-border rounded-xl border">
       <EmptyState
         icon={ShieldCheck}
         title="No rules found"
@@ -112,24 +126,45 @@
       />
     </div>
   {:else}
-    <div class="overflow-hidden rounded-xl border border-light-border bg-light-bg">
+    <div class="border-light-border bg-light-bg overflow-hidden rounded-xl border">
       <table class="w-full text-sm">
-        <thead class="border-b border-light-border">
+        <thead class="border-light-border border-b">
           <tr>
-            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Rule ID</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Category</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Severity</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Source</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Incident</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Status</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">YAML</th>
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Rule ID</th
+            >
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Category</th
+            >
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Severity</th
+            >
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Source</th
+            >
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Incident</th
+            >
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Status</th
+            >
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >YAML</th
+            >
           </tr>
         </thead>
-        <tbody class="divide-y divide-light-border">
+        <tbody class="divide-light-border divide-y">
           {#each rules as rule}
             <tr data-rule-id={rule.id} class="hover:bg-light-bg-hover transition-colors">
-              <td class="px-4 py-3 font-mono text-xs font-medium text-light-text">{rule.id}</td>
-              <td class="px-4 py-3 text-light-text-secondary">{rule.category}</td>
+              <td class="text-light-text px-4 py-3 font-mono text-xs font-medium">{rule.id}</td>
+              <td class="text-light-text-secondary px-4 py-3">{rule.category}</td>
               <td class="px-4 py-3">
                 <Badge severity={rule.severity} />
               </td>
@@ -140,7 +175,7 @@
                 {#if rule.incident_title}
                   <a
                     href="/incidents/{rule.incident_id}"
-                    class="block max-w-xs truncate text-primary-500 hover:underline"
+                    class="text-primary-500 block max-w-xs truncate hover:underline"
                   >
                     {rule.incident_title}
                   </a>
@@ -167,7 +202,9 @@
                              {rule.enabled ? 'translate-x-4' : 'translate-x-0'}"
                     ></span>
                   </button>
-                  <span class="text-xs {rule.enabled ? 'text-primary-500' : 'text-light-text-muted'}">
+                  <span
+                    class="text-xs {rule.enabled ? 'text-primary-500' : 'text-light-text-muted'}"
+                  >
                     {rule.enabled ? 'Enabled' : 'Disabled'}
                   </span>
                 </div>
@@ -178,7 +215,7 @@
                     'https://muscle.oute.pro/api/v1'}/rules/{rule.id}/yaml"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="text-xs text-primary-500 hover:underline"
+                  class="text-primary-500 text-xs hover:underline"
                 >
                   YAML ↗
                 </a>

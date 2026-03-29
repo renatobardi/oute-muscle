@@ -10,11 +10,11 @@
   let { title, description, actions }: PageHeaderProps = $props();
 </script>
 
-<div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
   <div>
-    <h1 class="text-2xl font-bold text-light-text">{title}</h1>
+    <h1 class="text-light-text text-2xl font-bold">{title}</h1>
     {#if description}
-      <p class="text-sm text-light-text-secondary mt-1">{description}</p>
+      <p class="text-light-text-secondary mt-1 text-sm">{description}</p>
     {/if}
   </div>
   {#if actions}

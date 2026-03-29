@@ -29,7 +29,9 @@
     ...rest
   }: InputProps = $props();
 
-  let inputId = $derived(id ?? (label ? `input-${label.toLowerCase().replace(/\s+/g, '-')}` : undefined));
+  let inputId = $derived(
+    id ?? (label ? `input-${label.toLowerCase().replace(/\s+/g, '-')}` : undefined)
+  );
 
   let inputClasses = $derived(
     twMerge(
@@ -39,14 +41,14 @@
       error && 'border-error text-light-text focus:border-error focus:ring-2 focus:ring-error/20',
       disabled && 'opacity-50 cursor-not-allowed bg-neutral-50',
       icon && 'pl-10',
-      className,
-    ),
+      className
+    )
   );
 </script>
 
 <div>
   {#if label}
-    <label for={inputId} class="block text-sm font-medium text-light-text mb-1.5">
+    <label for={inputId} class="text-light-text mb-1.5 block text-sm font-medium">
       {label}
     </label>
   {/if}
@@ -71,7 +73,7 @@
   </div>
 
   {#if error}
-    <div class="flex items-center gap-1.5 mt-1.5 text-xs text-error-text">
+    <div class="text-error-text mt-1.5 flex items-center gap-1.5 text-xs">
       <AlertCircle size={14} aria-hidden="true" />
       <span>{error}</span>
     </div>

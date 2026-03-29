@@ -34,8 +34,8 @@
     {enterpriseItems}
     showEnterprise={$isPlanEnterprise}
   />
-  <main class="flex flex-1 flex-col overflow-hidden bg-light-bg-page">
-    <div class="flex-1 overflow-y-auto p-8 md:ml-0 mt-14 md:mt-0">
+  <main class="bg-light-bg-page flex flex-1 flex-col overflow-hidden">
+    <div class="mt-14 flex-1 overflow-y-auto p-8 md:mt-0 md:ml-0">
       {@render children()}
     </div>
   </main>

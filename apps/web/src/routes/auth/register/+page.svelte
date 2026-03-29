@@ -41,22 +41,38 @@
   }
 </script>
 
-<div class="flex min-h-screen items-center justify-center bg-dark-bg">
+<div class="bg-dark-bg flex min-h-screen items-center justify-center">
   <div class="w-full max-w-sm p-4">
     <!-- Branding -->
     <div class="mb-8 text-center">
-      <div class="inline-flex items-center gap-2 mb-2">
-        <h1 class="text-2xl font-bold text-dark-text">Oute Muscle</h1>
-        <span class="rounded bg-primary-500/20 px-1.5 py-0.5 text-xs font-medium text-primary-400">&beta;</span>
+      <div class="mb-2 inline-flex items-center gap-2">
+        <h1 class="text-dark-text text-2xl font-bold">Oute Muscle</h1>
+        <span class="bg-primary-500/20 text-primary-400 rounded px-1.5 py-0.5 text-xs font-medium"
+          >&beta;</span
+        >
       </div>
-      <p class="text-sm text-dark-text-muted">Create your workspace</p>
+      <p class="text-dark-text-muted text-sm">Create your workspace</p>
     </div>
 
     <Card>
       {#if error}
-        <div class="mb-4 flex items-center gap-2 rounded-lg bg-error-light border border-error-border p-3 text-sm text-error-text" role="alert">
-          <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        <div
+          class="bg-error-light border-error-border text-error-text mb-4 flex items-center gap-2 rounded-lg border p-3 text-sm"
+          role="alert"
+        >
+          <svg
+            class="h-4 w-4 shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line
+              x1="12"
+              y1="16"
+              x2="12.01"
+              y2="16"
+            />
           </svg>
           {error}
         </div>
@@ -90,7 +106,7 @@
       </form>
     </Card>
 
-    <p class="mt-6 text-center text-sm text-dark-text-muted">
+    <p class="text-dark-text-muted mt-6 text-center text-sm">
       Already have an account?
       <a href="/auth/login" class="text-primary-400 hover:underline">Sign in</a>
     </p>

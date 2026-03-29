@@ -81,11 +81,11 @@
   <PageHeader title="Audit Log" description="Immutable record of all mutations — {total} entries" />
 
   {#if !$isEnterprise}
-    <div class="rounded-xl border border-warning-border bg-warning-light p-6 text-center">
-      <p class="text-sm font-medium text-warning-text">
+    <div class="border-warning-border bg-warning-light rounded-xl border p-6 text-center">
+      <p class="text-warning-text text-sm font-medium">
         Audit log is available on the Enterprise plan.
       </p>
-      <a href="/settings/billing" class="mt-2 inline-block text-sm text-warning-text underline">
+      <a href="/settings/billing" class="text-warning-text mt-2 inline-block text-sm underline">
         Upgrade to Enterprise
       </a>
     </div>
@@ -96,14 +96,20 @@
         options={entityTypeOptions}
         value={filterEntityType}
         placeholder="All entity types"
-        onchange={(v) => { filterEntityType = v; load(); }}
+        onchange={(v) => {
+          filterEntityType = v;
+          load();
+        }}
       />
 
       <Select
         options={actionOptions}
         value={filterAction}
         placeholder="All actions"
-        onchange={(v) => { filterAction = v; load(); }}
+        onchange={(v) => {
+          filterAction = v;
+          load();
+        }}
       />
 
       <input
@@ -111,7 +117,7 @@
         aria-label="from date"
         bind:value={filterFrom}
         onchange={load}
-        class="rounded-lg border border-light-border-strong bg-light-bg text-light-text px-3 py-2.5 text-sm h-11 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+        class="border-light-border-strong bg-light-bg text-light-text focus:border-primary-500 focus:ring-primary-500/20 h-11 rounded-lg border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
       />
 
       <input
@@ -119,20 +125,24 @@
         aria-label="to date"
         bind:value={filterTo}
         onchange={load}
-        class="rounded-lg border border-light-border-strong bg-light-bg text-light-text px-3 py-2.5 text-sm h-11 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+        class="border-light-border-strong bg-light-bg text-light-text focus:border-primary-500 focus:ring-primary-500/20 h-11 rounded-lg border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
       />
     </div>
 
     {#if error}
-      <div class="mb-4 rounded-lg bg-error-light border border-error-border p-3 text-sm text-error-text">{error}</div>
+      <div
+        class="bg-error-light border-error-border text-error-text mb-4 rounded-lg border p-3 text-sm"
+      >
+        {error}
+      </div>
     {/if}
 
     {#if loading}
-      <div class="bg-light-bg rounded-xl border border-light-border p-6">
+      <div class="bg-light-bg border-light-border rounded-xl border p-6">
         <LoadingSkeleton variant="table-row" rows={5} />
       </div>
     {:else if entries.length === 0}
-      <div class="bg-light-bg rounded-xl border border-light-border">
+      <div class="bg-light-bg border-light-border rounded-xl border">
         <EmptyState
           icon={ScrollText}
           title="No audit log entries"
@@ -140,30 +150,44 @@
         />
       </div>
     {:else}
-      <div class="overflow-hidden rounded-xl border border-light-border bg-light-bg">
+      <div class="border-light-border bg-light-bg overflow-hidden rounded-xl border">
         <table class="w-full text-sm">
-          <thead class="border-b border-light-border">
+          <thead class="border-light-border border-b">
             <tr>
-              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Time</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Actor</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Action</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Entity</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary">Entity ID</th>
+              <th
+                class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+                >Time</th
+              >
+              <th
+                class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+                >Actor</th
+              >
+              <th
+                class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+                >Action</th
+              >
+              <th
+                class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+                >Entity</th
+              >
+              <th
+                class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+                >Entity ID</th
+              >
             </tr>
           </thead>
-          <tbody class="divide-y divide-light-border">
+          <tbody class="divide-light-border divide-y">
             {#each entries as entry}
               <tr class="hover:bg-light-bg-hover transition-colors">
-                <td class="px-4 py-3 text-xs text-light-text-muted">{formatDate(entry.created_at)}</td>
-                <td class="px-4 py-3 text-light-text">{entry.actor_email}</td>
+                <td class="text-light-text-muted px-4 py-3 text-xs"
+                  >{formatDate(entry.created_at)}</td
+                >
+                <td class="text-light-text px-4 py-3">{entry.actor_email}</td>
                 <td class="px-4 py-3">
-                  <Badge
-                    status={actionBadgeMap[entry.action] ?? undefined}
-                    label={entry.action}
-                  />
+                  <Badge status={actionBadgeMap[entry.action] ?? undefined} label={entry.action} />
                 </td>
-                <td class="px-4 py-3 text-light-text capitalize">{entry.entity_type}</td>
-                <td class="px-4 py-3 font-mono text-xs text-light-text-secondary"
+                <td class="text-light-text px-4 py-3 capitalize">{entry.entity_type}</td>
+                <td class="text-light-text-secondary px-4 py-3 font-mono text-xs"
                   >{entry.entity_id.slice(0, 12)}…</td
                 >
               </tr>
@@ -173,7 +197,7 @@
       </div>
 
       {#if totalPages > 1}
-        <div class="mt-4 flex items-center justify-between text-sm text-light-text-secondary">
+        <div class="text-light-text-secondary mt-4 flex items-center justify-between text-sm">
           <span>Page {page} of {totalPages}</span>
           <div class="flex gap-2">
             <Button
@@ -183,8 +207,8 @@
               onclick={() => {
                 page--;
                 load();
-              }}
-            >Previous</Button>
+              }}>Previous</Button
+            >
             <Button
               variant="secondary"
               size="sm"
@@ -192,8 +216,8 @@
               onclick={() => {
                 page++;
                 load();
-              }}
-            >Next</Button>
+              }}>Next</Button
+            >
           </div>
         </div>
       {/if}

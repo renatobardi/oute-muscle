@@ -102,18 +102,22 @@
       placeholder="Search by email or name..."
       bind:value={query}
       oninput={onQueryInput}
-      class="w-full max-w-md rounded-lg border border-light-border px-3 py-2 text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none"
+      class="border-light-border focus:border-primary-500 focus:ring-primary-500 w-full max-w-md rounded-lg border px-3 py-2 text-sm focus:ring-1 focus:outline-none"
     />
   </div>
 
   <!-- Action error -->
   {#if actionError}
-    <div class="mb-4 rounded-lg bg-error-light border border-error-border p-3 text-sm text-error-text">{actionError}</div>
+    <div
+      class="bg-error-light border-error-border text-error-text mb-4 rounded-lg border p-3 text-sm"
+    >
+      {actionError}
+    </div>
   {/if}
 
   <!-- Error -->
   {#if error}
-    <div class="rounded-lg bg-error-light border border-error-border p-4 text-sm text-error-text">
+    <div class="bg-error-light border-error-border text-error-text rounded-lg border p-4 text-sm">
       <p>{error}</p>
       <Button variant="danger" size="sm" onclick={loadUsers} class="mt-2">
         {#snippet children()}Retry{/snippet}
@@ -124,43 +128,48 @@
   {:else if users.length === 0}
     <EmptyState title="No users found" description="Try adjusting your search query." />
   {:else}
-    <div class="overflow-x-auto rounded-xl border border-light-border bg-light-bg">
+    <div class="border-light-border bg-light-bg overflow-x-auto rounded-xl border">
       <table class="w-full text-sm">
-        <thead class="border-b border-light-border-strong bg-light-bg-hover">
+        <thead class="border-light-border-strong bg-light-bg-hover border-b">
           <tr>
-            <th class="px-4 py-3 text-left font-medium text-light-text-secondary">Email</th>
-            <th class="px-4 py-3 text-left font-medium text-light-text-secondary">Name</th>
-            <th class="px-4 py-3 text-left font-medium text-light-text-secondary">Tenant</th>
-            <th class="px-4 py-3 text-left font-medium text-light-text-secondary">Role</th>
-            <th class="px-4 py-3 text-left font-medium text-light-text-secondary">Status</th>
-            <th class="px-4 py-3 text-left font-medium text-light-text-secondary">Last Login</th>
-            <th class="px-4 py-3 text-left font-medium text-light-text-secondary">Created</th>
-            <th class="px-4 py-3 text-left font-medium text-light-text-secondary">Actions</th>
+            <th class="text-light-text-secondary px-4 py-3 text-left font-medium">Email</th>
+            <th class="text-light-text-secondary px-4 py-3 text-left font-medium">Name</th>
+            <th class="text-light-text-secondary px-4 py-3 text-left font-medium">Tenant</th>
+            <th class="text-light-text-secondary px-4 py-3 text-left font-medium">Role</th>
+            <th class="text-light-text-secondary px-4 py-3 text-left font-medium">Status</th>
+            <th class="text-light-text-secondary px-4 py-3 text-left font-medium">Last Login</th>
+            <th class="text-light-text-secondary px-4 py-3 text-left font-medium">Created</th>
+            <th class="text-light-text-secondary px-4 py-3 text-left font-medium">Actions</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-light-border">
+        <tbody class="divide-light-border divide-y">
           {#each users as user}
             <tr class="hover:bg-light-bg-hover">
-              <td class="px-4 py-3 font-medium text-light-text">{user.email}</td>
-              <td class="px-4 py-3 text-light-text-secondary">{user.display_name ?? '—'}</td>
-              <td class="px-4 py-3 text-light-text-secondary">{user.tenant_name ?? '—'}</td>
+              <td class="text-light-text px-4 py-3 font-medium">{user.email}</td>
+              <td class="text-light-text-secondary px-4 py-3">{user.display_name ?? '—'}</td>
+              <td class="text-light-text-secondary px-4 py-3">{user.tenant_name ?? '—'}</td>
               <td class="px-4 py-3">
                 <span
                   class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize
-                    {user.role === 'admin' ? 'bg-role-admin-light text-role-admin-text' :
-                     user.role === 'editor' ? 'bg-role-editor-light text-role-editor-text' :
-                     'bg-role-viewer-light text-role-viewer-text'}"
+                    {user.role === 'admin'
+                    ? 'bg-role-admin-light text-role-admin-text'
+                    : user.role === 'editor'
+                      ? 'bg-role-editor-light text-role-editor-text'
+                      : 'bg-role-viewer-light text-role-viewer-text'}"
                 >
                   {user.role}
                 </span>
               </td>
               <td class="px-4 py-3">
-                <Badge status={user.is_active ? 'active' : 'inactive'} label={user.is_active ? 'Active' : 'Inactive'} />
+                <Badge
+                  status={user.is_active ? 'active' : 'inactive'}
+                  label={user.is_active ? 'Active' : 'Inactive'}
+                />
               </td>
-              <td class="px-4 py-3 text-xs text-light-text-muted">
+              <td class="text-light-text-muted px-4 py-3 text-xs">
                 {user.last_login ? new Date(user.last_login).toLocaleDateString() : '—'}
               </td>
-              <td class="px-4 py-3 text-xs text-light-text-muted">
+              <td class="text-light-text-muted px-4 py-3 text-xs">
                 {new Date(user.created_at).toLocaleDateString()}
               </td>
               <td class="px-4 py-3">
@@ -170,20 +179,22 @@
                     <button
                       onclick={() =>
                         (roleDropdownOpen = roleDropdownOpen === user.id ? null : user.id)}
-                      class="rounded border border-light-border px-2 py-1 text-xs hover:bg-light-bg-hover"
+                      class="border-light-border hover:bg-light-bg-hover rounded border px-2 py-1 text-xs"
                       title="Change role"
                     >
                       Role
                     </button>
                     {#if roleDropdownOpen === user.id}
                       <div
-                        class="absolute right-0 z-10 mt-1 w-28 rounded-md border border-light-border bg-light-bg shadow-lg"
+                        class="border-light-border bg-light-bg absolute right-0 z-10 mt-1 w-28 rounded-md border shadow-lg"
                       >
                         {#each roles as role}
                           <button
                             onclick={() => changeRole(user.id, role)}
-                            class="block w-full px-3 py-1.5 text-left text-xs capitalize hover:bg-light-bg-hover
-                              {user.role === role ? 'font-bold text-primary-500' : 'text-light-text-secondary'}"
+                            class="hover:bg-light-bg-hover block w-full px-3 py-1.5 text-left text-xs capitalize
+                              {user.role === role
+                              ? 'text-primary-500 font-bold'
+                              : 'text-light-text-secondary'}"
                           >
                             {role}
                           </button>
@@ -195,7 +206,7 @@
                   <!-- Activate / Deactivate -->
                   <button
                     onclick={() => toggleActive(user)}
-                    class="rounded border border-light-border px-2 py-1 text-xs hover:bg-light-bg-hover"
+                    class="border-light-border hover:bg-light-bg-hover rounded border px-2 py-1 text-xs"
                     title={user.is_active ? 'Deactivate' : 'Activate'}
                   >
                     {user.is_active ? 'Deactivate' : 'Activate'}
@@ -204,7 +215,7 @@
                   <!-- Assign tenant -->
                   <button
                     onclick={() => assignTenant(user.id)}
-                    class="rounded border border-light-border px-2 py-1 text-xs hover:bg-light-bg-hover"
+                    class="border-light-border hover:bg-light-bg-hover rounded border px-2 py-1 text-xs"
                     title="Assign tenant"
                   >
                     Tenant
@@ -219,7 +230,7 @@
 
     <!-- Pagination -->
     {#if totalPages > 1}
-      <div class="mt-4 flex items-center justify-between text-sm text-light-text-muted">
+      <div class="text-light-text-muted mt-4 flex items-center justify-between text-sm">
         <span>Page {page} of {totalPages}</span>
         <div class="flex gap-2">
           <Button

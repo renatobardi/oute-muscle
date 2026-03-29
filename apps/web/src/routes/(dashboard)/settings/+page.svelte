@@ -6,7 +6,16 @@
   import { apiClient, type TenantUser, type Role, ApiError } from '$lib/api';
   import { tenantStore } from '$lib/stores/tenant';
   import { isAdmin } from '$lib/stores/auth';
-  import { PageHeader, Badge, Button, Card, Input, Select, Modal, LoadingSkeleton } from '$components/ui';
+  import {
+    PageHeader,
+    Badge,
+    Button,
+    Card,
+    Input,
+    Select,
+    Modal,
+    LoadingSkeleton,
+  } from '$components/ui';
 
   let users = $state<TenantUser[]>([]);
   let loadingUsers = $state(false);
@@ -82,11 +91,11 @@
   <!-- Tenant info -->
   {#if $tenantStore.tenant}
     <Card>
-      <h2 class="mb-4 text-lg font-semibold text-light-text">Workspace</h2>
+      <h2 class="text-light-text mb-4 text-lg font-semibold">Workspace</h2>
       <dl class="grid grid-cols-2 gap-4 text-sm">
         <div>
           <dt class="text-light-text-secondary">Name</dt>
-          <dd class="font-medium text-light-text">{$tenantStore.tenant.name}</dd>
+          <dd class="text-light-text font-medium">{$tenantStore.tenant.name}</dd>
         </div>
         <div>
           <dt class="text-light-text-secondary">Plan</dt>
@@ -96,15 +105,15 @@
         </div>
         <div>
           <dt class="text-light-text-secondary">Contributors</dt>
-          <dd class="font-medium text-light-text">{$tenantStore.tenant.contributor_count}</dd>
+          <dd class="text-light-text font-medium">{$tenantStore.tenant.contributor_count}</dd>
         </div>
         <div>
           <dt class="text-light-text-secondary">Repositories</dt>
-          <dd class="font-medium text-light-text">{$tenantStore.tenant.repo_count}</dd>
+          <dd class="text-light-text font-medium">{$tenantStore.tenant.repo_count}</dd>
         </div>
       </dl>
       <div class="mt-4">
-        <a href="/settings/billing" class="text-sm text-primary-500 hover:underline">
+        <a href="/settings/billing" class="text-primary-500 text-sm hover:underline">
           Manage plan & billing →
         </a>
       </div>
@@ -114,18 +123,26 @@
   <!-- Team members -->
   <Card>
     <div class="mb-4 flex items-center justify-between">
-      <h2 class="text-lg font-semibold text-light-text">Team</h2>
+      <h2 class="text-light-text text-lg font-semibold">Team</h2>
       {#if $isAdmin}
         <Button size="sm" onclick={() => (showInviteModal = true)}>Invite</Button>
       {/if}
     </div>
 
     {#if inviteSuccess}
-      <div class="mb-3 rounded-lg bg-success-light border border-success-border p-3 text-sm text-success-text">{inviteSuccess}</div>
+      <div
+        class="bg-success-light border-success-border text-success-text mb-3 rounded-lg border p-3 text-sm"
+      >
+        {inviteSuccess}
+      </div>
     {/if}
 
     {#if roleError}
-      <div class="mb-3 rounded-lg bg-error-light border border-error-border p-3 text-sm text-error-text">{roleError}</div>
+      <div
+        class="bg-error-light border-error-border text-error-text mb-3 rounded-lg border p-3 text-sm"
+      >
+        {roleError}
+      </div>
     {/if}
 
     {#if loadingUsers}
@@ -133,14 +150,16 @@
         <LoadingSkeleton variant="text" lines={4} />
       </div>
     {:else if usersError}
-      <div class="rounded-lg bg-error-light border border-error-border p-3 text-sm text-error-text">{usersError}</div>
+      <div class="bg-error-light border-error-border text-error-text rounded-lg border p-3 text-sm">
+        {usersError}
+      </div>
     {:else}
       <ul class="space-y-3">
         {#each users as user}
           <li data-user-id={user.id} class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-light-text">{user.email}</p>
-              <p class="text-xs text-light-text-muted">
+              <p class="text-light-text text-sm font-medium">{user.email}</p>
+              <p class="text-light-text-muted text-xs">
                 Joined {new Date(user.joined_at).toLocaleDateString()}
               </p>
             </div>
@@ -150,7 +169,7 @@
                 aria-label="role"
                 bind:value={pendingRoles[user.id]}
                 disabled={!$isAdmin}
-                class="rounded-lg border border-light-border-strong bg-light-bg text-light-text px-2 py-1 text-sm focus:border-primary-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                class="border-light-border-strong bg-light-bg text-light-text focus:border-primary-500 rounded-lg border px-2 py-1 text-sm focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {#each roles as r}
                   <option value={r}>{r}</option>
@@ -161,8 +180,8 @@
                 <Button
                   size="sm"
                   onclick={() => handleSaveRole(user)}
-                  disabled={savingRole[user.id]}
-                >Save</Button>
+                  disabled={savingRole[user.id]}>Save</Button
+                >
               {/if}
             </div>
           </li>
@@ -175,11 +194,18 @@
 <!-- Invite modal -->
 <Modal
   bind:open={showInviteModal}
-  onClose={() => { showInviteModal = false; inviteError = null; }}
+  onClose={() => {
+    showInviteModal = false;
+    inviteError = null;
+  }}
   title="Invite team member"
 >
   {#if inviteError}
-    <div class="mb-3 rounded-lg bg-error-light border border-error-border p-3 text-sm text-error-text">{inviteError}</div>
+    <div
+      class="bg-error-light border-error-border text-error-text mb-3 rounded-lg border p-3 text-sm"
+    >
+      {inviteError}
+    </div>
   {/if}
 
   <div class="space-y-4">
@@ -194,7 +220,9 @@
       label="Role"
       options={roleOptions}
       value={inviteRole}
-      onchange={(v) => { inviteRole = v as Role; }}
+      onchange={(v) => {
+        inviteRole = v as Role;
+      }}
     />
   </div>
 
@@ -205,13 +233,9 @@
         onclick={() => {
           showInviteModal = false;
           inviteError = null;
-        }}
-      >Cancel</Button>
-      <Button
-        onclick={handleInvite}
-        disabled={inviting || !inviteEmail}
-        loading={inviting}
+        }}>Cancel</Button
       >
+      <Button onclick={handleInvite} disabled={inviting || !inviteEmail} loading={inviting}>
         {inviting ? 'Sending…' : 'Send invite'}
       </Button>
     </div>

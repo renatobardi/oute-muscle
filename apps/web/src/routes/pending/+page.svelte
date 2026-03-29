@@ -18,28 +18,37 @@
   }
 </script>
 
-<div class="flex min-h-screen items-center justify-center bg-dark-bg">
+<div class="bg-dark-bg flex min-h-screen items-center justify-center">
   <div class="w-full max-w-md p-4">
     <!-- Branding -->
     <div class="mb-8 text-center">
-      <div class="inline-flex items-center gap-2 mb-2">
-        <h1 class="text-2xl font-bold text-dark-text">Oute Muscle</h1>
-        <span class="rounded bg-primary-500/20 px-1.5 py-0.5 text-xs font-medium text-primary-400">&beta;</span>
+      <div class="mb-2 inline-flex items-center gap-2">
+        <h1 class="text-dark-text text-2xl font-bold">Oute Muscle</h1>
+        <span class="bg-primary-500/20 text-primary-400 rounded px-1.5 py-0.5 text-xs font-medium"
+          >&beta;</span
+        >
       </div>
     </div>
 
     <Card class="text-center">
-      <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-warning-light">
-        <Clock class="h-8 w-8 text-warning" />
+      <div
+        class="bg-warning-light mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full"
+      >
+        <Clock class="text-warning h-8 w-8" />
       </div>
 
-      <h2 class="text-xl font-semibold text-light-text">Pending Approval</h2>
-      <p class="mt-3 text-sm leading-relaxed text-light-text-secondary">
+      <h2 class="text-light-text text-xl font-semibold">Pending Approval</h2>
+      <p class="text-light-text-secondary mt-3 text-sm leading-relaxed">
         Your account is pending approval. An administrator will assign you to a team.
       </p>
 
       <div class="mt-8">
-        <Button variant="secondary" onclick={handleLogout} loading={loggingOut} disabled={loggingOut}>
+        <Button
+          variant="secondary"
+          onclick={handleLogout}
+          loading={loggingOut}
+          disabled={loggingOut}
+        >
           Sign out
         </Button>
       </div>

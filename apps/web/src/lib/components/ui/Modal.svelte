@@ -11,30 +11,27 @@
     footer?: Snippet;
   }
 
-  let {
-    open = $bindable(false),
-    onClose,
-    title = '',
-    children,
-    footer,
-  }: ModalProps = $props();
+  let { open = $bindable(false), onClose, title = '', children, footer }: ModalProps = $props();
 </script>
 
-<Dialog.Root bind:open onOpenChange={(o) => { if (!o) onClose(); }}>
+<Dialog.Root
+  bind:open
+  onOpenChange={(o) => {
+    if (!o) onClose();
+  }}
+>
   <Dialog.Portal>
-    <Dialog.Overlay
-      class="fixed inset-0 z-50 bg-black/50"
-    />
+    <Dialog.Overlay class="fixed inset-0 z-50 bg-black/50" />
     <Dialog.Content
-      class="fixed z-50 bg-light-bg shadow-xl border border-light-border p-4 sm:p-6 max-sm:inset-0 max-sm:rounded-none max-sm:max-w-none sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-full sm:max-w-lg sm:rounded-xl"
+      class="bg-light-bg border-light-border fixed z-50 border p-4 shadow-xl max-sm:inset-0 max-sm:max-w-none max-sm:rounded-none sm:top-1/2 sm:left-1/2 sm:w-full sm:max-w-lg sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-xl sm:p-6"
     >
-      <Dialog.Title class="text-lg font-semibold text-light-text mb-4">
+      <Dialog.Title class="text-light-text mb-4 text-lg font-semibold">
         {title}
       </Dialog.Title>
 
       <button
         onclick={onClose}
-        class="absolute top-4 right-4 text-light-text-muted hover:text-light-text"
+        class="text-light-text-muted hover:text-light-text absolute top-4 right-4"
         aria-label="Close"
       >
         <X size={20} />
@@ -43,7 +40,7 @@
       {@render children()}
 
       {#if footer}
-        <div class="border-t border-light-border pt-4 mt-4">
+        <div class="border-light-border mt-4 border-t pt-4">
           {@render footer()}
         </div>
       {/if}

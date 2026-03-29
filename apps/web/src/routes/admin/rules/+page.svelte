@@ -58,13 +58,10 @@
 </script>
 
 <div>
-  <PageHeader
-    title="Rules Overview"
-    description="Active rules and synthesis candidates"
-  />
+  <PageHeader title="Rules Overview" description="Active rules and synthesis candidates" />
 
   {#if error}
-    <div class="rounded-lg bg-error-light border border-error-border p-4 text-sm text-error-text">
+    <div class="bg-error-light border-error-border text-error-text rounded-lg border p-4 text-sm">
       <p>{error}</p>
       <Button variant="danger" size="sm" onclick={loadData} class="mt-2">
         {#snippet children()}Retry{/snippet}
@@ -86,34 +83,47 @@
 
     <!-- Action error -->
     {#if actionError}
-      <div class="mt-4 rounded-lg bg-error-light border border-error-border p-3 text-sm text-error-text">{actionError}</div>
+      <div
+        class="bg-error-light border-error-border text-error-text mt-4 rounded-lg border p-3 text-sm"
+      >
+        {actionError}
+      </div>
     {/if}
 
     <!-- Pending candidates -->
     <div class="mt-8">
-      <h2 class="mb-4 text-lg font-semibold text-light-text">Pending Synthesis Candidates</h2>
+      <h2 class="text-light-text mb-4 text-lg font-semibold">Pending Synthesis Candidates</h2>
 
       {#if candidates.length === 0}
-        <EmptyState title="No pending candidates" description="All synthesis candidates have been reviewed." />
+        <EmptyState
+          title="No pending candidates"
+          description="All synthesis candidates have been reviewed."
+        />
       {:else}
-        <div class="overflow-hidden rounded-xl border border-light-border bg-light-bg">
+        <div class="border-light-border bg-light-bg overflow-hidden rounded-xl border">
           <table class="w-full text-sm">
-            <thead class="border-b border-light-border-strong bg-light-bg-hover">
+            <thead class="border-light-border-strong bg-light-bg-hover border-b">
               <tr>
-                <th class="px-4 py-3 text-left font-medium text-light-text-secondary">Pattern Hash</th>
-                <th class="px-4 py-3 text-right font-medium text-light-text-secondary">Advisory Count</th>
-                <th class="px-4 py-3 text-left font-medium text-light-text-secondary">Created</th>
-                <th class="px-4 py-3 text-left font-medium text-light-text-secondary">Actions</th>
+                <th class="text-light-text-secondary px-4 py-3 text-left font-medium"
+                  >Pattern Hash</th
+                >
+                <th class="text-light-text-secondary px-4 py-3 text-right font-medium"
+                  >Advisory Count</th
+                >
+                <th class="text-light-text-secondary px-4 py-3 text-left font-medium">Created</th>
+                <th class="text-light-text-secondary px-4 py-3 text-left font-medium">Actions</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-light-border">
+            <tbody class="divide-light-border divide-y">
               {#each candidates as candidate}
                 <tr class="hover:bg-light-bg-hover">
-                  <td class="px-4 py-3 font-mono text-xs text-light-text-secondary">
+                  <td class="text-light-text-secondary px-4 py-3 font-mono text-xs">
                     {candidate.anti_pattern_hash.slice(0, 16)}...
                   </td>
-                  <td class="px-4 py-3 text-right text-light-text-secondary">{candidate.advisory_count}</td>
-                  <td class="px-4 py-3 text-xs text-light-text-muted">
+                  <td class="text-light-text-secondary px-4 py-3 text-right"
+                    >{candidate.advisory_count}</td
+                  >
+                  <td class="text-light-text-muted px-4 py-3 text-xs">
                     {new Date(candidate.created_at).toLocaleDateString()}
                   </td>
                   <td class="px-4 py-3">

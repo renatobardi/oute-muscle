@@ -13,22 +13,24 @@
 {#if variant === 'text'}
   <div class="space-y-3">
     {#each Array(lines) as _, i}
-      <div class="bg-neutral-200 animate-pulse rounded h-4 {textWidths[i % textWidths.length]}"></div>
+      <div
+        class="h-4 animate-pulse rounded bg-neutral-200 {textWidths[i % textWidths.length]}"
+      ></div>
     {/each}
   </div>
 {:else if variant === 'card'}
-  <div class="bg-neutral-200 animate-pulse rounded-xl h-32 w-full"></div>
+  <div class="h-32 w-full animate-pulse rounded-xl bg-neutral-200"></div>
 {:else if variant === 'table-row'}
   <div>
     {#each Array(rows) as _}
-      <div class="flex items-center gap-4 h-10 border-b border-neutral-100">
-        <div class="bg-neutral-200 animate-pulse rounded h-4 w-1/4"></div>
-        <div class="bg-neutral-200 animate-pulse rounded h-4 w-2/5"></div>
-        <div class="bg-neutral-200 animate-pulse rounded h-4 w-1/5"></div>
-        <div class="bg-neutral-200 animate-pulse rounded h-4 w-1/6"></div>
+      <div class="flex h-10 items-center gap-4 border-b border-neutral-100">
+        <div class="h-4 w-1/4 animate-pulse rounded bg-neutral-200"></div>
+        <div class="h-4 w-2/5 animate-pulse rounded bg-neutral-200"></div>
+        <div class="h-4 w-1/5 animate-pulse rounded bg-neutral-200"></div>
+        <div class="h-4 w-1/6 animate-pulse rounded bg-neutral-200"></div>
       </div>
     {/each}
   </div>
 {:else if variant === 'circle'}
-  <div class="bg-neutral-200 animate-pulse rounded-full h-10 w-10"></div>
+  <div class="h-10 w-10 animate-pulse rounded-full bg-neutral-200"></div>
 {/if}

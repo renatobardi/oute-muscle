@@ -52,11 +52,13 @@
 <div class="overflow-x-auto">
   <table class="w-full text-sm">
     <thead>
-      <tr class="border-b border-light-border">
+      <tr class="border-light-border border-b">
         {#each columns as column}
           <th
-            class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-light-text-secondary {alignClass(column.align)}
-              {column.sortable && onSort ? 'cursor-pointer hover:text-light-text' : ''}"
+            class="text-light-text-secondary px-4 py-3 text-xs font-semibold tracking-wider uppercase {alignClass(
+              column.align
+            )}
+              {column.sortable && onSort ? 'hover:text-light-text cursor-pointer' : ''}"
             style={column.width ? `width: ${column.width}` : undefined}
             onclick={column.sortable && onSort ? () => onSort(column.key) : undefined}
           >
@@ -77,7 +79,7 @@
     <tbody>
       {#if loading}
         {#each Array(skeletonRows) as _}
-          <tr class="border-b border-light-border">
+          <tr class="border-light-border border-b">
             {#each columns as column}
               <td class="px-4 py-3 {alignClass(column.align)}">
                 <LoadingSkeleton variant="text" lines={1} />
@@ -88,11 +90,7 @@
       {:else if data.length === 0}
         <tr>
           <td colspan={columns.length}>
-            <EmptyState
-              title={emptyTitle}
-              description={emptyDescription}
-              action={emptyAction}
-            />
+            <EmptyState title={emptyTitle} description={emptyDescription} action={emptyAction} />
           </td>
         </tr>
       {:else if row}
@@ -101,10 +99,12 @@
         {/each}
       {:else}
         {#each data as item}
-          <tr class="border-b border-light-border hover:bg-light-bg-hover transition-colors">
+          <tr class="border-light-border hover:bg-light-bg-hover border-b transition-colors">
             {#each columns as column}
               <td
-                class="px-4 py-3 text-light-text {column.align === 'right' ? 'text-right font-mono' : ''} {column.align === 'center' ? 'text-center' : ''}"
+                class="text-light-text px-4 py-3 {column.align === 'right'
+                  ? 'text-right font-mono'
+                  : ''} {column.align === 'center' ? 'text-center' : ''}"
               >
                 <span class="block max-w-xs truncate" title={String(item[column.key] ?? '')}>
                   {String(item[column.key] ?? '')}

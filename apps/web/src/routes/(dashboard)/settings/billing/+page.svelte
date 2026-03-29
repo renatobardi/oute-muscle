@@ -49,7 +49,7 @@
 <div class="mx-auto max-w-4xl">
   <a
     href="/settings"
-    class="mb-6 inline-flex items-center gap-1 text-sm text-light-text-muted hover:text-light-text"
+    class="text-light-text-muted hover:text-light-text mb-6 inline-flex items-center gap-1 text-sm"
   >
     ← Back to settings
   </a>
@@ -59,21 +59,23 @@
   <!-- Current usage -->
   {#if $tenantStore.tenant}
     <Card class="mb-8">
-      <h2 class="mb-4 text-lg font-semibold text-light-text">Current usage</h2>
+      <h2 class="text-light-text mb-4 text-lg font-semibold">Current usage</h2>
       <div class="grid grid-cols-3 gap-6">
         <div>
-          <p class="text-sm text-light-text-secondary">Plan</p>
-          <p class="mt-1 text-xl font-bold text-light-text capitalize">{$tenantStore.tenant.plan}</p>
+          <p class="text-light-text-secondary text-sm">Plan</p>
+          <p class="text-light-text mt-1 text-xl font-bold capitalize">
+            {$tenantStore.tenant.plan}
+          </p>
         </div>
         <div>
-          <p class="text-sm text-light-text-secondary">Contributors</p>
-          <p class="mt-1 text-xl font-bold text-light-text">
+          <p class="text-light-text-secondary text-sm">Contributors</p>
+          <p class="text-light-text mt-1 text-xl font-bold">
             {$tenantStore.tenant.contributor_count}
           </p>
         </div>
         <div>
-          <p class="text-sm text-light-text-secondary">Repositories</p>
-          <p class="mt-1 text-xl font-bold text-light-text">{$tenantStore.tenant.repo_count}</p>
+          <p class="text-light-text-secondary text-sm">Repositories</p>
+          <p class="text-light-text mt-1 text-xl font-bold">{$tenantStore.tenant.repo_count}</p>
         </div>
       </div>
     </Card>
@@ -91,12 +93,12 @@
             </div>
           {/if}
 
-          <h3 class="text-lg font-bold text-light-text">{plan.name}</h3>
-          <p class="mt-1 text-2xl font-bold text-light-text">{plan.price}</p>
+          <h3 class="text-light-text text-lg font-bold">{plan.name}</h3>
+          <p class="text-light-text mt-1 text-2xl font-bold">{plan.price}</p>
 
           <ul class="mt-4 space-y-2">
             {#each plan.features as feature}
-              <li class="flex items-start gap-2 text-sm text-light-text-secondary">
+              <li class="text-light-text-secondary flex items-start gap-2 text-sm">
                 <span class="text-status-active">&#10003;</span>
                 {feature}
               </li>

@@ -65,7 +65,7 @@
 <div class="mx-auto max-w-2xl">
   <a
     href="/incidents"
-    class="mb-6 inline-flex items-center gap-1 text-sm text-light-text-muted hover:text-light-text"
+    class="text-light-text-muted hover:text-light-text mb-6 inline-flex items-center gap-1 text-sm"
   >
     ← Back to incidents
   </a>
@@ -81,7 +81,7 @@
       placeholder="https://blog.example.com/post-mortem"
       bind:value={url}
       required
-      class="flex-1 rounded-lg border border-light-border-strong bg-light-bg px-3 py-2 text-sm text-light-text placeholder:text-light-text-muted focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+      class="border-light-border-strong bg-light-bg text-light-text placeholder:text-light-text-muted focus:border-primary-500 focus:ring-primary-500/20 flex-1 rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
     />
     <Button type="submit" loading={extracting}>
       {extracting ? 'Extracting...' : 'Extract'}
@@ -89,36 +89,40 @@
   </form>
 
   {#if error}
-    <div class="mb-4 rounded-lg bg-error-light border border-error-border p-3 text-sm text-error-text">{error}</div>
+    <div
+      class="bg-error-light border-error-border text-error-text mb-4 rounded-lg border p-3 text-sm"
+    >
+      {error}
+    </div>
   {/if}
 
   <!-- Step 2: Review draft -->
   {#if draft}
     <Card class="border-primary-200 bg-primary-50/30">
-      <p class="mb-4 text-xs font-semibold tracking-wider text-primary-500 uppercase">
+      <p class="text-primary-500 mb-4 text-xs font-semibold tracking-wider uppercase">
         Review extracted draft
       </p>
 
       <div class="space-y-4">
         <div>
-          <label for="draft-title" class="block text-sm font-medium text-light-text">Title</label>
+          <label for="draft-title" class="text-light-text block text-sm font-medium">Title</label>
           <input
             id="draft-title"
             type="text"
             bind:value={draft.title}
-            class="mt-1 block w-full rounded-lg border border-light-border-strong bg-light-bg px-3 py-2 text-sm text-light-text focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+            class="border-light-border-strong bg-light-bg text-light-text focus:border-primary-500 focus:ring-primary-500/20 mt-1 block w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
           />
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label for="draft-category" class="block text-sm font-medium text-light-text"
+            <label for="draft-category" class="text-light-text block text-sm font-medium"
               >Category</label
             >
             <select
               id="draft-category"
               bind:value={draft.category}
-              class="mt-1 block w-full rounded-lg border border-light-border-strong bg-light-bg px-3 py-2 text-sm text-light-text focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+              class="border-light-border-strong bg-light-bg text-light-text focus:border-primary-500 focus:ring-primary-500/20 mt-1 block w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
             >
               {#each categories as cat}
                 <option value={cat}>{cat}</option>
@@ -126,13 +130,13 @@
             </select>
           </div>
           <div>
-            <label for="draft-severity" class="block text-sm font-medium text-light-text"
+            <label for="draft-severity" class="text-light-text block text-sm font-medium"
               >Severity</label
             >
             <select
               id="draft-severity"
               bind:value={draft.severity}
-              class="mt-1 block w-full rounded-lg border border-light-border-strong bg-light-bg px-3 py-2 text-sm text-light-text focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+              class="border-light-border-strong bg-light-bg text-light-text focus:border-primary-500 focus:ring-primary-500/20 mt-1 block w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
             >
               {#each severities as sev}
                 <option value={sev}>{sev}</option>
@@ -142,40 +146,38 @@
         </div>
 
         <div>
-          <label for="draft-anti" class="block text-sm font-medium text-light-text"
+          <label for="draft-anti" class="text-light-text block text-sm font-medium"
             >Anti-pattern</label
           >
           <textarea
             id="draft-anti"
             bind:value={draft.anti_pattern}
             rows={3}
-            class="mt-1 block w-full rounded-lg border border-light-border-strong bg-light-bg px-3 py-2 text-sm text-light-text focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+            class="border-light-border-strong bg-light-bg text-light-text focus:border-primary-500 focus:ring-primary-500/20 mt-1 block w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
           ></textarea>
         </div>
 
         <div>
-          <label for="draft-remediation" class="block text-sm font-medium text-light-text"
+          <label for="draft-remediation" class="text-light-text block text-sm font-medium"
             >Remediation</label
           >
           <textarea
             id="draft-remediation"
             bind:value={draft.remediation}
             rows={3}
-            class="mt-1 block w-full rounded-lg border border-light-border-strong bg-light-bg px-3 py-2 text-sm text-light-text focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
+            class="border-light-border-strong bg-light-bg text-light-text focus:border-primary-500 focus:ring-primary-500/20 mt-1 block w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
           ></textarea>
         </div>
 
         {#if draft.organization}
-          <p class="text-xs text-light-text-muted">
+          <p class="text-light-text-muted text-xs">
             Organization (LLM-extracted): <strong>{draft.organization}</strong>
           </p>
         {/if}
       </div>
 
       <div class="mt-5 flex justify-end gap-3">
-        <Button variant="secondary" onclick={() => (draft = null)}>
-          Discard
-        </Button>
+        <Button variant="secondary" onclick={() => (draft = null)}>Discard</Button>
         <Button loading={confirming} onclick={handleConfirm}>
           {confirming ? 'Saving...' : 'Confirm'}
         </Button>

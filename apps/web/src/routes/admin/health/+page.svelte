@@ -38,7 +38,9 @@
 <div>
   <PageHeader
     title="Platform Health"
-    description="Real-time platform metrics{lastUpdated ? ` — last updated ${lastUpdated.toLocaleTimeString()}` : ''}"
+    description="Real-time platform metrics{lastUpdated
+      ? ` — last updated ${lastUpdated.toLocaleTimeString()}`
+      : ''}"
   >
     {#snippet actions()}
       <Button variant="secondary" size="sm" onclick={loadMetrics}>
@@ -48,7 +50,7 @@
   </PageHeader>
 
   {#if error}
-    <div class="rounded-lg bg-error-light border border-error-border p-4 text-sm text-error-text">
+    <div class="bg-error-light border-error-border text-error-text rounded-lg border p-4 text-sm">
       <p>{error}</p>
       <Button variant="danger" size="sm" onclick={loadMetrics} class="mt-2">
         {#snippet children()}Retry{/snippet}
@@ -64,31 +66,31 @@
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       <MetricCard label="Active Scans" value={metrics.scans.active_now}>
         {#snippet children()}
-          <p class="mt-1 text-sm text-light-text-muted">{metrics!.scans.total_30d} total in 30d</p>
+          <p class="text-light-text-muted mt-1 text-sm">{metrics!.scans.total_30d} total in 30d</p>
         {/snippet}
       </MetricCard>
 
       <MetricCard label="Findings (30d)" value={metrics.findings.total_30d}>
         {#snippet children()}
-          <p class="mt-1 text-sm text-light-text-muted">Across all tenants</p>
+          <p class="text-light-text-muted mt-1 text-sm">Across all tenants</p>
         {/snippet}
       </MetricCard>
 
       <MetricCard label="Active Users (30d)" value={metrics.users.active_30d}>
         {#snippet children()}
-          <p class="mt-1 text-sm text-light-text-muted">of {metrics!.users.total} total</p>
+          <p class="text-light-text-muted mt-1 text-sm">of {metrics!.users.total} total</p>
         {/snippet}
       </MetricCard>
 
       <MetricCard label="Active Tenants" value={metrics.tenants.active}>
         {#snippet children()}
-          <p class="mt-1 text-sm text-light-text-muted">of {metrics!.tenants.total} total</p>
+          <p class="text-light-text-muted mt-1 text-sm">of {metrics!.tenants.total} total</p>
         {/snippet}
       </MetricCard>
 
       <MetricCard label="Active Rules" value={metrics.rules.active}>
         {#snippet children()}
-          <p class="mt-1 text-sm text-light-text-muted">
+          <p class="text-light-text-muted mt-1 text-sm">
             {metrics!.rules.synthesis_pending} synthesis pending
           </p>
         {/snippet}
@@ -101,7 +103,7 @@
           : 0}%"
       >
         {#snippet children()}
-          <p class="mt-1 text-sm text-light-text-muted">
+          <p class="text-light-text-muted mt-1 text-sm">
             {metrics!.incidents.with_embedding} of {metrics!.incidents.total} incidents
           </p>
         {/snippet}
@@ -110,23 +112,23 @@
 
     <!-- LLM Usage -->
     <div class="mt-8">
-      <h2 class="mb-4 text-lg font-semibold text-light-text">LLM Usage (30d)</h2>
+      <h2 class="text-light-text mb-4 text-lg font-semibold">LLM Usage (30d)</h2>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div class="rounded-lg bg-light-bg border border-light-border p-4">
-          <p class="text-sm text-light-text-secondary">Gemini Flash</p>
-          <p class="text-xl font-bold text-light-text">{metrics.llm_usage_30d.flash}</p>
+        <div class="bg-light-bg border-light-border rounded-lg border p-4">
+          <p class="text-light-text-secondary text-sm">Gemini Flash</p>
+          <p class="text-light-text text-xl font-bold">{metrics.llm_usage_30d.flash}</p>
         </div>
-        <div class="rounded-lg bg-light-bg border border-light-border p-4">
-          <p class="text-sm text-light-text-secondary">Gemini Pro</p>
-          <p class="text-xl font-bold text-light-text">{metrics.llm_usage_30d.pro}</p>
+        <div class="bg-light-bg border-light-border rounded-lg border p-4">
+          <p class="text-light-text-secondary text-sm">Gemini Pro</p>
+          <p class="text-light-text text-xl font-bold">{metrics.llm_usage_30d.pro}</p>
         </div>
-        <div class="rounded-lg bg-light-bg border border-light-border p-4">
-          <p class="text-sm text-light-text-secondary">Claude</p>
-          <p class="text-xl font-bold text-light-text">{metrics.llm_usage_30d.claude}</p>
+        <div class="bg-light-bg border-light-border rounded-lg border p-4">
+          <p class="text-light-text-secondary text-sm">Claude</p>
+          <p class="text-light-text text-xl font-bold">{metrics.llm_usage_30d.claude}</p>
         </div>
       </div>
     </div>
 
-    <p class="mt-6 text-xs text-light-text-muted">Auto-refreshes every 60 seconds</p>
+    <p class="text-light-text-muted mt-6 text-xs">Auto-refreshes every 60 seconds</p>
   {/if}
 </div>

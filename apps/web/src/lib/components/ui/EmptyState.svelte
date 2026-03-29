@@ -14,13 +14,13 @@
 
 <div class="flex flex-col items-center justify-center py-12 text-center">
   {#if icon}
-    <div class="rounded-full bg-neutral-100 p-3 mb-4">
+    <div class="mb-4 rounded-full bg-neutral-100 p-3">
       {@render iconRender()}
     </div>
   {/if}
-  <h3 class="text-lg font-semibold text-light-text">{title}</h3>
+  <h3 class="text-light-text text-lg font-semibold">{title}</h3>
   {#if description}
-    <p class="text-sm text-light-text-secondary mt-1 max-w-sm">{description}</p>
+    <p class="text-light-text-secondary mt-1 max-w-sm text-sm">{description}</p>
   {/if}
   {#if action}
     <div class="mt-4">

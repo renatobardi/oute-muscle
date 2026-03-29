@@ -76,23 +76,17 @@
       'inline-flex items-center justify-center font-medium rounded-md transition-colors focus-visible:outline',
       sizeClasses[size],
       variantClasses[variant],
-      className,
-    ),
+      className
+    )
   );
 </script>
 
-<button
-  {type}
-  class={classes}
-  disabled={disabled || loading}
-  aria-busy={loading}
-  {...rest}
->
+<button {type} class={classes} disabled={disabled || loading} aria-busy={loading} {...rest}>
   {#if loading}
     <span
       class={twMerge(
         'animate-spin rounded-full border-2 border-current border-t-transparent',
-        spinnerSizeClasses[size],
+        spinnerSizeClasses[size]
       )}
       aria-hidden="true"
     ></span>

@@ -11,14 +11,7 @@
   }
 
   // svelte-ignore custom_element_props_identifier
-  let {
-    icon,
-    label,
-    variant = 'ghost',
-    size = 'md',
-    disabled = false,
-    ...rest
-  }: Props = $props();
+  let { icon, label, variant = 'ghost', size = 'md', disabled = false, ...rest }: Props = $props();
 
   const variantClasses: Record<string, string> = {
     ghost: 'text-light-text-secondary hover:bg-light-bg-hover hover:text-light-text',
@@ -42,7 +35,9 @@
   type="button"
   aria-label={label}
   {disabled}
-  class="inline-flex items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 {variantClasses[variant]} {sizeClasses[size]} {disabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}"
+  class="focus-visible:ring-primary-500 inline-flex items-center justify-center rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none {variantClasses[
+    variant
+  ]} {sizeClasses[size]} {disabled ? 'pointer-events-none cursor-not-allowed opacity-50' : ''}"
   {...rest}
 >
   {#snippet iconRender()}

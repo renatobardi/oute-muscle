@@ -18,9 +18,15 @@
   };
 </script>
 
-<div class={twMerge('bg-light-bg rounded-xl border border-light-border shadow-sm', paddingMap[padding], className)}>
+<div
+  class={twMerge(
+    'bg-light-bg border-light-border rounded-xl border shadow-sm',
+    paddingMap[padding],
+    className
+  )}
+>
   {#if header}
-    <div class="border-b border-light-border pb-4 mb-4">
+    <div class="border-light-border mb-4 border-b pb-4">
       {@render header()}
     </div>
   {/if}

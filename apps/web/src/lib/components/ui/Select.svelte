@@ -34,14 +34,14 @@
 
 <div>
   {#if label}
-    <label for={selectId} class="block text-sm font-medium text-light-text mb-1.5">
+    <label for={selectId} class="text-light-text mb-1.5 block text-sm font-medium">
       {label}
     </label>
   {/if}
   <div class="relative">
     <select
       id={selectId}
-      class="w-full appearance-none rounded-lg border border-light-border-strong bg-light-bg text-light-text text-sm px-3 py-2.5 h-11 pr-10 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+      class="border-light-border-strong bg-light-bg text-light-text focus:border-primary-500 focus:ring-primary-500/20 h-11 w-full appearance-none rounded-lg border px-3 py-2.5 pr-10 text-sm focus:ring-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
       {disabled}
       onchange={handleChange}
     >
@@ -54,7 +54,9 @@
         </option>
       {/each}
     </select>
-    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-light-text-secondary">
+    <div
+      class="text-light-text-secondary pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
+    >
       <ChevronDown class="h-4 w-4" />
     </div>
   </div>

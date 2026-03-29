@@ -26,13 +26,10 @@
 </script>
 
 <div>
-  <PageHeader
-    title="Admin Overview"
-    description="Platform-wide metrics and health summary"
-  />
+  <PageHeader title="Admin Overview" description="Platform-wide metrics and health summary" />
 
   {#if error}
-    <div class="rounded-lg bg-error-light border border-error-border p-4 text-sm text-error-text">
+    <div class="bg-error-light border-error-border text-error-text rounded-lg border p-4 text-sm">
       <p>{error}</p>
       <Button variant="danger" size="sm" onclick={loadMetrics} class="mt-2">
         {#snippet children()}Retry{/snippet}
@@ -48,31 +45,33 @@
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       <MetricCard label="Total Users" value={metrics.users.total}>
         {#snippet children()}
-          <p class="mt-1 text-sm text-light-text-muted">{metrics!.users.active_30d} active in last 30d</p>
+          <p class="text-light-text-muted mt-1 text-sm">
+            {metrics!.users.active_30d} active in last 30d
+          </p>
         {/snippet}
       </MetricCard>
 
       <MetricCard label="Tenants" value={metrics.tenants.total}>
         {#snippet children()}
-          <p class="mt-1 text-sm text-light-text-muted">{metrics!.tenants.active} active</p>
+          <p class="text-light-text-muted mt-1 text-sm">{metrics!.tenants.active} active</p>
         {/snippet}
       </MetricCard>
 
       <MetricCard label="Scans (30d)" value={metrics.scans.total_30d}>
         {#snippet children()}
-          <p class="mt-1 text-sm text-light-text-muted">{metrics!.scans.active_now} running now</p>
+          <p class="text-light-text-muted mt-1 text-sm">{metrics!.scans.active_now} running now</p>
         {/snippet}
       </MetricCard>
 
       <MetricCard label="Findings (30d)" value={metrics.findings.total_30d}>
         {#snippet children()}
-          <p class="mt-1 text-sm text-light-text-muted">Across all tenants</p>
+          <p class="text-light-text-muted mt-1 text-sm">Across all tenants</p>
         {/snippet}
       </MetricCard>
 
       <MetricCard label="Incidents" value={metrics.incidents.total}>
         {#snippet children()}
-          <p class="mt-1 text-sm text-light-text-muted">
+          <p class="text-light-text-muted mt-1 text-sm">
             {metrics!.incidents.with_embedding} with embeddings ({metrics!.incidents.total > 0
               ? Math.round((metrics!.incidents.with_embedding / metrics!.incidents.total) * 100)
               : 0}%)
@@ -82,7 +81,7 @@
 
       <MetricCard label="Active Rules" value={metrics.rules.active}>
         {#snippet children()}
-          <p class="mt-1 text-sm text-light-text-muted">
+          <p class="text-light-text-muted mt-1 text-sm">
             {metrics!.rules.synthesis_pending} synthesis pending
           </p>
         {/snippet}
@@ -91,19 +90,19 @@
 
     <!-- LLM Usage -->
     <div class="mt-8">
-      <h2 class="mb-4 text-lg font-semibold text-light-text">LLM Usage (30d)</h2>
+      <h2 class="text-light-text mb-4 text-lg font-semibold">LLM Usage (30d)</h2>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div class="rounded-lg bg-light-bg border border-light-border p-4">
-          <p class="text-sm text-light-text-secondary">Gemini Flash</p>
-          <p class="text-xl font-bold text-light-text">{metrics.llm_usage_30d.flash}</p>
+        <div class="bg-light-bg border-light-border rounded-lg border p-4">
+          <p class="text-light-text-secondary text-sm">Gemini Flash</p>
+          <p class="text-light-text text-xl font-bold">{metrics.llm_usage_30d.flash}</p>
         </div>
-        <div class="rounded-lg bg-light-bg border border-light-border p-4">
-          <p class="text-sm text-light-text-secondary">Gemini Pro</p>
-          <p class="text-xl font-bold text-light-text">{metrics.llm_usage_30d.pro}</p>
+        <div class="bg-light-bg border-light-border rounded-lg border p-4">
+          <p class="text-light-text-secondary text-sm">Gemini Pro</p>
+          <p class="text-light-text text-xl font-bold">{metrics.llm_usage_30d.pro}</p>
         </div>
-        <div class="rounded-lg bg-light-bg border border-light-border p-4">
-          <p class="text-sm text-light-text-secondary">Claude</p>
-          <p class="text-xl font-bold text-light-text">{metrics.llm_usage_30d.claude}</p>
+        <div class="bg-light-bg border-light-border rounded-lg border p-4">
+          <p class="text-light-text-secondary text-sm">Claude</p>
+          <p class="text-light-text text-xl font-bold">{metrics.llm_usage_30d.claude}</p>
         </div>
       </div>
     </div>
