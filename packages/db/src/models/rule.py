@@ -3,10 +3,6 @@
 Stores Semgrep rules linked to incidents with revision tracking.
 """
 
-from __future__ import annotations
-
-from typing import Any
-
 from sqlalchemy import CheckConstraint, Column, ForeignKey, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -16,14 +12,14 @@ from .base import Base
 class SemgrepRule(Base):
     """SemgrepRule model — Semgrep rules linked to incidents."""
 
-    id: Any = Column(String(50), primary_key=True)  # e.g. "unsafe-regex-001"
-    tenant_id: Any = Column(
+    id = Column(String(50), primary_key=True)  # e.g. "unsafe-regex-001"
+    tenant_id = Column(
         UUID(as_uuid=True),
         ForeignKey("tenant.id", ondelete="CASCADE"),
         nullable=True,
         index=True,
     )
-    incident_id: Any = Column(
+    incident_id = Column(
         UUID(as_uuid=True),
         ForeignKey("incident.id", ondelete="CASCADE"),
         nullable=False,
@@ -31,32 +27,28 @@ class SemgrepRule(Base):
     )
 
     # Semgrep rule content
-    category: Any = Column(
-        String(50), nullable=False, index=True
-    )  # unsafe-regex, race-condition, etc.
-    sequence_number: Any = Column(
-        Integer, nullable=False, default=1
-    )  # next sequence within category
-    yaml_content: Any = Column(Text, nullable=False)  # Full YAML rule definition
-    test_file_content: Any = Column(Text, nullable=False)  # Test cases (Semgrep format)
-    languages: Any = Column(
+    category = Column(String(50), nullable=False, index=True)  # unsafe-regex, race-condition, etc.
+    sequence_number = Column(Integer, nullable=False, default=1)  # next sequence within category
+    yaml_content = Column(Text, nullable=False)  # Full YAML rule definition
+    test_file_content = Column(Text, nullable=False)  # Test cases (Semgrep format)
+    languages = Column(
         "languages", type_=None, default=list, nullable=False
     )  # [python, javascript, ...]
-    severity: Any = Column(String(50), nullable=False)  # error, warning, info (Semgrep severity)
-    message: Any = Column(Text, nullable=False)
-    remediation: Any = Column(Text, nullable=False)
-    source: Any = Column(String(50), nullable=False, default="manual")  # manual, synthesized
+    severity = Column(String(50), nullable=False)  # error, warning, info (Semgrep severity)
+    message = Column(Text, nullable=False)
+    remediation = Column(Text, nullable=False)
+    source = Column(String(50), nullable=False, default="manual")  # manual, synthesized
 
     # Metadata
-    is_approved: Any = Column("is_approved", type_=None, default=False, nullable=False)
-    approved_by: Any = Column(
+    is_approved = Column("is_approved", type_=None, default=False, nullable=False)
+    approved_by = Column(
         UUID(as_uuid=True),
         ForeignKey("user.id", ondelete="SET NULL"),
         nullable=True,
     )
-    approved_at: Any = Column("approved_at", type_=None, nullable=True)
-    is_active: Any = Column("is_active", type_=None, default=True, nullable=False)
-    created_by: Any = Column(
+    approved_at = Column("approved_at", type_=None, nullable=True)
+    is_active = Column("is_active", type_=None, default=True, nullable=False)
+    created_by = Column(
         UUID(as_uuid=True),
         ForeignKey("user.id", ondelete="SET NULL"),
         nullable=True,

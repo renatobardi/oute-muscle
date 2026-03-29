@@ -4,11 +4,8 @@ Constitution VI: Row-Level Security (RLS) policies enforce tenant isolation.
 All queries must set current_setting('app.tenant_id') via session factory.
 """
 
-from __future__ import annotations
-
 import uuid
 from datetime import datetime
-from typing import Any
 
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import UUID
@@ -31,9 +28,9 @@ class Base(DeclarativeBase):
         name = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", cls.__name__)
         return re.sub("([a-z0-9])([A-Z])", r"\1_\2", name).lower()
 
-    id: Any = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    created_at: Any = Column("created_at", type_=None, nullable=False, default=datetime.utcnow)
-    updated_at: Any = Column(
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    created_at = Column("created_at", type_=None, nullable=False, default=datetime.utcnow)
+    updated_at = Column(
         "updated_at", type_=None, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
     )
 
