@@ -128,7 +128,7 @@ async def run_semgrep(code: str, language: str) -> list[dict[str, Any]]:
     rules_path = os.environ.get("SEMGREP_RULES_PATH", "packages/semgrep-rules")
     rules_dir = pathlib.Path(rules_path)
     if not rules_dir.exists():
-        logger.warning("semgrep_rules_not_found", path=rules_path)
+        logger.warning("semgrep_rules_not_found path=%s", rules_path)
         return []
 
     ext = _LANGUAGE_EXTENSIONS.get(language.lower(), ".txt")
@@ -153,7 +153,7 @@ async def run_semgrep(code: str, language: str) -> list[dict[str, Any]]:
             stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=30.0)
         except TimeoutError:
             proc.kill()
-            logger.warning("semgrep_timeout", language=language)
+            logger.warning("semgrep_timeout language=%s", language)
             return []
     except FileNotFoundError:
         logger.warning("semgrep_not_installed")
@@ -165,12 +165,12 @@ async def run_semgrep(code: str, language: str) -> list[dict[str, Any]]:
             pass
 
     if stderr:
-        logger.debug("semgrep_stderr", stderr=stderr.decode(errors="replace")[:500])
+        logger.debug("semgrep_stderr stderr=%s", stderr.decode(errors="replace")[:500])
 
     try:
         output = json.loads(stdout.decode())
     except json.JSONDecodeError as exc:
-        logger.warning("semgrep_json_parse_error", error=str(exc))
+        logger.warning("semgrep_json_parse_error error=%s", exc)
         return []
 
     return [_normalise_finding(r) for r in output.get("results", [])]

@@ -11,6 +11,8 @@ from fastapi.testclient import TestClient
 from apps.api.src.main import create_app
 from apps.api.src.middleware.auth import register_api_key
 
+pytestmark = pytest.mark.integration
+
 
 @pytest.fixture
 def client() -> TestClient:

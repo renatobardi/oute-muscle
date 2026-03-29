@@ -68,8 +68,8 @@ async def get_incident_advisory(
 
     if not gcp_project or not database_url:
         logger.info(
-            "get_incident_advisory_fallback",
-            reason="GCP_PROJECT or DATABASE_URL not set",
+            "get_incident_advisory_fallback reason=%s",
+            "GCP_PROJECT or DATABASE_URL not set",
         )
         return {
             "advisory_text": (
@@ -108,7 +108,7 @@ async def get_incident_advisory(
             gcp_project=gcp_project,
         )
     except Exception as exc:
-        logger.warning("get_incident_advisory_rag_error", error=str(exc))
+        logger.warning("get_incident_advisory_rag_error error=%s", exc)
         return {
             "advisory_text": "Advisory generation failed. Please try again.",
             "confidence": 0.0,

@@ -50,7 +50,8 @@ class TestRAGPipeline:
 
         embedding_adapter.embed.assert_called_once()
         call_args = embedding_adapter.embed.call_args
-        assert diff in str(call_args)
+        actual_text = call_args[0][0]
+        assert diff in actual_text
 
     @pytest.mark.asyncio
     async def test_vector_search_uses_diff_embedding(self) -> None:

@@ -25,7 +25,10 @@ import pytest
 SKIP_ACCEPTANCE = os.getenv("SKIP_ACCEPTANCE", "1") == "1"
 API_BASE_URL = os.getenv("ACCEPTANCE_API_URL", "http://localhost:8000")
 
-pytestmark = pytest.mark.skipif(SKIP_ACCEPTANCE, reason="SKIP_ACCEPTANCE=1")
+pytestmark = [
+    pytest.mark.acceptance,
+    pytest.mark.skipif(SKIP_ACCEPTANCE, reason="SKIP_ACCEPTANCE=1"),
+]
 
 
 @pytest.fixture(scope="module")

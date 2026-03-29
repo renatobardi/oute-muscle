@@ -21,8 +21,9 @@ class MockEmbeddingPort:
     """Mock Embedding adapter for unit tests."""
 
     async def embed(self, text: str) -> list[float]:
-        """Return a dummy 768-dim embedding."""
-        return [0.1] * 768
+        """Return a deterministic 768-dim embedding that varies by input."""
+        seed = hash(text) % 1000
+        return [0.1 + (seed + i) * 0.0001 for i in range(768)]
 
 
 class MockIncidentRepoPort:

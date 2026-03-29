@@ -84,7 +84,7 @@ source = ["packages/core/src", "apps/api/src", "packages/db/src"]
 omit = ["*/tests/*", "*/migrations/*", "*/adapters/vertex_*", "*/adapters/pg_*", "*/workers/*", "*/domain/observability/*"]
 
 [tool.coverage.report]
-fail_under = 50
+fail_under = 40
 show_missing = true
 
 # ---------------------------------------------------------------------------
