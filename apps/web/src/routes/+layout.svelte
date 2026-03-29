@@ -5,7 +5,7 @@
    */
   import '../app.css';
 
-  let { children, data } = $props();
+  let { children, data: _data } = $props();
 </script>
 
 {@render children()}
