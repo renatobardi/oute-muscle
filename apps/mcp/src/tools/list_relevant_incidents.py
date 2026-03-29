@@ -58,7 +58,7 @@ async def list_relevant_incidents(
 
     database_url = os.environ.get("DATABASE_URL")
     if not database_url:
-        logger.info("list_relevant_incidents_fallback", reason="DATABASE_URL not set")
+        logger.info("list_relevant_incidents_fallback reason=%s", "DATABASE_URL not set")
         return {"incidents": [], "total": 0}
 
     try:
@@ -84,7 +84,7 @@ async def list_relevant_incidents(
                 database_url=database_url,
             )
     except Exception as exc:
-        logger.warning("list_relevant_incidents_db_error", error=str(exc))
+        logger.warning("list_relevant_incidents_db_error error=%s", exc)
         return {"incidents": [], "total": 0}
 
     return {"incidents": incidents[:max_results], "total": len(incidents)}
@@ -176,7 +176,7 @@ async def _filter_list(
 
             category_enum = IncidentCategory(category)
         except ValueError:
-            logger.warning("list_incidents_unknown_category", category=category)
+            logger.warning("list_incidents_unknown_category category=%s", category)
 
     session_factory = SessionFactory(database_url=database_url)
     try:
