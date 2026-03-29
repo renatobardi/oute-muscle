@@ -16,10 +16,13 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 # Skip entire module if no database URL provided
-pytestmark = pytest.mark.skipif(
-    os.getenv("SKIP_INTEGRATION") == "1" or not os.getenv("DATABASE_URL"),
-    reason="Integration tests require DATABASE_URL and SKIP_INTEGRATION != 1",
-)
+pytestmark = [
+    pytest.mark.integration,
+    pytest.mark.skipif(
+        os.getenv("SKIP_INTEGRATION") == "1" or not os.getenv("DATABASE_URL"),
+        reason="Integration tests require DATABASE_URL and SKIP_INTEGRATION != 1",
+    ),
+]
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://localhost/oute_test")
 
