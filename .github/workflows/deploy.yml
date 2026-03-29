@@ -195,7 +195,7 @@ jobs:
           echo "Service URL: $SERVICE_URL"
           # Poll /health/ready for up to 60s
           for i in $(seq 1 12); do
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$SERVICE_URL/health")
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$SERVICE_URL/health/live")
             if [[ "$STATUS" == "200" ]]; then
               echo "✓ Service healthy"
               exit 0
