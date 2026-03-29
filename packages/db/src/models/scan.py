@@ -38,6 +38,8 @@ class Scan(Base):
 
     # Results
     layer1_findings_count: Any = Column(Integer, nullable=False, default=0)
+    risk_score: Any = Column(Integer, nullable=True)  # 0-100; NULL until completed
+    risk_level: Any = Column(String(20), nullable=True)  # low, medium, high, critical
     duration_ms: Any = Column(Integer, nullable=False, default=0)
 
     # Status
