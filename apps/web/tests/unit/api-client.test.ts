@@ -40,7 +40,7 @@ describe('ApiClient', () => {
 
   beforeEach(() => {
     fetchSpy = mockFetch(200, {});
-    client = new ApiClient({ baseUrl: 'https://api.outemuscle.com/v1', fetch: fetchSpy });
+    client = new ApiClient({ baseUrl: 'https://muscle.oute.pro/api/v1', fetch: fetchSpy });
   });
 
   afterEach(() => {
@@ -56,7 +56,7 @@ describe('ApiClient', () => {
       client.setToken('my-jwt-token');
       fetchSpy = mockFetch(200, { items: [], total: 0, page: 1, per_page: 20 });
       client = new ApiClient({
-        baseUrl: 'https://api.outemuscle.com/v1',
+        baseUrl: 'https://muscle.oute.pro/api/v1',
         fetch: fetchSpy,
         token: 'my-jwt-token',
       });
@@ -71,7 +71,7 @@ describe('ApiClient', () => {
 
     it('omits Authorization header when no token is set', async () => {
       fetchSpy = mockFetch(200, { items: [], total: 0, page: 1, per_page: 20 });
-      client = new ApiClient({ baseUrl: 'https://api.outemuscle.com/v1', fetch: fetchSpy });
+      client = new ApiClient({ baseUrl: 'https://muscle.oute.pro/api/v1', fetch: fetchSpy });
 
       await client.incidents.list();
 
@@ -83,7 +83,7 @@ describe('ApiClient', () => {
 
     it('updates token dynamically via setToken', async () => {
       fetchSpy = mockFetch(200, { items: [], total: 0, page: 1, per_page: 20 });
-      client = new ApiClient({ baseUrl: 'https://api.outemuscle.com/v1', fetch: fetchSpy });
+      client = new ApiClient({ baseUrl: 'https://muscle.oute.pro/api/v1', fetch: fetchSpy });
       client.setToken('updated-token');
 
       await client.incidents.list();
@@ -105,7 +105,7 @@ describe('ApiClient', () => {
         error: 'Conflict — incident modified by another user',
         code: 'CONFLICT',
       });
-      client = new ApiClient({ baseUrl: 'https://api.outemuscle.com/v1', fetch: fetchSpy });
+      client = new ApiClient({ baseUrl: 'https://muscle.oute.pro/api/v1', fetch: fetchSpy });
 
       await expect(client.incidents.get('abc')).rejects.toThrow(ApiError);
 
@@ -121,14 +121,14 @@ describe('ApiClient', () => {
 
     it('throws ApiError on 401 UNAUTHORIZED', async () => {
       fetchSpy = mockFetch(401, { error: 'Unauthorized', code: 'UNAUTHORIZED' });
-      client = new ApiClient({ baseUrl: 'https://api.outemuscle.com/v1', fetch: fetchSpy });
+      client = new ApiClient({ baseUrl: 'https://muscle.oute.pro/api/v1', fetch: fetchSpy });
 
       await expect(client.incidents.list()).rejects.toThrow(ApiError);
     });
 
     it('throws ApiError on 404 NOT_FOUND', async () => {
       fetchSpy = mockFetch(404, { error: 'Incident not found', code: 'NOT_FOUND' });
-      client = new ApiClient({ baseUrl: 'https://api.outemuscle.com/v1', fetch: fetchSpy });
+      client = new ApiClient({ baseUrl: 'https://muscle.oute.pro/api/v1', fetch: fetchSpy });
 
       await expect(client.incidents.get('nonexistent')).rejects.toMatchObject({
         status: 404,
@@ -138,7 +138,7 @@ describe('ApiClient', () => {
 
     it('throws ApiError with RATE_LIMITED code on 429', async () => {
       fetchSpy = mockFetch(429, { error: 'Rate limit exceeded', code: 'RATE_LIMITED' });
-      client = new ApiClient({ baseUrl: 'https://api.outemuscle.com/v1', fetch: fetchSpy });
+      client = new ApiClient({ baseUrl: 'https://muscle.oute.pro/api/v1', fetch: fetchSpy });
 
       await expect(client.incidents.list()).rejects.toMatchObject({ code: 'RATE_LIMITED' });
     });
@@ -171,7 +171,7 @@ describe('ApiClient', () => {
         per_page: 20,
       };
       fetchSpy = mockFetch(200, payload);
-      client = new ApiClient({ baseUrl: 'https://api.outemuscle.com/v1', fetch: fetchSpy });
+      client = new ApiClient({ baseUrl: 'https://muscle.oute.pro/api/v1', fetch: fetchSpy });
 
       const result = await client.incidents.list();
 
@@ -182,7 +182,7 @@ describe('ApiClient', () => {
 
     it('forwards query params (q, semantic, category, page)', async () => {
       fetchSpy = mockFetch(200, { items: [], total: 0, page: 2, per_page: 20 });
-      client = new ApiClient({ baseUrl: 'https://api.outemuscle.com/v1', fetch: fetchSpy });
+      client = new ApiClient({ baseUrl: 'https://muscle.oute.pro/api/v1', fetch: fetchSpy });
 
       await client.incidents.list({
         q: 'regex',
@@ -215,7 +215,7 @@ describe('ApiClient', () => {
         updated_at: '2024-01-01T00:00:00Z',
       };
       fetchSpy = mockFetch(200, incident);
-      client = new ApiClient({ baseUrl: 'https://api.outemuscle.com/v1', fetch: fetchSpy });
+      client = new ApiClient({ baseUrl: 'https://muscle.oute.pro/api/v1', fetch: fetchSpy });
 
       const result = await client.incidents.get('inc-1');
 
@@ -240,7 +240,7 @@ describe('ApiClient', () => {
         updated_at: '2024-01-01T00:00:00Z',
       };
       fetchSpy = mockFetch(201, created);
-      client = new ApiClient({ baseUrl: 'https://api.outemuscle.com/v1', fetch: fetchSpy });
+      client = new ApiClient({ baseUrl: 'https://muscle.oute.pro/api/v1', fetch: fetchSpy });
 
       const result = await client.incidents.create({
         title: 'New incident',
@@ -275,7 +275,7 @@ describe('ApiClient', () => {
         updated_at: '2024-01-02T00:00:00Z',
       };
       fetchSpy = mockFetch(200, updated);
-      client = new ApiClient({ baseUrl: 'https://api.outemuscle.com/v1', fetch: fetchSpy });
+      client = new ApiClient({ baseUrl: 'https://muscle.oute.pro/api/v1', fetch: fetchSpy });
 
       await client.incidents.update('inc-1', { title: 'Updated', version: 3 });
 
@@ -290,7 +290,7 @@ describe('ApiClient', () => {
   describe('incidents.delete', () => {
     it('sends DELETE request', async () => {
       fetchSpy = mockFetch(204, null);
-      client = new ApiClient({ baseUrl: 'https://api.outemuscle.com/v1', fetch: fetchSpy });
+      client = new ApiClient({ baseUrl: 'https://muscle.oute.pro/api/v1', fetch: fetchSpy });
 
       await client.incidents.delete('inc-1');
 
@@ -310,7 +310,7 @@ describe('ApiClient', () => {
         },
       };
       fetchSpy = mockFetch(200, draft);
-      client = new ApiClient({ baseUrl: 'https://api.outemuscle.com/v1', fetch: fetchSpy });
+      client = new ApiClient({ baseUrl: 'https://muscle.oute.pro/api/v1', fetch: fetchSpy });
 
       const result = await client.incidents.ingestUrl('https://example.com/post-mortem');
 
@@ -342,7 +342,7 @@ describe('ApiClient', () => {
         per_page: 20,
       };
       fetchSpy = mockFetch(200, payload);
-      client = new ApiClient({ baseUrl: 'https://api.outemuscle.com/v1', fetch: fetchSpy });
+      client = new ApiClient({ baseUrl: 'https://muscle.oute.pro/api/v1', fetch: fetchSpy });
 
       const result = await client.rules.list();
 
@@ -353,7 +353,7 @@ describe('ApiClient', () => {
   describe('rules.toggle', () => {
     it('sends PATCH /rules/:id with enabled field', async () => {
       fetchSpy = mockFetch(200, { id: 'unsafe-regex-001', enabled: false });
-      client = new ApiClient({ baseUrl: 'https://api.outemuscle.com/v1', fetch: fetchSpy });
+      client = new ApiClient({ baseUrl: 'https://muscle.oute.pro/api/v1', fetch: fetchSpy });
 
       await client.rules.toggle('unsafe-regex-001', false);
 
@@ -388,7 +388,7 @@ describe('ApiClient', () => {
         per_page: 20,
       };
       fetchSpy = mockFetch(200, payload);
-      client = new ApiClient({ baseUrl: 'https://api.outemuscle.com/v1', fetch: fetchSpy });
+      client = new ApiClient({ baseUrl: 'https://muscle.oute.pro/api/v1', fetch: fetchSpy });
 
       const result = await client.scans.list();
 
@@ -411,7 +411,7 @@ describe('ApiClient', () => {
         created_at: '2024-01-01T00:00:00Z',
       };
       fetchSpy = mockFetch(200, tenant);
-      client = new ApiClient({ baseUrl: 'https://api.outemuscle.com/v1', fetch: fetchSpy });
+      client = new ApiClient({ baseUrl: 'https://muscle.oute.pro/api/v1', fetch: fetchSpy });
 
       const result = await client.tenants.me();
 

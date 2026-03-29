@@ -65,7 +65,7 @@ def findings_to_sarif(findings: list[dict[str, Any]], scan_id: str) -> dict[str,
                     "driver": {
                         "name": "oute-muscle",
                         "version": "0.1.0",
-                        "informationUri": "https://outemuscle.com",
+                        "informationUri": "https://muscle.oute.pro",
                         "rules": rules,
                     }
                 },

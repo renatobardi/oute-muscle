@@ -10,7 +10,7 @@
   let submitting = $state(false);
   let error = $state<string | null>(null);
 
-  const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'https://api.outemuscle.com/v1';
+  const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'https://muscle.oute.pro/api/v1';
 
   async function handleRegister(e: SubmitEvent) {
     e.preventDefault();

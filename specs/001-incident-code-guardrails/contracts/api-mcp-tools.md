@@ -2,7 +2,7 @@
 
 **Transport**: Streamable HTTP
 **Auth**: OAuth 2.1 Authorization Code + PKCE
-**Base URL**: `https://mcp.outemuscle.com`
+**Base URL**: `https://mcp.muscle.oute.pro`
 **Metering**: 50 free tool calls/month, then pay-as-you-go (FR-024). This is MCP-specific — the REST API uses per-tier rate limiting instead.
 **Result Limiting**: MCP tools use `max_results` for bounded single-shot responses. This differs from the REST API which uses `page`/`per_page` pagination — the divergence is intentional: MCP serves tool calls with bounded output, REST serves browsable UIs.
 
@@ -168,7 +168,7 @@ Check if a proposed fix resolves a previously flagged finding.
 {
   "error": "Quota exceeded. 50 free scans/month used.",
   "code": "QUOTA_EXCEEDED",
-  "upgrade_url": "https://app.outemuscle.com/settings/billing"
+  "upgrade_url": "https://app.muscle.oute.pro/settings/billing"
 }
 ```
 

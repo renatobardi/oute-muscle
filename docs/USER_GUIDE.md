@@ -231,7 +231,7 @@ curl https://oute-prod-api-ujzimacvza-uc.a.run.app/v1/scans/abc123 \
 {
   "rule_id": "unsafe-regex-001",
   "incident_id": "550e8400-...",
-  "incident_url": "https://oute.me/incidents/550e8400-...",
+  "incident_url": "https://muscle.oute.pro/incidents/550e8400-...",
   "file_path": "src/validators.py",
   "start_line": 42,
   "end_line": 42,

@@ -6,7 +6,7 @@
   import { goto } from '$app/navigation';
   import { auth } from '$lib/stores/auth';
 
-  const TOKEN_URL = import.meta.env.VITE_MCP_TOKEN_URL ?? 'https://mcp.outemuscle.com/oauth/token';
+  const TOKEN_URL = import.meta.env.VITE_MCP_TOKEN_URL ?? 'https://mcp.muscle.oute.pro/oauth/token';
   const CLIENT_ID = import.meta.env.VITE_OAUTH_CLIENT_ID ?? 'oute-dashboard';
 
   let error = $state<string | null>(null);
@@ -55,7 +55,7 @@
       auth.login(token, {
         id: payload.sub,
         email: payload.email,
-        role: payload['https://outemuscle.com/role'] ?? 'viewer',
+        role: payload['https://muscle.oute.pro/role'] ?? 'viewer',
       });
 
       await goto('/incidents');
