@@ -62,7 +62,7 @@ Toda regra L1 aponta para o incidente que a originou. Todo finding de um scan ap
 | Serviço | URL |
 |---------|-----|
 | Landing page / waitlist | https://muscle.oute.pro *(em breve)* |
-| API (prod) | https://oute-prod-api-ujzimacvza-uc.a.run.app |
+| API (prod) | https://muscle.oute.pro/api |
 | Dashboard web | Em desenvolvimento |
 
 ### Usar a API Key
@@ -70,7 +70,7 @@ Toda regra L1 aponta para o incidente que a originou. Todo finding de um scan ap
 A key recebida é enviada no header `X-API-Key` em todas as chamadas:
 
 ```bash
-curl -H "X-API-Key: sk-..." https://oute-prod-api-ujzimacvza-uc.a.run.app/v1/incidents
+curl -H "X-API-Key: sk-..." https://muscle.oute.pro/api/v1/incidents
 ```
 
 ---
@@ -86,7 +86,7 @@ O dashboard web ainda não está disponível no beta atual. Use a API diretament
 Se você tem o post-mortem em uma URL pública (Notion, Confluence, GitHub issue):
 
 ```bash
-curl -X POST https://oute-prod-api-ujzimacvza-uc.a.run.app/v1/incidents/ingest-url \
+curl -X POST https://muscle.oute.pro/api/v1/incidents/ingest-url \
   -H "X-API-Key: sk-..." \
   -H "Content-Type: application/json" \
   -d '{"url": "https://notion.so/seu-post-mortem"}'
@@ -97,7 +97,7 @@ O LLM extrai os campos automaticamente e cria um **draft** para revisão. Confir
 ### Via API (criar diretamente)
 
 ```bash
-curl -X POST https://oute-prod-api-ujzimacvza-uc.a.run.app/v1/incidents \
+curl -X POST https://muscle.oute.pro/api/v1/incidents \
   -H "X-API-Key: sk-..." \
   -H "Content-Type: application/json" \
   -d '{
@@ -166,7 +166,7 @@ jobs:
           OUTE_API_KEY: ${{ secrets.OUTE_API_KEY }}
         run: |
           RESULT=$(curl -s -X POST \
-            https://oute-prod-api-ujzimacvza-uc.a.run.app/v1/scans \
+            https://muscle.oute.pro/api/v1/scans \
             -H "X-API-Key: $OUTE_API_KEY" \
             -H "Content-Type: application/json" \
             -d "{
@@ -197,13 +197,13 @@ Configure `OUTE_API_KEY` em **GitHub → Settings → Secrets and variables → 
 git diff origin/main...HEAD > pr.diff
 
 # Enviar para scan (JSON)
-curl -X POST https://oute-prod-api-ujzimacvza-uc.a.run.app/v1/scans \
+curl -X POST https://muscle.oute.pro/api/v1/scans \
   -H "X-API-Key: sk-..." \
   -H "Content-Type: application/json" \
   -d "{\"diff\": $(cat pr.diff | jq -Rs .), \"repository\": \"org/repo\"}"
 
 # Enviar para scan (SARIF — para integrar com GitHub Code Scanning)
-curl -X POST https://oute-prod-api-ujzimacvza-uc.a.run.app/v1/scans \
+curl -X POST https://muscle.oute.pro/api/v1/scans \
   -H "X-API-Key: sk-..." \
   -H "Accept: application/sarif+json" \
   -H "Content-Type: application/json" \
@@ -217,7 +217,7 @@ GET /v1/scans/{scan_id}
 ```
 
 ```bash
-curl https://oute-prod-api-ujzimacvza-uc.a.run.app/v1/scans/abc123 \
+curl https://muscle.oute.pro/api/v1/scans/abc123 \
   -H "X-API-Key: sk-..."
 ```
 
@@ -407,7 +407,7 @@ Ao atingir um limite, a API retorna `402 Payment Required` com `code: PLAN_LIMIT
 
 ## Referência de API
 
-Base URL: `https://oute-prod-api-ujzimacvza-uc.a.run.app`
+Base URL: `https://muscle.oute.pro/api`
 
 Documentação interativa (Swagger): `/docs` (disponível localmente em desenvolvimento)
 

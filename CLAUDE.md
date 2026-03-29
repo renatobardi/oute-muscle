@@ -155,7 +155,7 @@ Rule ID format: `{category}-{NNN}` (e.g., `unsafe-regex-001`). Each rule YAML re
 **Trunk-Based CD — single environment (prod).**
 
 - CI runs on every PR targeting `main` (lint + mypy + tests + semgrep)
-- Merging to `main` triggers automatic deploy to prod (Cloud Run `oute-prod-api`)
+- Merging to `main` triggers automatic deploy to prod (Cloud Run `muscle-prod-api`)
 - No staging environment — CI quality gates are the only barrier before prod
 - Uses Workload Identity Federation — no service account keys
 

@@ -51,16 +51,16 @@ jobs:
       - name: Build and push
         id: image
         env:
-          REGISTRY: ${{ vars.REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/oute-prod-docker
+          REGISTRY: ${{ vars.REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/muscle-prod-docker
           TAG: ${{ github.sha }}
         run: |
-          IMAGE="$REGISTRY/oute-api:${TAG::8}"
+          IMAGE="$REGISTRY/muscle-api:${TAG::8}"
           docker buildx build \
             --file apps/api/Dockerfile \
             --tag "$IMAGE" \
-            --tag "$REGISTRY/oute-api:latest" \
-            --cache-from type=registry,ref="$REGISTRY/oute-api:buildcache" \
-            --cache-to   type=registry,ref="$REGISTRY/oute-api:buildcache",mode=max \
+            --tag "$REGISTRY/muscle-api:latest" \
+            --cache-from type=registry,ref="$REGISTRY/muscle-api:buildcache" \
+            --cache-to   type=registry,ref="$REGISTRY/muscle-api:buildcache",mode=max \
             --push \
             .
           echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
@@ -141,7 +141,7 @@ jobs:
       - name: Deploy
         uses: google-github-actions/deploy-cloudrun@v3
         with:
-          service:    oute-prod-api
+          service:    muscle-prod-api
           image:      ${{ needs.build.outputs.image }}
           region:     ${{ vars.REGION }}
           project_id: ${{ vars.PROJECT_ID }}
@@ -156,7 +156,7 @@ jobs:
       - name: Verify deployment (readiness probe)
         run: |
           SERVICE_URL=$(gcloud run services describe \
-            oute-prod-api \
+            muscle-prod-api \
             --region=${{ vars.REGION }} \
             --project=${{ vars.PROJECT_ID }} \
             --format='value(status.url)')
@@ -200,16 +200,16 @@ jobs:
       - name: Build and push
         id: image
         env:
-          REGISTRY: ${{ vars.REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/oute-prod-docker
+          REGISTRY: ${{ vars.REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/muscle-prod-docker
           TAG: ${{ github.sha }}
         run: |
-          IMAGE="$REGISTRY/oute-web:${TAG::8}"
+          IMAGE="$REGISTRY/muscle-web:${TAG::8}"
           docker buildx build \
             --file apps/web/Dockerfile \
             --tag "$IMAGE" \
-            --tag "$REGISTRY/oute-web:latest" \
-            --cache-from type=registry,ref="$REGISTRY/oute-web:buildcache" \
-            --cache-to   type=registry,ref="$REGISTRY/oute-web:buildcache",mode=max \
+            --tag "$REGISTRY/muscle-web:latest" \
+            --cache-from type=registry,ref="$REGISTRY/muscle-web:buildcache" \
+            --cache-to   type=registry,ref="$REGISTRY/muscle-web:buildcache",mode=max \
             --push \
             .
           echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
@@ -217,7 +217,7 @@ jobs:
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v3
         with:
-          service:    oute-prod-web
+          service:    muscle-prod-web
           image:      ${{ steps.image.outputs.image }}
           region:     ${{ vars.REGION }}
           project_id: ${{ vars.PROJECT_ID }}
@@ -232,7 +232,7 @@ jobs:
       - name: Verify deployment
         run: |
           SERVICE_URL=$(gcloud run services describe \
-            oute-prod-web \
+            muscle-prod-web \
             --region=${{ vars.REGION }} \
             --project=${{ vars.PROJECT_ID }} \
             --format='value(status.url)')
