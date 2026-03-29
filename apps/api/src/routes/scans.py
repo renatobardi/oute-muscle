@@ -355,12 +355,79 @@ async def create_scan(
 async def get_scan_status(
     scan_id: str,
     tenant: dict[str, str] = Depends(require_api_key),
-) -> ScanStatusResponse:
-    """Get scan status and results."""
-    return ScanStatusResponse(
-        scan_id=scan_id,
-        status="completed",
-        risk_level="low",
-        findings=[],
-        created_at=datetime.now(tz=timezone.utc),  # noqa: UP017 (Python 3.11+ only)
+    session: DbSession = None,
+) -> Response:
+    """Get scan status and results.
+
+    Returns 404 when the scan does not exist or belongs to a different tenant.
+    Falls back to a minimal stub when DB is unavailable (session is None).
+    """
+    from fastapi import HTTPException
+
+    from packages.db.src.adapters.pg_scan_repo import PostgreSQLScanRepo
+
+    # Validate scan_id format
+    try:
+        scan_uuid = uuid.UUID(scan_id)
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Scan not found") from None
+
+    # Validate tenant_id format
+    try:
+        tenant_uuid: uuid.UUID | None = uuid.UUID(tenant["tenant_id"])
+    except (ValueError, KeyError):
+        tenant_uuid = None
+
+    if session is None or tenant_uuid is None:
+        # DB unavailable or non-UUID tenant — return minimal stub
+        stub = ScanStatusResponse(
+            scan_id=scan_id,
+            status="unknown",
+            risk_level=None,
+            findings=[],
+            created_at=datetime.now(tz=timezone.utc),  # noqa: UP017
+        )
+        return Response(content=stub.model_dump_json(), media_type="application/json")
+
+    try:
+        repo = PostgreSQLScanRepo(session)
+        scan = await repo.get_by_id(scan_uuid, tenant_id=tenant_uuid)
+    except Exception as exc:
+        logger.warning("GET /scans/%s DB query failed: %s", scan_id, exc)
+        scan = None
+
+    if scan is None:
+        raise HTTPException(status_code=404, detail="Scan not found")
+
+    # Load findings for this scan
+    findings_data: list[FindingResponse] = []
+    try:
+        db_findings = await repo.list_findings(scan_uuid)
+        findings_data = [
+            FindingResponse(
+                rule_id=f.rule_id or "unknown",
+                incident_id=str(f.incident_id) if f.incident_id else "",
+                incident_url="",
+                file_path=f.file_path or "unknown",
+                start_line=f.start_line or 1,
+                end_line=f.end_line or 1,
+                severity=f.severity or "low",
+                category="",
+                message=f.message or "",
+                remediation=f.remediation or "",
+            )
+            for f in db_findings
+        ]
+    except Exception as exc:
+        logger.warning("GET /scans/%s findings query failed: %s", scan_id, exc)
+
+    resp = ScanStatusResponse(
+        scan_id=str(scan.id),
+        status=scan.status,
+        risk_level=scan.risk_level,
+        findings=findings_data,
+        created_at=scan.created_at or datetime.now(tz=timezone.utc),  # noqa: UP017
+        completed_at=scan.completed_at,
+        duration_ms=scan.duration_ms,
     )
+    return Response(content=resp.model_dump_json(), media_type="application/json")

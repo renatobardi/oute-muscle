@@ -69,6 +69,18 @@ class MockAuditLogRepo:
 
 
 @pytest.fixture
+def tenant_id() -> uuid.UUID:
+    """Stable tenant UUID for tests."""
+    return uuid.uuid4()
+
+
+@pytest.fixture
+def user_id() -> uuid.UUID:
+    """Stable user UUID for tests."""
+    return uuid.uuid4()
+
+
+@pytest.fixture
 def mock_audit_log_repo() -> MockAuditLogRepo:
     """Create mock audit log repository."""
     return MockAuditLogRepo()

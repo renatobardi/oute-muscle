@@ -35,7 +35,7 @@ class TestRAGPipeline:
         llm_router = AsyncMock()
         llm_router.generate = AsyncMock(return_value="advisory text")
 
-        from src.domain.advisory.rag_pipeline import RAGPipeline
+        from packages.core.src.domain.advisory.rag_pipeline import RAGPipeline
 
         pipeline = RAGPipeline(
             embedding_port=embedding_adapter,
@@ -63,7 +63,7 @@ class TestRAGPipeline:
         llm_router = AsyncMock()
         llm_router.generate = AsyncMock(return_value="advisory")
 
-        from src.domain.advisory.rag_pipeline import RAGPipeline
+        from packages.core.src.domain.advisory.rag_pipeline import RAGPipeline
 
         pipeline = RAGPipeline(
             embedding_port=embedding_adapter,
@@ -106,7 +106,7 @@ class TestRAGPipeline:
         llm_router = AsyncMock()
         llm_router.generate = AsyncMock(return_value="advisory with context")
 
-        from src.domain.advisory.rag_pipeline import RAGPipeline
+        from packages.core.src.domain.advisory.rag_pipeline import RAGPipeline
 
         pipeline = RAGPipeline(
             embedding_port=embedding_adapter,
@@ -135,7 +135,7 @@ class TestRAGPipeline:
         llm_router = AsyncMock()
         llm_router.generate = AsyncMock(return_value="generic advisory")
 
-        from src.domain.advisory.rag_pipeline import RAGPipeline
+        from packages.core.src.domain.advisory.rag_pipeline import RAGPipeline
 
         pipeline = RAGPipeline(
             embedding_port=embedding_adapter,
@@ -162,7 +162,7 @@ class TestRAGPipeline:
         llm_router = AsyncMock()
         llm_router.generate = AsyncMock(return_value="advisory")
 
-        from src.domain.advisory.rag_pipeline import RAGPipeline
+        from packages.core.src.domain.advisory.rag_pipeline import RAGPipeline
 
         pipeline = RAGPipeline(
             embedding_port=embedding_adapter,
@@ -193,7 +193,7 @@ class TestRAGPipeline:
         llm_router = AsyncMock()
         llm_router.generate = AsyncMock(return_value="advisory text")
 
-        from src.domain.advisory.rag_pipeline import RAGPipeline
+        from packages.core.src.domain.advisory.rag_pipeline import RAGPipeline
 
         pipeline = RAGPipeline(
             embedding_port=embedding_adapter,
@@ -242,7 +242,7 @@ class TestRAGPipeline:
         llm_router = AsyncMock()
         llm_router.generate = AsyncMock(return_value="advisory")
 
-        from src.domain.advisory.rag_pipeline import RAGPipeline
+        from packages.core.src.domain.advisory.rag_pipeline import RAGPipeline
 
         pipeline = RAGPipeline(
             embedding_port=embedding_adapter,
@@ -264,7 +264,7 @@ class TestRAGPipeline:
         llm_router = AsyncMock()
         llm_router.generate = AsyncMock(return_value="advisory")
 
-        from src.domain.advisory.rag_pipeline import RAGPipeline
+        from packages.core.src.domain.advisory.rag_pipeline import RAGPipeline
 
         pipeline = RAGPipeline(
             embedding_port=embedding_adapter,

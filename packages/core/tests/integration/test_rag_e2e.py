@@ -21,11 +21,11 @@ async def test_diff_in_advisory_out() -> None:
     """Submit a diff, verify advisory is generated with incident reference."""
     import uuid
 
-    from src.adapters.vertex_embedding import VertexAIEmbedding
-    from src.adapters.vertex_llm import VertexGeminiFlash
-    from src.domain.advisory.llm_router import LLMRouter
-    from src.domain.advisory.rag_pipeline import RAGPipeline
-    from src.domain.incidents.enums import (
+    from packages.core.src.adapters.vertex_embedding import VertexAIEmbedding
+    from packages.core.src.adapters.vertex_llm import VertexGeminiFlash
+    from packages.core.src.domain.advisory.llm_router import LLMRouter
+    from packages.core.src.domain.advisory.rag_pipeline import RAGPipeline
+    from packages.core.src.domain.incidents.enums import (
         RiskLevel,
     )
 

@@ -101,10 +101,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Wire synthesis repos into app.state so the synthesis route can inject them.
     # These are null-safe: list operations return empty results if DB is unavailable.
     from apps.api.src.adapters.pg_candidate_repo import PostgreSQLCandidateRepo
-    from packages.core.src.adapters.pg_rule_repo import PostgreSQLRuleRepo
+    from apps.api.src.adapters.pg_rule_repo import PostgreSQLRuleRepo
 
     app.state.candidate_repo = PostgreSQLCandidateRepo(_container.session_factory)
-    app.state.rule_repo = PostgreSQLRuleRepo()
+    app.state.rule_repo = PostgreSQLRuleRepo(_container.session_factory)
     logger.info("startup_complete")
 
     yield

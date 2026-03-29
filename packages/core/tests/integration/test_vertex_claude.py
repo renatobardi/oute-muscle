@@ -19,7 +19,7 @@ pytestmark = pytest.mark.skipif(
 @pytest.mark.asyncio
 async def test_claude_generate_returns_string() -> None:
     """Basic generation with Claude returns non-empty string."""
-    from src.adapters.vertex_claude import VertexClaudeSonnet4
+    from packages.core.src.adapters.vertex_claude import VertexClaudeSonnet4
 
     adapter = VertexClaudeSonnet4()
     result = await adapter.generate("Say hello in one word.")
@@ -31,6 +31,6 @@ async def test_claude_generate_returns_string() -> None:
 @pytest.mark.asyncio
 async def test_claude_model_name() -> None:
     """Claude adapter uses correct model identifier."""
-    from src.adapters.vertex_claude import VertexClaudeSonnet4
+    from packages.core.src.adapters.vertex_claude import VertexClaudeSonnet4
 
     assert VertexClaudeSonnet4.MODEL == "claude-sonnet-4@20251101"

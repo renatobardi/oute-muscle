@@ -25,7 +25,7 @@ class TestLLMRouter:
         pro = AsyncMock(spec=LLMPort)
         claude = AsyncMock(spec=LLMPort)
 
-        from src.domain.advisory.llm_router import LLMRouter
+        from packages.core.src.domain.advisory.llm_router import LLMRouter
 
         router = LLMRouter(flash=flash, pro=pro, claude=claude)
         result = await router.generate("test prompt", RiskLevel.LOW)
@@ -43,7 +43,7 @@ class TestLLMRouter:
         pro.generate = AsyncMock(return_value="Pro response")
         claude = AsyncMock(spec=LLMPort)
 
-        from src.domain.advisory.llm_router import LLMRouter
+        from packages.core.src.domain.advisory.llm_router import LLMRouter
 
         router = LLMRouter(flash=flash, pro=pro, claude=claude)
         result = await router.generate("test prompt", RiskLevel.MEDIUM)
@@ -61,7 +61,7 @@ class TestLLMRouter:
         claude = AsyncMock(spec=LLMPort)
         claude.generate = AsyncMock(return_value="Claude response")
 
-        from src.domain.advisory.llm_router import LLMRouter
+        from packages.core.src.domain.advisory.llm_router import LLMRouter
 
         router = LLMRouter(flash=flash, pro=pro, claude=claude)
         result = await router.generate("test prompt", RiskLevel.HIGH)
@@ -80,7 +80,7 @@ class TestLLMRouter:
         pro.generate = AsyncMock(return_value="Pro fallback")
         claude = AsyncMock(spec=LLMPort)
 
-        from src.domain.advisory.llm_router import LLMRouter
+        from packages.core.src.domain.advisory.llm_router import LLMRouter
 
         router = LLMRouter(flash=flash, pro=pro, claude=claude)
         result = await router.generate("test prompt", RiskLevel.LOW)
@@ -99,7 +99,7 @@ class TestLLMRouter:
         claude = AsyncMock(spec=LLMPort)
         claude.generate = AsyncMock(return_value="Claude fallback")
 
-        from src.domain.advisory.llm_router import LLMRouter
+        from packages.core.src.domain.advisory.llm_router import LLMRouter
 
         router = LLMRouter(flash=flash, pro=pro, claude=claude)
         result = await router.generate("test prompt", RiskLevel.MEDIUM)
@@ -119,7 +119,7 @@ class TestLLMRouter:
         claude = AsyncMock(spec=LLMPort)
         claude.generate = AsyncMock(side_effect=LLMTimeoutError("timeout"))
 
-        from src.domain.advisory.llm_router import LLMRouter
+        from packages.core.src.domain.advisory.llm_router import LLMRouter
 
         router = LLMRouter(flash=flash, pro=pro, claude=claude)
 
@@ -134,7 +134,7 @@ class TestLLMRouter:
         pro = AsyncMock(spec=LLMPort)
         claude = AsyncMock(spec=LLMPort)
 
-        from src.domain.advisory.llm_router import LLMRouter
+        from packages.core.src.domain.advisory.llm_router import LLMRouter
 
         router = LLMRouter(flash=flash, pro=pro, claude=claude)
         result = await router.generate("test prompt", RiskLevel.LOW)

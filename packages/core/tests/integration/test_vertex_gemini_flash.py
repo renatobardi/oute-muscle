@@ -19,7 +19,7 @@ pytestmark = pytest.mark.skipif(
 @pytest.mark.asyncio
 async def test_flash_generate_returns_string() -> None:
     """Basic generation with Flash returns non-empty string."""
-    from src.adapters.vertex_llm import VertexGeminiFlash
+    from packages.core.src.adapters.vertex_llm import VertexGeminiFlash
 
     adapter = VertexGeminiFlash()
     result = await adapter.generate("Say hello in one word.")
@@ -31,7 +31,7 @@ async def test_flash_generate_returns_string() -> None:
 @pytest.mark.asyncio
 async def test_flash_model_name() -> None:
     """Flash adapter uses correct model identifier."""
-    from src.adapters.vertex_llm import VertexGeminiFlash
+    from packages.core.src.adapters.vertex_llm import VertexGeminiFlash
 
     assert VertexGeminiFlash.MODEL == "gemini-2.5-flash"
 
@@ -41,8 +41,8 @@ async def test_flash_timeout_respected() -> None:
     """Flash respects 30-second timeout (mock)."""
     from unittest.mock import patch
 
-    from src.adapters.vertex_llm import VertexGeminiFlash
-    from src.ports.llm import LLMTimeoutError
+    from packages.core.src.adapters.vertex_llm import VertexGeminiFlash
+    from packages.core.src.ports.llm import LLMTimeoutError
 
     adapter = VertexGeminiFlash()
 
