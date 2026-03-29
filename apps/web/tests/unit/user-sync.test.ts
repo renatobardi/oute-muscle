@@ -7,11 +7,13 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-vi.mock('$env/static/private', () => ({
-  ADMIN_EMAILS: 'admin@oute.pro,boss@company.com',
-  FIREBASE_PROJECT_ID: 'oute-test',
-  FIREBASE_CLIENT_EMAIL: '',
-  FIREBASE_PRIVATE_KEY: '',
+vi.mock('$env/dynamic/private', () => ({
+  env: {
+    ADMIN_EMAILS: 'admin@oute.pro,boss@company.com',
+    FIREBASE_PROJECT_ID: 'oute-test',
+    FIREBASE_CLIENT_EMAIL: '',
+    FIREBASE_PRIVATE_KEY: '',
+  },
 }));
 
 import { getOrCreateUser, getUserByFirebaseUid, _resetUsers } from '../../src/lib/server/users';

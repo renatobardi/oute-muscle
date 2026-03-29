@@ -20,11 +20,13 @@ vi.mock('$lib/server/firebase-admin', () => ({
   }),
 }));
 
-vi.mock('$env/static/private', () => ({
-  ADMIN_EMAILS: 'admin@oute.pro',
-  FIREBASE_PROJECT_ID: 'oute-test',
-  FIREBASE_CLIENT_EMAIL: '',
-  FIREBASE_PRIVATE_KEY: '',
+vi.mock('$env/dynamic/private', () => ({
+  env: {
+    ADMIN_EMAILS: 'admin@oute.pro',
+    FIREBASE_PROJECT_ID: 'oute-test',
+    FIREBASE_CLIENT_EMAIL: '',
+    FIREBASE_PRIVATE_KEY: '',
+  },
 }));
 
 // ---------------------------------------------------------------------------
