@@ -259,9 +259,7 @@ async def list_tenants(
     items = []
     for t in tenants:
         contributor_count = (
-            await session.execute(
-                select(func.count(User.id)).where(User.tenant_id == t.id)
-            )
+            await session.execute(select(func.count(User.id)).where(User.tenant_id == t.id))
         ).scalar_one()
 
         from datetime import timedelta
@@ -316,22 +314,16 @@ async def get_metrics(
 
     users_total = (await session.execute(select(func.count(User.id)))).scalar_one()
     users_active = (
-        await session.execute(
-            select(func.count(User.id)).where(User.last_login >= thirty_days_ago)
-        )
+        await session.execute(select(func.count(User.id)).where(User.last_login >= thirty_days_ago))
     ).scalar_one()
 
     tenants_total = (await session.execute(select(func.count(Tenant.id)))).scalar_one()
     tenants_active = (
-        await session.execute(
-            select(func.count(Tenant.id)).where(Tenant.is_active.is_(True))
-        )
+        await session.execute(select(func.count(Tenant.id)).where(Tenant.is_active.is_(True)))
     ).scalar_one()
 
     scans_30d = (
-        await session.execute(
-            select(func.count(Scan.id)).where(Scan.created_at >= thirty_days_ago)
-        )
+        await session.execute(select(func.count(Scan.id)).where(Scan.created_at >= thirty_days_ago))
     ).scalar_one()
 
     findings_30d = (
@@ -355,9 +347,7 @@ async def get_metrics(
 
     synthesis_pending = (
         await session.execute(
-            select(func.count(SynthesisCandidate.id)).where(
-                SynthesisCandidate.status == "pending"
-            )
+            select(func.count(SynthesisCandidate.id)).where(SynthesisCandidate.status == "pending")
         )
     ).scalar_one()
 
@@ -585,8 +575,8 @@ async def list_audit_log(
     count_stmt = select(func.count()).select_from(stmt.subquery())
     total = (await session.execute(count_stmt)).scalar_one()
 
-    stmt = stmt.order_by(AuditLogEntry.created_at.desc()).limit(per_page).offset(
-        (page - 1) * per_page
+    stmt = (
+        stmt.order_by(AuditLogEntry.created_at.desc()).limit(per_page).offset((page - 1) * per_page)
     )
     entries = (await session.execute(stmt)).scalars().all()
 
