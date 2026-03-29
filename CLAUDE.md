@@ -14,7 +14,7 @@ Ratified at `.specify/memory/constitution.md` (v1.1.0, 12 principles). Key princ
 - **Three-Layer Detection**: L1 Semgrep (blocking) → L2 RAG (consultive) → L3 Synthesis (progressive)
 - **Hexagonal Boundaries**: Ports/adapters only at real boundaries (LLM router, delivery channels, GCP adapters) — no speculative interfaces
 - **Incremental Complexity**: L1 proven before L2, L2 before L3. Abstractions require 2 implementations
-- **Quality Gates**: TDD mandatory, 80% coverage, mypy strict, Ruff, ESLint
+- **Quality Gates**: TDD mandatory, mypy strict, Ruff, ESLint (coverage threshold currently at 40%, target 80%)
 
 ## Tech Stack
 
@@ -52,7 +52,7 @@ make dev-web             # SvelteKit dev server
 ```bash
 make test                # All backend tests (pytest)
 make test-unit           # Unit tests only: apps/api/tests/unit/ + packages/core/tests/
-make test-cov            # Tests with coverage (HTML report in htmlcov/, fails under 80%)
+make test-cov            # Tests with coverage (HTML report in htmlcov/, fails under 40%)
 make test-rules          # Semgrep rule tests: semgrep --test packages/semgrep-rules/
 make test-web            # Frontend unit tests: vitest run
 make test-e2e            # Playwright e2e tests
@@ -117,10 +117,26 @@ UV workspace members: `apps/api`, `apps/mcp`, `packages/core`, `packages/db`.
 ### API Layer (`apps/api/`)
 
 - **Entry point**: `apps/api/src/main.py` — FastAPI app with lifespan, DI container, routes at `/v1`
-- **Routes**: `src/routes/` — one router per domain (incidents, scans, findings, webhooks, sarif, synthesis, tenants, audit, health)
-- **Middleware stack**: `src/middleware/` — auth (JWT), webhook_auth (GitHub signature), rate_limit, rls (tenant context), correlation (request tracing)
+- **Routes**: `src/routes/` — one router per domain (health, waitlist, incidents, scans, findings, webhooks, synthesis, tenants, audit). `sarif.py` is a utility module (not a router)
+- **Middleware**: `src/middleware/` — `rate_limit` and `correlation` are registered as global middleware; `auth`, `webhook_auth`, and `rls` exist as modules but are used as route-level dependencies/functions, not global middleware. CORS is also configured globally
 - **Workers**: `src/workers/` — background tasks (synthesis, RAG, retention purge, archive)
 - **Config**: `src/config.py` — Pydantic BaseSettings (DB URL, JWT key, GCP project, Vertex AI location)
+
+### Dependency Injection
+
+Two-tier DI pattern:
+- **App-level singletons** in `DIContainer` (`apps/api/src/main.py`): session factory, embedding adapter, LLM adapters (Gemini Flash/Pro, Claude Sonnet). Uses `NullLLMAdapter` when GCP is not configured (local dev).
+- **Per-request resources** in `apps/api/src/dependencies.py`: DB sessions and domain services via `Depends()`. Services receive ports (repos, adapters) in `__init__`.
+
+To add a new domain service: create the service in `packages/core/`, add a `get_*_service()` function in `dependencies.py` that wires ports to concrete adapters, then use `Annotated[Service, Depends(get_service)]` in route handlers.
+
+### Tenant Isolation (RLS)
+
+RLS middleware (`apps/api/src/middleware/rls.py`) extracts tenant from JWT or `X-API-Key`, sets PostgreSQL `app.tenant_id` session variable. All DB queries are automatically tenant-scoped. Public paths (no tenant required): `/health`, `/ready`, `/docs`, `/openapi.json`, `/v1/tenants/register`.
+
+### Database Models (`packages/db/`)
+
+`Base` model (`packages/db/src/models/base.py`) auto-generates snake_case table names, provides UUID `id`, `created_at`, `updated_at` on all models. Uses legacy `Column()` style (with `__allow_unmapped__ = True`), not `Mapped[]` annotations. Domain entities in `packages/core/` are frozen Pydantic models — DB models and domain entities are separate.
 
 ### Semgrep Rules (`packages/semgrep-rules/`)
 

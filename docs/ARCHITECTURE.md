@@ -45,10 +45,12 @@ packages/core/src/
 **Boundary rule**: nothing outside `packages/core/adapters/` may import from `packages/core/domain/` directly. All cross-boundary communication goes through ports.
 
 **Adapters that exist**:
-- `LLMRouter` — routes prompts to Vertex AI (Gemini) or Anthropic (Claude)
-- `EmbeddingAdapter` — generates embeddings via `text-embedding-005`
-- `SemgrepAdapter` — shells out to `semgrep` CLI
-- `DBQueryAdapter` — asyncpg-based database access
+- `VertexGeminiFlash` / `VertexGeminiPro` / `VertexClaudeSonnet` — LLM adapters (implements `LLMPort`)
+- `VertexAIEmbedding` — generates embeddings via `text-embedding-005` (implements `EmbeddingPort`)
+- `PostgreSQLIncidentRepo` — incident persistence (implements `IncidentRepoPort`)
+- `PostgreSQLRuleRepo` — rule persistence (implements `RuleRepoPort`)
+- `PostgreSQLVectorSearch` — pgvector HNSW similarity search (implements `VectorSearchPort`)
+- `GitHubAdapter` — GitHub App API integration (implements `GitHubPort`)
 
 ### `apps/api/` — FastAPI backend
 
@@ -57,16 +59,19 @@ apps/api/src/
   main.py         App factory, DI container, lifespan, route registration
   config.py       Pydantic BaseSettings (env vars)
   routes/         One router per domain area
-  middleware/     Auth (JWT), webhook_auth, rate_limit, RLS, correlation
+  middleware/     CORS, rate_limit, correlation (global); auth, rls, webhook_auth (route-level)
   workers/        Background tasks (synthesis, RAG ingestion, retention)
 ```
 
-**Middleware execution order** (outer → inner):
-1. `correlation` — injects `X-Request-ID` for distributed tracing
-2. `rate_limit` — per-tenant request throttling
-3. `auth` — validates JWT, sets `request.state.tenant_id`
-4. `rls` — sets PostgreSQL `app.current_tenant_id` for Row-Level Security
-5. `webhook_auth` — GitHub HMAC-SHA256 signature validation (webhooks only)
+**Middleware registered** (in `main.py`, outer → inner):
+1. `CORSMiddleware` — allows all origins (dev/beta phase)
+2. `RateLimitMiddleware` — per-tenant request throttling (in-memory sliding window)
+3. `CorrelationMiddleware` — injects `X-Correlation-ID` for distributed tracing
+
+**Route-level dependencies** (not global middleware):
+- `auth.py` — `require_api_key()` function via `Depends()`, validates `X-API-Key`
+- `webhook_auth.py` — `verify_webhook_signature()` utility for GitHub HMAC-SHA256
+- `rls.py` — `RLSMiddleware` class exists but is **not yet registered** in `main.py`
 
 ### `packages/db/` — Data layer
 
@@ -74,26 +79,37 @@ SQLAlchemy 2.0 (async) models and Alembic migrations.
 
 **Key tables**:
 - `tenants` — multi-tenant root, plan tier, slug
-- `incidents` — post-mortem entries, category, severity, embedding vector
-- `rules` — Semgrep rules, linked to incidents, source (manual/synthesized)
-- `scans` — scan runs, status, SARIF output
+- `users` — users per tenant, email, role (admin/editor/viewer)
+- `incidents` — post-mortem entries, category, severity, embedding vector (768D)
+- `semgrep_rules` — Semgrep rules, linked to incidents, yaml_content, test_file_content
+- `scans` — scan runs, status, trigger source, risk score
 - `findings` — per-file findings from scans, linked to rules
-- `waitlist` — beta signup emails
+- `advisories` — L2 RAG advisory results, confidence, reasoning
+- `synthesis_candidates` — L3 candidates, status (pending_review/approved/rejected/failed)
+- `audit_log_entries` — audit trail, action, entity, changes (JSONB)
 
-**Row-Level Security**: all tenant-scoped tables have RLS policies enforcing `app.current_tenant_id`. The middleware sets this per request.
+Note: there is no `waitlist` DB model — the waitlist route uses direct SQL insert.
+
+**Row-Level Security**: all tenant-scoped tables have RLS policies enforcing `app.tenant_id`. The RLS middleware (when registered) sets this per request via `SET LOCAL`.
 
 ### `packages/semgrep-rules/` — Detection rules
 
-10 categories, each with numbered rules (`{category}-{NNN}.yml`) and mandatory test files (`{category}-{NNN}.test.py` or `.test.js`).
+10 categories under `rules/`, each with numbered rules (`{category}-{NNN}.yaml`) and mandatory test files (`{category}-{NNN}.test.py`).
 
 ```
 packages/semgrep-rules/
-  unsafe-regex/
-    unsafe-regex-001.yml
-    unsafe-regex-001.test.py
-  injection/
-  race-condition/
-  ...
+  rules/
+    unsafe-regex/
+      unsafe-regex-001.yaml
+      unsafe-regex-001.test.py
+    injection/
+    race-condition/
+    ...
+  metadata/
+    registry.json
+  tests/
+    run_tests.sh
+    test_scan_runner.py
 ```
 
 **Every rule must include**:
@@ -167,7 +183,7 @@ git push main
   └── ci.yml
         ├── lint (ruff + eslint)
         ├── type-check (mypy + svelte-check)
-        ├── test (pytest, min 80% coverage)
+        ├── test (pytest, coverage reported via codecov)
         ├── test-rules (semgrep --test)
         └── semgrep-scan.yml (Semgrep rules on changed files)
   └── deploy.yml (staging only)
@@ -183,6 +199,12 @@ git tag v*.*.*
         ├── run migrations (prod DB)
         └── deploy to Cloud Run (prod)
 ```
+
+## Observability
+
+- **Structured logging**: `structlog` with JSON output, GCP Cloud Logging compatible. Context vars auto-injected: `correlation_id`, `tenant_id`, `user_id`.
+- **Distributed tracing**: OpenTelemetry with GCP Cloud Trace exporter. Auto-instruments FastAPI (ASGI), SQLAlchemy (queries), HTTPX (outbound calls).
+- **Health probes**: `/health/live` (liveness), `/health/ready` (DB + LLM check), `/health/startup` (boot complete).
 
 ## Key design decisions
 

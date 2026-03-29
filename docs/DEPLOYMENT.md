@@ -30,7 +30,7 @@ gh run list --workflow=deploy.yml --limit 5
 gh run watch <run-id>
 
 # 4. Smoke test
-curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health
+curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/live
 ```
 
 ## First-time environment bootstrap
@@ -125,11 +125,7 @@ make migrate-gen MSG="add_column_to_foo"
 
 Migrations live in `packages/db/src/migrations/versions/`. Naming convention: `{NNN}_{description}.py`.
 
-**Important**: migrations are excluded from `.gitignore` by default (`packages/db/src/migrations/versions/*.py`). When adding a new migration, use `git add -f`:
-
-```bash
-git add -f packages/db/src/migrations/versions/003_my_migration.py
-```
+Migration files are tracked in git normally (not ignored). Just `git add` as usual.
 
 ## Terraform changes
 
@@ -193,7 +189,7 @@ gcloud logging read \
   --limit=50
 
 # Health endpoints
-curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health
+curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/live
 curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/ready
 curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/startup
 ```
