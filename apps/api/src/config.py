@@ -52,6 +52,12 @@ class Settings(BaseSettings):
     # Vertex AI
     vertex_location: str = "us-central1"
 
+    # Admin
+    admin_emails: str = ""  # Comma-separated list of admin emails (e.g., "a@x.com,b@x.com")
+
+    # CORS
+    allowed_origins: str = "https://muscle.oute.pro,https://oute.pro,http://localhost:5173"
+
     # Logging
     log_level: str = "INFO"
     log_format: str = "json"  # "json" | "console"

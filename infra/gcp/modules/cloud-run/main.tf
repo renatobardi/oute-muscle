@@ -67,6 +67,16 @@ resource "google_cloud_run_v2_service" "api" {
         }
       }
 
+      # Admin & Auth (spec 237)
+      env {
+        name  = "ADMIN_EMAILS"
+        value = var.admin_emails
+      }
+      env {
+        name  = "ALLOWED_ORIGINS"
+        value = var.allowed_origins
+      }
+
       volume_mounts {
         name       = "cloudsql"
         mount_path = "/cloudsql"
@@ -93,6 +103,34 @@ resource "google_cloud_run_v2_service_iam_member" "public" {
   member   = "allUsers"
 }
 
+# Custom domain mappings
+resource "google_cloud_run_domain_mapping" "domains" {
+  for_each = { for d in var.custom_domains : d.domain => d }
+
+  name     = each.value.domain
+  location = var.region
+  project  = var.project_id
+
+  metadata {
+    namespace = var.project_id
+    labels    = var.labels
+  }
+
+  spec {
+    route_name = each.value.service_name
+  }
+}
+
 output "service_url" {
   value = google_cloud_run_v2_service.api.uri
+}
+
+output "domain_mappings" {
+  description = "Custom domain mapping details"
+  value = {
+    for domain, mapping in google_cloud_run_domain_mapping.domains : domain => {
+      name   = mapping.name
+      status = mapping.status
+    }
+  }
 }

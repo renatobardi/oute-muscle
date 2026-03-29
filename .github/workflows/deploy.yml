@@ -173,3 +173,78 @@ jobs:
           done
           echo "✗ Service did not become healthy in 60s"
           exit 1
+
+  # ─────────────────────────────────────────────────────────────
+  # Build, push, and deploy Web frontend
+  # ─────────────────────────────────────────────────────────────
+  deploy-web:
+    name: Deploy Web
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.GH_ACTIONS_SA }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ vars.REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and push
+        id: image
+        env:
+          REGISTRY: ${{ vars.REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/oute-prod-docker
+          TAG: ${{ github.sha }}
+        run: |
+          IMAGE="$REGISTRY/oute-web:${TAG::8}"
+          docker buildx build \
+            --file apps/web/Dockerfile \
+            --tag "$IMAGE" \
+            --tag "$REGISTRY/oute-web:latest" \
+            --cache-from type=registry,ref="$REGISTRY/oute-web:buildcache" \
+            --cache-to   type=registry,ref="$REGISTRY/oute-web:buildcache",mode=max \
+            --push \
+            .
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v3
+        with:
+          service:    oute-prod-web
+          image:      ${{ steps.image.outputs.image }}
+          region:     ${{ vars.REGION }}
+          project_id: ${{ vars.PROJECT_ID }}
+          flags: >-
+            --memory 512Mi
+            --cpu 1
+            --min-instances 0
+            --max-instances 5
+            --port 3000
+            --set-env-vars NODE_ENV=production,HOST=0.0.0.0,PORT=3000
+
+      - name: Verify deployment
+        run: |
+          SERVICE_URL=$(gcloud run services describe \
+            oute-prod-web \
+            --region=${{ vars.REGION }} \
+            --project=${{ vars.PROJECT_ID }} \
+            --format='value(status.url)')
+          echo "Service URL: $SERVICE_URL"
+          for i in $(seq 1 12); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$SERVICE_URL")
+            if [[ "$STATUS" == "200" ]]; then
+              echo "✓ Web service healthy"
+              exit 0
+            fi
+            echo "Attempt $i: status=$STATUS — waiting 5s..."
+            sleep 5
+          done
+          echo "✗ Web service did not become healthy in 60s"
+          exit 1
