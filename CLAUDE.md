@@ -109,10 +109,14 @@ UV workspace members: `apps/api`, `apps/mcp`, `packages/core`, `packages/db`.
 ### Hexagonal Core (`packages/core/`)
 
 - **`src/domain/`** — Pure business logic, no framework dependencies
-- **`src/ports/`** — Interface definitions (abstract base classes for adapters/services)
-- **`src/adapters/`** — Implementations (LLM routers, DB queries, embeddings)
+- **`src/ports/`** — Interface definitions (Protocol classes for adapters/services)
+- **`src/adapters/`** — Only GitHub adapter (PyGithub, no heavy infra deps)
 
 `packages/core` depends only on Pydantic — no GCP, no FastAPI, no SQLAlchemy.
+
+Adapter implementations live where their dependencies are:
+- **`packages/db/src/adapters/`** — PostgreSQL adapters (incident repo, vector search, advisory repo, scan repo) — depends on SQLAlchemy + pgvector
+- **`apps/api/src/adapters/`** — Vertex AI adapters (embedding, LLM Flash/Pro/Claude) + synthesis repos — depends on google-cloud-aiplatform, anthropic[vertex]
 
 ### API Layer (`apps/api/`)
 
@@ -125,8 +129,10 @@ UV workspace members: `apps/api`, `apps/mcp`, `packages/core`, `packages/db`.
 ### Dependency Injection
 
 Two-tier DI pattern:
-- **App-level singletons** in `DIContainer` (`apps/api/src/main.py`): session factory, embedding adapter, LLM adapters (Gemini Flash/Pro, Claude Sonnet). Uses `NullLLMAdapter` when GCP is not configured (local dev).
+- **App-level singletons** in `DIContainer` (`apps/api/src/main.py`): session factory, embedding adapter, LLM adapters (Gemini Flash/Pro, Claude Sonnet). Uses `NullLLMAdapter` when GCP is not configured (local dev). Also wires `app.state.rule_repo` and `app.state.candidate_repo` (synthesis repos that create their own sessions via SessionFactory).
 - **Per-request resources** in `apps/api/src/dependencies.py`: DB sessions and domain services via `Depends()`. Services receive ports (repos, adapters) in `__init__`.
+
+Note: IncidentService uses per-request session injection (`Depends`), while RuleRepo/CandidateRepo use app-level SessionFactory (`app.state`). This is intentional — synthesis routes operate outside the per-request lifecycle.
 
 To add a new domain service: create the service in `packages/core/`, add a `get_*_service()` function in `dependencies.py` that wires ports to concrete adapters, then use `Annotated[Service, Depends(get_service)]` in route handlers.
 

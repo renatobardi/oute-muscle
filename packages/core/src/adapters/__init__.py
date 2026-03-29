@@ -1,13 +1,12 @@
-"""Adapter implementations of ports."""
+"""Adapter implementations of ports.
 
-from .pg_incident_repo import PostgreSQLIncidentRepo
-from .pg_rule_repo import PostgreSQLRuleRepo
-from .pg_vector_search import PostgreSQLVectorSearch
-from .vertex_embedding import VertexAIEmbedding
+Real DB adapters live in packages/db/src/adapters/ (SQLAlchemy dependency).
+Real Vertex AI adapters live in apps/api/src/adapters/ (GCP dependency).
+Only the GitHub adapter lives here (pure PyGithub, no heavy infra deps).
+"""
+
+from .github_adapter import GitHubAdapter
 
 __all__ = [
-    "PostgreSQLIncidentRepo",
-    "PostgreSQLRuleRepo",
-    "PostgreSQLVectorSearch",
-    "VertexAIEmbedding",
+    "GitHubAdapter",
 ]

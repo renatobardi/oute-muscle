@@ -19,9 +19,10 @@ pytestmark = pytest.mark.skipif(
 @pytest.mark.asyncio
 async def test_claude_generate_returns_string() -> None:
     """Basic generation with Claude returns non-empty string."""
-    from packages.core.src.adapters.vertex_claude import VertexClaudeSonnet4
+    from apps.api.src.adapters.vertex_llm import VertexClaudeSonnet
 
-    adapter = VertexClaudeSonnet4()
+    project_id = os.environ["GOOGLE_CLOUD_PROJECT"]
+    adapter = VertexClaudeSonnet(project_id=project_id, location="us-east5")
     result = await adapter.generate("Say hello in one word.")
 
     assert isinstance(result, str)
@@ -31,6 +32,6 @@ async def test_claude_generate_returns_string() -> None:
 @pytest.mark.asyncio
 async def test_claude_model_name() -> None:
     """Claude adapter uses correct model identifier."""
-    from packages.core.src.adapters.vertex_claude import VertexClaudeSonnet4
+    from apps.api.src.adapters.vertex_llm import VertexClaudeSonnet
 
-    assert VertexClaudeSonnet4.MODEL == "claude-sonnet-4@20251101"
+    assert VertexClaudeSonnet.MODEL == "claude-sonnet-4@20250514"

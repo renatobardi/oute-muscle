@@ -19,9 +19,10 @@ pytestmark = pytest.mark.skipif(
 @pytest.mark.asyncio
 async def test_pro_generate_returns_string() -> None:
     """Basic generation with Pro returns non-empty string."""
-    from packages.core.src.adapters.vertex_llm import VertexGeminiPro
+    from apps.api.src.adapters.vertex_llm import VertexGeminiPro
 
-    adapter = VertexGeminiPro()
+    project_id = os.environ["GOOGLE_CLOUD_PROJECT"]
+    adapter = VertexGeminiPro(project_id=project_id)
     result = await adapter.generate("Say hello in one word.")
 
     assert isinstance(result, str)
@@ -31,6 +32,6 @@ async def test_pro_generate_returns_string() -> None:
 @pytest.mark.asyncio
 async def test_pro_model_name() -> None:
     """Pro adapter uses correct model identifier."""
-    from packages.core.src.adapters.vertex_llm import VertexGeminiPro
+    from apps.api.src.adapters.vertex_llm import VertexGeminiPro
 
-    assert VertexGeminiPro.MODEL == "gemini-2.5-pro"
+    assert VertexGeminiPro.MODEL == "gemini-2.5-pro-preview-03-25"
