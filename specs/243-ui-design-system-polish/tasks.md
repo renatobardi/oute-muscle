@@ -71,6 +71,25 @@
 
 ---
 
+## Phase 3.5: Component Unit Tests (Constitution VII — TDD)
+
+**Purpose**: Unit tests for components with non-trivial logic. Constitution VII mandates TDD and test coverage for new code.
+
+**⚠️ REQUIRED**: Constitution principle VII (Quality Gates) requires tests for new code. These tests validate prop behavior, state transitions, and edge cases — not visual appearance.
+
+- [x] T065 [P] [US2] Create Button unit tests (variant rendering, loading state disables interaction, disabled state, click handler) in apps/web/src/lib/components/ui/Button.test.ts
+- [x] T066 [P] [US2] Create Badge unit tests (severity auto-mapping, status auto-mapping, unknown value fallback to neutral, dot indicator presence) in apps/web/src/lib/components/ui/Badge.test.ts
+- [x] T067 [P] [US2] Create Table unit tests (empty state rendering, loading skeleton rows, sortable header click toggles direction, hover row class) in apps/web/src/lib/components/ui/Table.test.ts
+- [x] T068 [P] [US2] Create Modal unit tests (Escape key closes, backdrop click closes, focus trap activation, body scroll lock) in apps/web/src/lib/components/ui/Modal.test.ts
+- [x] T069 [P] [US2] Create Input unit tests (error state renders message + icon, icon prefix renders, focus ring class, label association) in apps/web/src/lib/components/ui/Input.test.ts
+- [x] T070 [P] [US2] Create MetricCard unit tests (trend up/down/neutral renders correct arrow + color, highlight variant adds accent border) in apps/web/src/lib/components/ui/MetricCard.test.ts
+- [x] T071 [US2] Verify SSR safety: `grep -rn "window\.\|document\." apps/web/src/lib/components/ui/ --include="*.svelte"` returns zero results outside `browser`-guarded blocks (FR-023)
+- [x] T072 [US2] Run all component tests: `cd apps/web && npx vitest run src/lib/components/`
+
+**Checkpoint**: 6 component test files created. All tests pass. Zero SSR-unsafe references. Constitution VII satisfied.
+
+---
+
 ## Phase 4: User Story 3 -- Unified Sidebar & Navigation (Priority: P2)
 
 **Goal**: Single Sidebar component replaces both Dashboard and Admin sidebars. Lucide icons replace emojis/inline SVGs. Mobile collapse at < 768px.
@@ -83,7 +102,9 @@
 - [x] T023 [US3] Replace Admin sidebar with Sidebar component (variant="admin") in apps/web/src/routes/admin/+layout.svelte -- map existing nav items (Overview, Users, Tenants, Health, Incidents, Rules, Access Control) to SidebarItem[] with lucide icons
 - [x] T024 [US3] Verify both sidebars render correctly: dark bg, SVG icons, active accent bar, user footer, mobile collapse
 
-**Checkpoint**: Single Sidebar component serves both layouts. Zero emoji icons remain. Mobile sidebar collapses.
+- [x] T073 [US3] Create Sidebar unit tests (renders items with icons, active item accent bar, variant="admin" shows admin badge, mobile toggle visibility) in apps/web/src/lib/components/ui/Sidebar.test.ts
+
+**Checkpoint**: Single Sidebar component serves both layouts. Zero emoji icons remain. Mobile sidebar collapses. Sidebar tests pass.
 
 ---
 
@@ -173,12 +194,12 @@
 - [x] T054 [US7] Verify Table horizontal scroll with visible scroll indicator on viewports < 768px
 - [x] T055 [US7] Verify Modal full-screen rendering on viewports < 640px
 - [x] T056 [US7] Audit touch targets >= 44x44px on all interactive elements at mobile viewports
-- [ ] T057 [US7] Run Lighthouse accessibility audit on /auth/login, /(dashboard) index, and /admin index -- verify score >= 90 (DEFERRED: requires running app with Firebase ADC — validate post-deploy)
+- [ ] T057 [US7] Run Lighthouse accessibility audit on /auth/login, /(dashboard) index, and /admin index -- verify score >= 90 (DEFERRED: requires running app with Firebase ADC — **trigger: run after first successful deploy of this branch to muscle-prod-web on Cloud Run**)
 - [x] T058 [US7] Run existing frontend tests: `cd apps/web && npx vitest run`
-- [ ] T059 [US7] Run existing e2e tests: `cd apps/web && npx playwright test` (DEFERRED: requires running app with Firebase ADC — validate post-deploy)
+- [ ] T059 [US7] Run existing e2e tests: `cd apps/web && npx playwright test` (DEFERRED: requires running app with Firebase ADC — **trigger: run after first successful deploy of this branch to muscle-prod-web on Cloud Run**)
 - [x] T060 [US7] Run svelte-check and ESLint on full apps/web codebase
 
-**Checkpoint**: All pages functional at 320px. Accessibility >= 90. All existing tests pass. No type errors. No lint errors.
+**Checkpoint**: All pages functional at 320px. Unit tests pass. No type errors. No lint errors. Deferred: Lighthouse accessibility (T057) and e2e tests (T059) — run post-deploy.
 
 ---
 
@@ -200,6 +221,7 @@
 - **Phase 1 (Setup)**: No dependencies -- start immediately
 - **Phase 2 (Tokens)**: Depends on Phase 1 -- BLOCKS all component work
 - **Phase 3 (Components)**: Depends on Phase 2 -- BLOCKS all page work
+- **Phase 3.5 (Component Tests)**: Depends on Phase 3 -- can run parallel with Phase 4/5
 - **Phase 4 (Sidebar)**: Depends on Phase 3 (uses Badge, IconButton)
 - **Phase 5 (Login)**: Depends on Phase 3 (uses Input, Button) -- can run parallel with Phase 4
 - **Phase 6 (Dashboard)**: Depends on Phase 3 + Phase 4 (pages need Sidebar in layout)
