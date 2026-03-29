@@ -21,11 +21,13 @@ Ratified at `.specify/memory/constitution.md` (v1.1.0, 12 principles). Key princ
 | Layer | Technology |
 |-------|-----------|
 | API | FastAPI (Python 3.12+), asyncpg, pydantic v2, uvicorn |
-| Frontend | SvelteKit, TypeScript strict, Tailwind CSS, shadcn-svelte |
+| Frontend | SvelteKit (adapter-node), Svelte 5, TypeScript strict, Tailwind CSS v4, bits-ui |
+| Auth | Firebase Auth (client + admin SDK), session cookies (httpOnly, 5-day), shared with oute.me |
 | Database | PostgreSQL 16 + pgvector (Cloud SQL), HNSW indexes, RLS |
 | LLM | Vertex AI (Gemini 2.5 Flash/Pro + Claude Sonnet 4), text-embedding-005 |
 | Static Analysis | Semgrep (custom rules with mandatory test files) |
-| Infra | GCP Managed: Cloud Run, Cloud SQL, Vertex AI, Secret Manager |
+| Infra | GCP Managed: Cloud Run (`muscle-prod-api`, `muscle-prod-web`), Cloud SQL, Vertex AI, Secret Manager |
+| Domain | `muscle.oute.pro` (web + API via BFF), `mcp.muscle.oute.pro` (MCP) |
 | CI/CD | GitHub Actions, Workload Identity Federation, Conventional Commits |
 | Monorepo | UV workspaces (Python), npm (frontend) |
 
@@ -121,10 +123,11 @@ Adapter implementations live where their dependencies are:
 ### API Layer (`apps/api/`)
 
 - **Entry point**: `apps/api/src/main.py` — FastAPI app with lifespan, DI container, routes at `/v1`
-- **Routes**: `src/routes/` — one router per domain (health, waitlist, incidents, scans, findings, webhooks, synthesis, tenants, audit). `sarif.py` is a utility module (not a router)
-- **Middleware**: `src/middleware/` — `rate_limit` and `correlation` are registered as global middleware; `auth`, `webhook_auth`, and `rls` exist as modules but are used as route-level dependencies/functions, not global middleware. CORS is also configured globally
+- **Routes**: `src/routes/` — one router per domain (health, waitlist, incidents, scans, findings, webhooks, synthesis, tenants, audit, admin). `sarif.py` is a utility module (not a router). `admin.py` provides 8 cross-tenant admin endpoints at `/v1/admin/`
+- **Middleware**: `src/middleware/` — `rate_limit` and `correlation` are registered as global middleware; `auth` (includes `require_admin` dependency), `webhook_auth`, and `rls` (includes `is_admin` flag for RLS bypass) exist as modules but are used as route-level dependencies/functions, not global middleware. CORS restricted to `muscle.oute.pro`, `oute.pro`, and localhost
 - **Workers**: `src/workers/` — background tasks (synthesis, RAG, retention purge, archive)
-- **Config**: `src/config.py` — Pydantic BaseSettings (DB URL, JWT key, GCP project, Vertex AI location)
+- **Config**: `src/config.py` — Pydantic BaseSettings (DB URL, JWT key, GCP project, Vertex AI location, ADMIN_EMAILS, ALLOWED_ORIGINS)
+- **Services**: `src/services/` — application services (false_positive.py for FR-028 auto-disable)
 
 ### Dependency Injection
 
@@ -138,11 +141,25 @@ To add a new domain service: create the service in `packages/core/`, add a `get_
 
 ### Tenant Isolation (RLS)
 
-RLS middleware (`apps/api/src/middleware/rls.py`) extracts tenant from JWT or `X-API-Key`, sets PostgreSQL `app.tenant_id` session variable. All DB queries are automatically tenant-scoped. Public paths (no tenant required): `/health`, `/ready`, `/docs`, `/openapi.json`, `/v1/tenants/register`.
+RLS middleware (`apps/api/src/middleware/rls.py`) extracts tenant from JWT or `X-API-Key`, sets PostgreSQL `app.tenant_id` session variable. All DB queries are automatically tenant-scoped. Admin requests (role=admin) set `is_admin=True` on request.state and bypass RLS for cross-tenant reads. Public paths (no tenant required): `/health`, `/ready`, `/docs`, `/openapi.json`, `/v1/tenants/register`.
+
+### Web Auth (Firebase — `apps/web/`)
+
+SvelteKit acts as BFF (Backend For Frontend) for Firebase Auth:
+- **`src/lib/firebase.ts`** — Firebase client SDK singleton (browser-side)
+- **`src/lib/server/firebase-admin.ts`** — Firebase Admin SDK singleton (server-side, ADC on Cloud Run)
+- **`src/lib/server/auth.ts`** — `verifyAuthToken()` supporting `__session` cookie + Bearer token
+- **`src/lib/server/users.ts`** — `getOrCreateUser()` JIT provisioning, ADMIN_EMAILS check
+- **`src/hooks.server.ts`** — `authenticate` + `gateUser` sequence on every request
+- **`src/routes/api/auth/session/+server.ts`** — POST (exchange idToken for session cookie) / DELETE (logout)
+- **`src/routes/admin/`** — Admin cockpit (6 sections), server-side role guard in `+layout.server.ts`
+- Session cookie: `__session`, 5-day, httpOnly, secure, SameSite=Lax
 
 ### Database Models (`packages/db/`)
 
 `Base` model (`packages/db/src/models/base.py`) auto-generates snake_case table names, provides UUID `id`, `created_at`, `updated_at` on all models. Uses legacy `Column()` style (with `__allow_unmapped__ = True`), not `Mapped[]` annotations. Domain entities in `packages/core/` are frozen Pydantic models — DB models and domain entities are separate.
+
+`User` model has `firebase_uid` (unique, indexed) linking to Firebase Auth, `display_name`, `email_verified`, `last_login`, and nullable `tenant_id` (JIT-provisioned users start without a tenant). Migrations: 001 (initial), 002 (waitlist), 003 (false positive fields), 004 (Firebase auth fields).
 
 ### Semgrep Rules (`packages/semgrep-rules/`)
 
@@ -155,11 +172,13 @@ Rule ID format: `{category}-{NNN}` (e.g., `unsafe-regex-001`). Each rule YAML re
 **Trunk-Based CD — single environment (prod).**
 
 - CI runs on every PR targeting `main` (lint + mypy + tests + semgrep)
-- Merging to `main` triggers automatic deploy to prod (Cloud Run `muscle-prod-api`)
+- Merging to `main` triggers automatic deploy to prod: API (`muscle-prod-api`) + Web (`muscle-prod-web`)
+- Domain: `muscle.oute.pro` (web + API via BFF), `mcp.muscle.oute.pro` (MCP)
 - No staging environment — CI quality gates are the only barrier before prod
 - Uses Workload Identity Federation — no service account keys
+- Artifact Registry: `muscle-prod-docker` (images: `muscle-api`, `muscle-web`)
 
-Flow: `feature branch → PR → CI → merge main → deploy prod`
+Flow: `feature branch → PR → CI → merge main → deploy prod (API + Web)`
 
 Branch protection on `main` (configure in GitHub Settings → Branches):
 - Require PR before merging
