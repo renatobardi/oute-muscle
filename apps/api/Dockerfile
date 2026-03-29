@@ -85,18 +85,10 @@ USER appuser
 
 EXPOSE ${APP_PORT}
 
-# Startup diagnostics + Uvicorn
-CMD ["sh", "-c", "\
-    echo \"=== Container starting ===\"; \
-    echo \"PORT=$PORT APP_PORT=$APP_PORT PYTHONPATH=$PYTHONPATH\"; \
-    echo \"Python: $(python --version 2>&1)\"; \
-    echo \"Working dir: $(pwd)\"; \
-    ls -la apps/api/src/main.py 2>&1 || echo 'main.py NOT FOUND'; \
-    python -c 'import apps.api.src.main; print(\"App import OK\")' 2>&1 || echo 'App import FAILED'; \
-    echo \"=== Starting uvicorn ===\"; \
-    exec uvicorn apps.api.src.main:app \
-        --host 0.0.0.0 \
-        --port ${PORT:-${APP_PORT}} \
-        --workers 1 \
-        --loop uvloop \
-        --no-access-log"]
+# Uvicorn: 1 worker, managed by Cloud Run autoscaling
+CMD ["sh", "-c", "exec uvicorn apps.api.src.main:app \
+    --host 0.0.0.0 \
+    --port ${PORT:-${APP_PORT}} \
+    --workers 1 \
+    --loop uvloop \
+    --no-access-log"]
