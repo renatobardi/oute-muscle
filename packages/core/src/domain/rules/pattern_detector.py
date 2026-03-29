@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Any, Protocol
 
 SYNTHESIS_THRESHOLD: int = 3  # must stay in sync with synthesis_candidate.py
 
@@ -58,13 +58,13 @@ class PatternDetectorRepo(Protocol):
 class PatternDetector:
     """Stateless detection service. All state comes from the injected repo."""
 
-    def should_trigger(self, advisories: list[dict]) -> bool:
+    def should_trigger(self, advisories: list[dict[str, Any]]) -> bool:
         """Return True if the given list of same-hash advisories meets the threshold."""
         return len(advisories) >= SYNTHESIS_THRESHOLD
 
-    def group_by_hash(self, advisories: list[dict]) -> dict[str, list[dict]]:
+    def group_by_hash(self, advisories: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
         """Group a flat list of advisory dicts by their anti_pattern_hash."""
-        groups: dict[str, list[dict]] = defaultdict(list)
+        groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for advisory in advisories:
             groups[advisory["anti_pattern_hash"]].append(advisory)
         return dict(groups)

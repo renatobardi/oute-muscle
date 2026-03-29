@@ -8,8 +8,7 @@ from __future__ import annotations
 
 import uuid
 
-from ..domain.incidents.entity import Incident
-from ..ports.vector_search import VectorSearchPort
+from ..ports.vector_search import VectorSearchPort, VectorSearchResult
 
 
 class PostgreSQLVectorSearch(VectorSearchPort):
@@ -17,10 +16,11 @@ class PostgreSQLVectorSearch(VectorSearchPort):
 
     async def find_similar(
         self,
-        embedding: list[float],
+        query_embedding: list[float],
         *,
         tenant_id: uuid.UUID | None = None,
-        limit: int = 20,
-    ) -> list[Incident]:
+        limit: int = 5,
+        min_similarity: float = 0.7,
+    ) -> list[VectorSearchResult]:
         """Find incidents similar to the given embedding (cosine distance)."""
         raise NotImplementedError("PostgreSQL vector search adapter implementation pending")

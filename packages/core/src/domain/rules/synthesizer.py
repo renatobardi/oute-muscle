@@ -13,9 +13,9 @@ from __future__ import annotations
 
 import textwrap
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Any, Protocol
 
-import yaml
+import yaml  # type: ignore[import-untyped]
 
 # ---------------------------------------------------------------------------
 # Result / error types
@@ -39,7 +39,7 @@ class SynthesisError(Exception):
 
 
 class LLMPort(Protocol):
-    async def generate_structured(self, prompt: str, schema: dict) -> dict: ...
+    async def generate_structured(self, prompt: str, schema: dict[str, Any]) -> dict[str, Any]: ...
 
 
 # ---------------------------------------------------------------------------
@@ -98,7 +98,7 @@ class RuleSynthesizer:
     def __init__(self, llm: LLMPort) -> None:
         self._llm = llm
 
-    async def synthesize(self, incident: dict) -> SynthesisResult:
+    async def synthesize(self, incident: dict[str, Any]) -> SynthesisResult:
         """
         Generate a Semgrep rule and test file for the given incident dict.
         Raises SynthesisError on any failure.

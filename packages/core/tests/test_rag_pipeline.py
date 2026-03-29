@@ -10,15 +10,16 @@ import uuid
 from unittest.mock import AsyncMock
 
 import pytest
-from src.domain.incidents.entity import Incident
-from src.domain.incidents.enums import (
+
+from packages.core.src.domain.incidents.entity import Incident
+from packages.core.src.domain.incidents.enums import (
     IncidentCategory,
     IncidentSeverity,
     RiskLevel,
 )
-from src.domain.scanning.entities import Advisory
-from src.ports.embedding import EmbeddingPort
-from src.ports.vector_search import VectorSearchPort, VectorSearchResult
+from packages.core.src.domain.scanning.entities import Advisory
+from packages.core.src.ports.embedding import EmbeddingPort
+from packages.core.src.ports.vector_search import VectorSearchPort, VectorSearchResult
 
 
 class TestRAGPipeline:

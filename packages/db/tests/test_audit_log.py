@@ -16,7 +16,8 @@ import uuid
 from datetime import datetime
 
 import pytest
-from src.domain.incidents.enums import AuditAction
+
+from packages.core.src.domain.incidents.enums import AuditAction
 
 
 class MockAuditLogEntry:

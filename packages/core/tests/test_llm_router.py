@@ -9,8 +9,9 @@ from __future__ import annotations
 from unittest.mock import AsyncMock
 
 import pytest
-from src.domain.incidents.enums import RiskLevel
-from src.ports.llm import LLMPort, LLMTimeoutError
+
+from packages.core.src.domain.incidents.enums import RiskLevel
+from packages.core.src.ports.llm import LLMPort, LLMTimeoutError
 
 
 class TestLLMRouter:

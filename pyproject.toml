@@ -63,6 +63,7 @@ ignore_missing_imports = true
 # ---------------------------------------------------------------------------
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+pythonpath = ["."]
 testpaths = [
     "packages/core/tests",
     "apps/api/tests",

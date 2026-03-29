@@ -9,8 +9,9 @@ import uuid
 from datetime import datetime
 
 import pytest
-from src.domain.incidents.entity import Incident
-from src.domain.incidents.enums import (
+
+from packages.core.src.domain.incidents.entity import Incident
+from packages.core.src.domain.incidents.enums import (
     IncidentCategory,
     IncidentSeverity,
     RuleSeverity,
@@ -18,9 +19,9 @@ from src.domain.incidents.enums import (
     ScanStatus,
     ScanTriggerSource,
 )
-from src.domain.rules.entity import SemgrepRule
-from src.domain.scanning.entities import Finding
-from src.domain.scanning.scan import Scan
+from packages.core.src.domain.rules.entity import SemgrepRule
+from packages.core.src.domain.scanning.entities import Finding
+from packages.core.src.domain.scanning.scan import Scan
 
 
 @pytest.fixture

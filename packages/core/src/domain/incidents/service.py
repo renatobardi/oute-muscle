@@ -135,9 +135,10 @@ class IncidentService:
         if use_semantic:
             # Embed query and search by vector similarity
             embedding = await self.embedding_adapter.embed(query)
-            return await self.vector_search.find_similar(
+            results = await self.vector_search.find_similar(
                 embedding, tenant_id=tenant_id, limit=limit
             )
+            return [r.incident for r in results]
         else:
             # Full-text search
             return await self.incident_repo.search(query, tenant_id=tenant_id, limit=limit)

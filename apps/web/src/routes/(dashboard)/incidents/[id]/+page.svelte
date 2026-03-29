@@ -50,7 +50,7 @@
     loading = true;
     error = null;
     try {
-      incident = await apiClient.incidents.get(id);
+      incident = await apiClient.incidents.get(id!);
       populateForm(incident);
     } catch (e) {
       error = e instanceof ApiError ? e.message : 'Failed to load incident';

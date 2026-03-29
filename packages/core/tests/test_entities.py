@@ -7,14 +7,15 @@ import uuid
 from datetime import datetime
 
 import pytest
-from src.domain.incidents.entity import Incident
-from src.domain.incidents.enums import (
+
+from packages.core.src.domain.incidents.entity import Incident
+from packages.core.src.domain.incidents.enums import (
     IncidentCategory,
     IncidentSeverity,
     RuleSeverity,
     RuleSource,
 )
-from src.domain.rules.entity import SemgrepRule
+from packages.core.src.domain.rules.entity import SemgrepRule
 
 
 def make_incident(**overrides: object) -> Incident:

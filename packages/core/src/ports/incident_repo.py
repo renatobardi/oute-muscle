@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import builtins
 import uuid
 from typing import Protocol, runtime_checkable
 
@@ -91,7 +92,7 @@ class IncidentRepoPort(Protocol):
         *,
         tenant_id: uuid.UUID | None = None,
         limit: int = 20,
-    ) -> list[Incident]:
+    ) -> builtins.list[Incident]:
         """Full-text search over title, anti_pattern, and remediation."""
         ...
 

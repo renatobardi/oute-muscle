@@ -12,8 +12,9 @@ import uuid
 from datetime import datetime
 
 import pytest
-from src.domain.incidents.entity import Incident
-from src.domain.incidents.enums import IncidentCategory, IncidentSeverity
+
+from packages.core.src.domain.incidents.entity import Incident
+from packages.core.src.domain.incidents.enums import IncidentCategory, IncidentSeverity
 
 
 class MockEmbeddingPort:
