@@ -182,7 +182,7 @@ jobs:
             --cpu 1
             --min-instances 0
             --max-instances 10
-            --startup-cpu-boost
+            --cpu-boost
             --set-env-vars PYTHONUNBUFFERED=1
 
       - name: Verify deployment (readiness probe)
