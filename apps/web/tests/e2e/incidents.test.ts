@@ -151,7 +151,7 @@ test.describe('Incident CRUD flow', () => {
 
     await page.goto('/incidents/inc-1');
 
-    await expect(page.getByDisplayValue('Old title')).toBeVisible();
+    await expect(page.locator('input[value="Old title"]')).toBeVisible();
     await page.getByLabel(/title/i).fill('Updated title');
     await page.getByRole('button', { name: /save/i }).click();
 

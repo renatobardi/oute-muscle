@@ -15,7 +15,8 @@ from __future__ import annotations
 import uuid
 
 import pytest
-from src.domain.incidents.entity import Incident
+
+from packages.core.src.domain.incidents.entity import Incident
 
 # Skip these tests if DATABASE_URL is not set
 pytestmark = pytest.mark.integration

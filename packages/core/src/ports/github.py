@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 
 @dataclass(frozen=True)
@@ -62,7 +62,7 @@ class GitHubPort(Protocol):
         conclusion: str,  # 'success' | 'failure' | 'neutral'
         title: str,
         summary: str,
-        annotations: list[dict] | None = None,
+        annotations: list[dict[str, Any]] | None = None,
     ) -> CheckRunResult:
         """Create or update a Check Run with SARIF-style annotations.
 

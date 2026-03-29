@@ -36,6 +36,8 @@ class PostgreSQLRuleRepo(RuleRepoPort):
         """Enable or disable a rule."""
         raise NotImplementedError("PostgreSQL adapter implementation pending")
 
-    async def next_sequence_number(self, category: IncidentCategory) -> int:
+    async def next_sequence_number(
+        self, category: IncidentCategory, *, tenant_id: uuid.UUID | None = None
+    ) -> int:
         """Get the next sequence number for a category."""
         raise NotImplementedError("PostgreSQL adapter implementation pending")

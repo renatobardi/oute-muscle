@@ -6,6 +6,7 @@ Uses optimistic locking (version column), soft delete (deleted_at), and RLS.
 
 from __future__ import annotations
 
+import builtins
 import uuid
 
 from ..domain.incidents.entity import Incident
@@ -59,6 +60,6 @@ class PostgreSQLIncidentRepo(IncidentRepoPort):
         *,
         tenant_id: uuid.UUID | None = None,
         limit: int = 20,
-    ) -> list[Incident]:
+    ) -> builtins.list[Incident]:
         """Full-text search over title, anti_pattern, and remediation."""
         raise NotImplementedError("PostgreSQL adapter implementation pending")

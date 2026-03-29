@@ -151,7 +151,7 @@ class GitHubAdapter:
         conclusion: str,
         title: str,
         summary: str,
-        annotations: list[dict] | None = None,
+        annotations: list[dict[str, Any]] | None = None,
     ) -> CheckRunResult:
         """Create or update a Check Run with SARIF-style annotations.
 
@@ -250,7 +250,7 @@ class GitHubAdapter:
                 # Post top-level PR comment
                 comment = pr.create_issue_comment(body=body)
 
-            return comment.id
+            return int(comment.id)
 
         except GithubException as e:
             raise GitHubError(f"Failed to post review comment: {e}") from e
@@ -300,7 +300,7 @@ class GitHubAdapter:
                 base=base,
             )
 
-            return pr.html_url
+            return str(pr.html_url)
 
         except GithubException as e:
             raise GitHubError(f"Failed to create pull request: {e}") from e

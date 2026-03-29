@@ -12,7 +12,7 @@ Manages all state transitions for SynthesisCandidate:
 
 from __future__ import annotations
 
-from typing import Protocol
+from typing import Any, Protocol
 
 from packages.core.src.domain.rules.synthesis_candidate import (
     AUTO_ARCHIVE_DAYS,
@@ -55,7 +55,7 @@ class SynthesisCandidateRepo(Protocol):
 
 
 class RuleRepo(Protocol):
-    async def create(self, rule_data: dict) -> object: ...
+    async def create(self, rule_data: dict[str, Any]) -> object: ...
 
 
 # ---------------------------------------------------------------------------

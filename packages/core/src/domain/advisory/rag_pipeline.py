@@ -17,6 +17,7 @@ Confidence scoring:
 from __future__ import annotations
 
 import uuid
+from typing import Any
 
 from ...ports.embedding import EmbeddingPort
 from ...ports.vector_search import VectorSearchPort
@@ -107,7 +108,7 @@ class RAGPipeline:
 
         return advisory
 
-    def _build_prompt(self, diff: str, incidents: list, was_truncated: bool) -> str:
+    def _build_prompt(self, diff: str, incidents: list[Any], was_truncated: bool) -> str:
         """Build LLM prompt with diff and incident context.
 
         Args:
@@ -172,7 +173,7 @@ class RAGPipeline:
             # Low confidence when no incidents found
             return 0.3
 
-    def _extract_anti_pattern(self, incidents: list) -> str:
+    def _extract_anti_pattern(self, incidents: list[Any]) -> str:
         """Extract first incident's anti-pattern, or return generic.
 
         Args:
@@ -182,7 +183,7 @@ class RAGPipeline:
             Anti-pattern string.
         """
         if incidents:
-            return incidents[0].anti_pattern
+            return str(incidents[0].anti_pattern)
         return "Unidentified security pattern"
 
     def _get_model_name(self, risk_level: RiskLevel) -> str:

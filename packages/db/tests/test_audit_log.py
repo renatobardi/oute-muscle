@@ -16,7 +16,8 @@ import uuid
 from datetime import datetime
 
 import pytest
-from src.domain.incidents.enums import AuditAction
+
+from packages.core.src.domain.incidents.enums import AuditAction
 
 
 class MockAuditLogEntry:
@@ -65,6 +66,18 @@ class MockAuditLogRepo:
             and e.entity_type == "incident"
             and e.tenant_id == tenant_id
         ]
+
+
+@pytest.fixture
+def tenant_id() -> uuid.UUID:
+    """Stable tenant UUID for tests."""
+    return uuid.uuid4()
+
+
+@pytest.fixture
+def user_id() -> uuid.UUID:
+    """Stable user UUID for tests."""
+    return uuid.uuid4()
 
 
 @pytest.fixture
