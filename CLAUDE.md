@@ -191,6 +191,16 @@ If the AI suggests or implements any change to a Master Rule without receiving t
 
 No docker-compose — local development uses `make dev` directly. Dockerfiles exist per app (`apps/api/Dockerfile`, `apps/web/Dockerfile`, `apps/mcp/Dockerfile`) for Cloud Run deployment only. Local DB requires a standalone PostgreSQL instance or Cloud SQL Auth Proxy.
 
+### MASTER RULE 2 — Resource Isolation: muscle-* namespace (no oute-* sharing)
+
+**Ratified**: 2026-03-29
+
+1. **All GCP resources MUST use the `muscle-` prefix**: Cloud Run services (`muscle-prod-api`, `muscle-prod-web`), Artifact Registry (`muscle-prod-docker`), service accounts (`muscle-prod-gh-actions`), WIF pools (`muscle-prod-gh-pool`), secrets (`muscle-prod-db-password`).
+2. **NEVER use the `oute-` or `oute-prod-` prefix** for any resource in this project. That namespace belongs to the oute.me project.
+3. **Shared resources (exceptions)**: only the GCP project ID (`oute-488706`), the Cloud SQL instance, and the Firebase Auth project are shared with oute.me. Everything else is isolated.
+4. **URLs MUST use `muscle.oute.pro`** as the canonical domain. Never reference raw Cloud Run URLs (`*.a.run.app`) in code, docs, or config.
+5. **Terraform name_prefix**: `infra/gcp/main.tf` MUST use `"muscle-${var.environment}"`. Any change to this prefix is a Master Rule violation.
+
 ## Code Style
 
 ### Python
