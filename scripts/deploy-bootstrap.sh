@@ -1,16 +1,15 @@
 #!/usr/bin/env bash
 # =============================================================================
-# deploy-bootstrap.sh — One-shot bootstrap for Oute Muscle on GCP
+# deploy-bootstrap.sh — One-shot bootstrap for Oute Muscle on GCP (prod only)
 #
 # Usage:
-#   bash scripts/deploy-bootstrap.sh staging
-#   bash scripts/deploy-bootstrap.sh prod
+#   bash scripts/deploy-bootstrap.sh
 #
 # What it does:
 #   1. Validates prerequisites (gcloud, terraform, gh)
 #   2. Enables required GCP APIs
 #   3. Creates the GCS bucket for Terraform state (idempotent)
-#   4. Runs terraform init + apply for the given environment
+#   4. Runs terraform init + apply for prod
 #   5. Reads terraform outputs and sets GitHub Actions environment vars/secrets
 #   6. Prints a smoke-test command for the deployed service
 #
@@ -19,6 +18,9 @@
 #   - gh authenticated: `gh auth login`
 #   - terraform >= 1.8 installed
 #   - Run from the repo root
+#
+# Gitflow: Trunk-Based CD — single environment (prod).
+#   PR → CI → merge main → auto-deploy prod
 # =============================================================================
 
 set -euo pipefail
@@ -30,26 +32,23 @@ success() { echo -e "${GREEN}[OK]${NC}   $*"; }
 warn()    { echo -e "${YELLOW}[WARN]${NC} $*"; }
 error()   { echo -e "${RED}[ERR]${NC}  $*" >&2; exit 1; }
 
-# ─── Args ─────────────────────────────────────────────────────────────────────
-ENV="${1:-}"
-[[ "$ENV" == "staging" || "$ENV" == "prod" ]] || error "Usage: $0 <staging|prod>"
-
 # ─── Project constants ────────────────────────────────────────────────────────
+ENV="prod"
 PROJECT_ID="oute-488706"
 REGION="us-central1"
 GITHUB_ORG="renatobardi"
 GITHUB_REPO="oute-muscle"
 STATE_BUCKET="oute-terraform-state"
-STATE_PREFIX="oute-muscle/${ENV}"
+STATE_PREFIX="oute-muscle/prod"
 DB_USER="muscle_app"
-DB_NAME="oute_muscle_${ENV}"             # oute_muscle_staging or oute_muscle_prod
-SHARED_SQL_INSTANCE="oute-postgres"      # existing instance shared across environments
+DB_NAME="oute_muscle_prod"
+SHARED_SQL_INSTANCE="oute-postgres"
 INFRA_DIR="infra/gcp"
 PLACEHOLDER_IMAGE="us-docker.pkg.dev/cloudrun/container/hello"   # replaced on first CI deploy
 
 echo ""
 echo -e "${CYAN}═══════════════════════════════════════════════════════${NC}"
-echo -e "${CYAN}  Oute Muscle — Bootstrap: ${YELLOW}${ENV}${NC}"
+echo -e "${CYAN}  Oute Muscle — Bootstrap: ${YELLOW}prod${NC}"
 echo -e "${CYAN}═══════════════════════════════════════════════════════${NC}"
 echo ""
 
@@ -162,7 +161,7 @@ AR_URL=$(terraform output -raw artifact_registry_url)
 CLOUD_SQL_CONN=$(terraform output -raw cloud_sql_connection_name)
 
 # DB password from Secret Manager (terraform put it there)
-SECRET_NAME="oute-${ENV}-db-password"
+SECRET_NAME="oute-prod-db-password"
 DB_PASSWORD=$(gcloud secrets versions access latest \
   --secret="${SECRET_NAME}" \
   --project="${PROJECT_ID}" 2>/dev/null || echo "")
@@ -172,19 +171,19 @@ cd - >/dev/null
 echo ""
 
 # ─── Step 7: Set GitHub Actions environment vars ──────────────────────────────
-info "Setting GitHub Actions environment: ${ENV}..."
+info "Setting GitHub Actions environment: production..."
 
 GH_REPO="${GITHUB_ORG}/${GITHUB_REPO}"
 
-# Create environment if it doesn't exist (gh will error silently if it does)
-gh api "repos/${GH_REPO}/environments/${ENV}" \
+# Create environment if it doesn't exist
+gh api "repos/${GH_REPO}/environments/production" \
   --method PUT \
   --field wait_timer=0 \
   --silent 2>/dev/null || true
 
-# Variables (plain text) — compatible with bash 3 (macOS default)
+# Variables (plain text)
 set_var() {
-  gh variable set "$1" --env "${ENV}" --repo "${GH_REPO}" --body "$2"
+  gh variable set "$1" --env "production" --repo "${GH_REPO}" --body "$2"
   info "  var: $1 ✓"
 }
 
@@ -199,42 +198,30 @@ set_var "DB_NAME"            "${DB_NAME}"
 # Secret (DB password)
 if [[ -n "$DB_PASSWORD" ]]; then
   gh secret set "DB_PASSWORD" \
-    --env "${ENV}" \
+    --env "production" \
     --repo "${GH_REPO}" \
     --body "${DB_PASSWORD}"
   info "  secret: DB_PASSWORD ✓"
 else
   warn "Could not read DB_PASSWORD from Secret Manager — set it manually:"
-  warn "  gh secret set DB_PASSWORD --env ${ENV} --repo ${GH_REPO}"
+  warn "  gh secret set DB_PASSWORD --env production --repo ${GH_REPO}"
 fi
 
-success "GitHub Actions environment '${ENV}' configured"
+success "GitHub Actions environment 'production' configured"
 echo ""
 
 # ─── Done ─────────────────────────────────────────────────────────────────────
 echo -e "${GREEN}═══════════════════════════════════════════════════════${NC}"
-echo -e "${GREEN}  Bootstrap complete for: ${YELLOW}${ENV}${GREEN}${NC}"
+echo -e "${GREEN}  Bootstrap complete: prod${NC}"
 echo -e "${GREEN}═══════════════════════════════════════════════════════${NC}"
 echo ""
 echo -e "  ${CYAN}API URL:${NC}            ${API_URL}"
 echo -e "  ${CYAN}Artifact Registry:${NC}  ${AR_URL}"
 echo -e "  ${CYAN}Cloud SQL:${NC}          ${CLOUD_SQL_CONN}"
 echo ""
-
-if [[ "$ENV" == "staging" ]]; then
-  echo -e "  ${YELLOW}Next steps:${NC}"
-  echo -e "  1. Push to main → CI/CD deploys to staging automatically"
-  echo -e "     ${CYAN}git push origin main${NC}"
-  echo ""
-  echo -e "  2. Smoke test after deploy:"
-  echo -e "     ${CYAN}curl ${API_URL}/health/ready${NC}"
-  echo ""
-  echo -e "  3. When staging is green, deploy prod:"
-  echo -e "     ${CYAN}git tag v0.1.0 && git push origin v0.1.0${NC}"
-else
-  echo -e "  ${YELLOW}Next step:${NC}"
-  echo -e "  Smoke test:"
-  echo -e "     ${CYAN}curl ${API_URL}/health/ready${NC}"
-fi
-
+echo -e "  ${YELLOW}Next steps:${NC}"
+echo -e "  1. Merge a PR to main — CI/CD deploys to prod automatically"
+echo -e ""
+echo -e "  2. Smoke test after deploy:"
+echo -e "     ${CYAN}curl ${API_URL}/health/ready${NC}"
 echo ""

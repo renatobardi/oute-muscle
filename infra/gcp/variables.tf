@@ -10,11 +10,12 @@ variable "region" {
 }
 
 variable "environment" {
-  description = "Deployment environment (dev | staging | prod)"
+  description = "Deployment environment — always prod. Single-environment Trunk-Based CD."
   type        = string
+  default     = "prod"
   validation {
-    condition     = contains(["dev", "staging", "prod"], var.environment)
-    error_message = "environment must be dev, staging, or prod."
+    condition     = var.environment == "prod"
+    error_message = "environment must be prod. This project uses Trunk-Based CD with a single production environment."
   }
 }
 
@@ -60,7 +61,7 @@ variable "db_user" {
 
 # Cloud Run
 variable "cloud_run_min_instances" {
-  description = "Minimum Cloud Run instances (use 0 for dev to save cost)"
+  description = "Minimum Cloud Run instances"
   type        = number
   default     = 0
 }

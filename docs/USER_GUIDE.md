@@ -63,7 +63,6 @@ Toda regra L1 aponta para o incidente que a originou. Todo finding de um scan ap
 |---------|-----|
 | Landing page / waitlist | https://muscle.oute.pro *(em breve)* |
 | API (prod) | https://oute-prod-api-ujzimacvza-uc.a.run.app |
-| API (staging) | https://oute-staging-api-ujzimacvza-uc.a.run.app |
 | Dashboard web | Em desenvolvimento |
 
 ### Usar a API Key

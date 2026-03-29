@@ -1,41 +1,42 @@
 # Deployment Runbook
 
-## Environments
+## Environment
+
+Single environment: **prod** — Trunk-Based CD.
 
 | Environment | URL | Trigger |
 |-------------|-----|---------|
-| Staging | https://oute-staging-api-ujzimacvza-uc.a.run.app | Push to `main` |
-| Prod | https://oute-prod-api-ujzimacvza-uc.a.run.app | Git tag `v*.*.*` |
+| Prod | https://oute-prod-api-ujzimacvza-uc.a.run.app | Merge to `main` |
 
 ## Normal deploy flow
 
-### Staging (automatic)
+Every PR merged to `main` triggers an automatic deploy to prod via `.github/workflows/deploy.yml`.
 
-Every push to `main` triggers a staging deploy via `.github/workflows/deploy.yml`. No action needed.
+No manual steps. No tags. No staging.
+
+```
+feature branch → PR → CI (lint + tests + semgrep) → merge main → deploy prod
+```
 
 Monitor at: https://github.com/renatobardi/oute-muscle/actions/workflows/deploy.yml
 
-### Prod release
+## Rollback
 
 ```bash
-# 1. Make sure main is green and you're on main
-git checkout main && git pull
+# List recent Cloud Run revisions
+gcloud run revisions list --service=oute-prod-api --region=us-central1
 
-# 2. Tag the release (semver)
-git tag v0.2.0
-git push origin v0.2.0
-
-# 3. Watch the deploy
-gh run list --workflow=deploy.yml --limit 5
-gh run watch <run-id>
-
-# 4. Smoke test
-curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/live
+# Roll back to a specific revision
+gcloud run services update-traffic oute-prod-api \
+  --region=us-central1 \
+  --to-revisions=oute-prod-api-00003-xyz=100
 ```
 
-## First-time environment bootstrap
+Then fix the issue on a feature branch, open a PR, and let CI/CD redeploy.
 
-Run once per environment to provision all GCP resources and configure GitHub Actions.
+## First-time bootstrap
+
+Run once to provision all GCP resources and configure GitHub Actions.
 
 ### Prerequisites
 
@@ -58,18 +59,14 @@ gcloud config set project oute-488706
 ### Bootstrap
 
 ```bash
-# Staging
-bash scripts/deploy-bootstrap.sh staging
-
-# Prod
-bash scripts/deploy-bootstrap.sh prod
+bash scripts/deploy-bootstrap.sh
 ```
 
 The script will:
 1. Enable required GCP APIs
 2. Create the GCS Terraform state bucket (idempotent)
 3. Run `terraform init && terraform apply`
-4. Set all GitHub Actions environment variables and secrets
+4. Set all GitHub Actions environment variables and secrets in the `production` environment
 
 If it fails mid-way, it's safe to re-run — all operations are idempotent.
 
@@ -93,7 +90,7 @@ terraform import \
   module.cloud_sql.google_sql_database.oute \
   "projects/oute-488706/instances/oute-postgres/databases/oute_muscle_prod"
 cd ../..
-bash scripts/deploy-bootstrap.sh prod
+bash scripts/deploy-bootstrap.sh
 ```
 
 **`Permission denied on secret` (Cloud Run)**
@@ -105,7 +102,7 @@ IAM propagation lag (~60s). Wait a minute and re-run the bootstrap.
 The GitHub Actions environment vars weren't configured. Bootstrap again to set them:
 
 ```bash
-bash scripts/deploy-bootstrap.sh prod
+bash scripts/deploy-bootstrap.sh
 ```
 
 ## Database migrations
@@ -152,29 +149,6 @@ terraform plan \
 terraform apply [same vars]
 ```
 
-## Rollback
-
-### Cloud Run revision rollback
-
-```bash
-# List recent revisions
-gcloud run revisions list --service=oute-prod-api --region=us-central1
-
-# Roll back to a specific revision
-gcloud run services update-traffic oute-prod-api \
-  --region=us-central1 \
-  --to-revisions=oute-prod-api-00003-xyz=100
-```
-
-### Database migration rollback
-
-```bash
-make migrate-down   # rollback one migration
-# Repeat if needed
-```
-
-Then redeploy the previous image version.
-
 ## Monitoring
 
 ```bash
@@ -182,11 +156,6 @@ Then redeploy the previous image version.
 gcloud logging read \
   'resource.type="cloud_run_revision" resource.labels.service_name="oute-prod-api"' \
   --limit=50 --format=json | jq '.[].jsonPayload'
-
-# Cloud Run logs (staging)
-gcloud logging read \
-  'resource.type="cloud_run_revision" resource.labels.service_name="oute-staging-api"' \
-  --limit=50
 
 # Health endpoints
 curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/live
@@ -200,14 +169,9 @@ curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/startup
 |----------|------|-------|
 | GCP project | `oute-488706` | |
 | Cloud SQL | `oute-postgres` | Shared instance, `us-central1` |
-| DB (staging) | `oute_muscle_staging` | User: `muscle_app` |
 | DB (prod) | `oute_muscle_prod` | User: `muscle_app` |
-| Cloud Run (staging) | `oute-staging-api` | Min 0 instances |
-| Cloud Run (prod) | `oute-prod-api` | Min 1 instance |
-| Artifact Registry (staging) | `oute-staging-docker` | |
+| Cloud Run (prod) | `oute-prod-api` | Min 0 instances |
 | Artifact Registry (prod) | `oute-prod-docker` | |
-| Terraform state bucket | `oute-terraform-state` | `gs://` |
-| WIF pool (staging) | `oute-staging-gh-pool` | |
+| Terraform state bucket | `oute-terraform-state` | `gs://oute-terraform-state/oute-muscle/prod/` |
 | WIF pool (prod) | `oute-prod-gh-pool` | |
-| GH Actions SA (staging) | `oute-staging-gh-actions@oute-488706.iam.gserviceaccount.com` | |
 | GH Actions SA (prod) | `oute-prod-gh-actions@oute-488706.iam.gserviceaccount.com` | |

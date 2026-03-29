@@ -154,50 +154,43 @@ GCP Project: oute-488706
 Region: us-central1
 
 Cloud Run:
-  oute-staging-api  (min: 0, max: 10 instances)
-  oute-prod-api     (min: 1, max: 20 instances)
+  oute-prod-api  (min: 0, max: 10 instances)
 
 Cloud SQL:
   oute-postgres (shared PostgreSQL 16 instance)
-    databases: oute_muscle_staging, oute_muscle_prod
+    database: oute_muscle_prod
     user: muscle_app
 
 Artifact Registry:
-  us-central1-docker.pkg.dev/oute-488706/oute-staging-docker
   us-central1-docker.pkg.dev/oute-488706/oute-prod-docker
 
 Secret Manager:
-  oute-staging-db-password  (version 3)
-  oute-prod-db-password     (version 3)
+  oute-prod-db-password
 
 Terraform state:
-  gs://oute-terraform-state/oute-muscle/{staging,prod}/
+  gs://oute-terraform-state/oute-muscle/prod/
 ```
 
-**Auth model**: Workload Identity Federation (no service account keys). GitHub Actions authenticates as `oute-{env}-gh-actions@oute-488706.iam.gserviceaccount.com` via OIDC token exchange.
+**Auth model**: Workload Identity Federation (no service account keys). GitHub Actions authenticates as `oute-prod-gh-actions@oute-488706.iam.gserviceaccount.com` via OIDC token exchange.
 
 ## CI/CD pipeline
 
 ```
-git push main
+PR → main (CI gate)
   └── ci.yml
         ├── lint (ruff + eslint)
         ├── type-check (mypy + svelte-check)
         ├── test (pytest, coverage reported via codecov)
         ├── test-rules (semgrep --test)
         └── semgrep-scan.yml (Semgrep rules on changed files)
-  └── deploy.yml (staging only)
-        ├── build Docker image
-        ├── push to Artifact Registry
-        ├── run migrations (alembic upgrade head)
-        └── deploy to Cloud Run (staging)
 
-git tag v*.*.*
-  └── deploy.yml (prod)
+merge main → deploy prod (automatic)
+  └── deploy.yml
         ├── build Docker image
-        ├── push to Artifact Registry
-        ├── run migrations (prod DB)
-        └── deploy to Cloud Run (prod)
+        ├── push to Artifact Registry (oute-prod-docker)
+        ├── run migrations (alembic upgrade head → oute_muscle_prod)
+        ├── deploy to Cloud Run (oute-prod-api)
+        └── readiness probe (/health/live — 60s timeout)
 ```
 
 ## Observability

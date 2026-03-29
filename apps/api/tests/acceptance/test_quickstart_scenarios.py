@@ -1,7 +1,7 @@
 """
 T187: Quickstart acceptance tests — validates all 8 scenarios from quickstart.md.
 
-These tests run against a live stack (local Docker Compose or a staging environment).
+These tests run against a live stack (local or prod via BASE_URL env var).
 Skip them by setting SKIP_ACCEPTANCE=1.
 
 Scenarios validated:

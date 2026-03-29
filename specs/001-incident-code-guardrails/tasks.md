@@ -381,7 +381,7 @@
 - [x] T175 [P] Create health and readiness probe endpoints in apps/api/src/routes/health.py
 - [x] T176 [P] Create GCP Terraform main configuration (Cloud Run, Cloud SQL, Vertex AI, Secret Manager, Artifact Registry) in infra/gcp/main.tf
 - [x] T177 [P] Create Terraform modules for cloud-run, cloud-sql, vertex-ai, secret-manager, artifact-registry, iam in infra/gcp/modules/
-- [x] T178 [P] Create Terraform environment tfvars (dev, staging, prod) in infra/gcp/environments/
+- [x] T178 [P] Create Terraform configuration for prod environment in infra/gcp/ — single environment (Trunk-Based CD, no staging)
 - [x] T179 [P] Create Terraform IAM module for Workload Identity Federation (GitHub Actions → GCP) in infra/gcp/modules/iam/
 - [x] T180 Create GitHub Actions deploy workflow (build → push to Artifact Registry → deploy to Cloud Run) in .github/workflows/deploy.yml
 - [x] T181 [P] Configure OpenTelemetry tracing (spans: API→LLM→DB) with GCP Cloud Trace exporter in apps/api/src/config.py
@@ -394,7 +394,7 @@
 - [x] T188 Verify 80% unit test coverage across all packages (pytest --cov)
 - [x] T189 Run full Semgrep rule test suite and verify all 10+ rules pass
 
-**Checkpoint**: Terraform plan dry-run passes without errors. Docker builds for all apps complete without warnings. OpenTelemetry traces arrive in Cloud Monitoring on staging. GitHub Actions full workflow green (lint + test + build + deploy). Semgrep scan of oute-muscle codebase itself passes with zero critical findings.
+**Checkpoint**: Terraform plan dry-run passes without errors. Docker builds for all apps complete without warnings. OpenTelemetry traces arrive in Cloud Monitoring on prod. GitHub Actions full workflow green (lint + test + build + deploy). Semgrep scan of oute-muscle codebase itself passes with zero critical findings.
 
 ---
 

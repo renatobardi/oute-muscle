@@ -181,7 +181,7 @@ def configure_tracing() -> None:
 
     resource = Resource(attributes={SERVICE_NAME: settings.otel_service_name})
 
-    # Sample 100% of traces in dev/staging; 10% in prod to reduce cost
+    # Sample 100% of traces (adjust ratio here if cost becomes a concern)
     sampler = ParentBased(TraceIdRatioBased(1.0))
 
     provider = TracerProvider(resource=resource, sampler=sampler)
