@@ -77,7 +77,7 @@ def _html_to_text(markup: str, max_chars: int = 12_000) -> str:
     try:
         parser.feed(markup)
     except Exception:
-        pass
+        logger.warning("HTML parsing failed for ingest-url, returning partial text")
     return parser.text()[:max_chars]
 
 
