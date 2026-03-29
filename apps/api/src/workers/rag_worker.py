@@ -32,7 +32,11 @@ import os
 import sys
 import time
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from packages.db.src.adapters.pg_scan_repo import PostgreSQLScanRepo
 
 logger = logging.getLogger(__name__)
 
@@ -191,9 +195,7 @@ async def _process(
     )
     from packages.core.src.domain.advisory.llm_router import LLMRouter
 
-    embedding_adapter = VertexAIEmbedding(
-        project_id=gcp_project, location=vertex_location
-    )
+    embedding_adapter = VertexAIEmbedding(project_id=gcp_project, location=vertex_location)
     llm_router = LLMRouter(
         flash=VertexGeminiFlash(project_id=gcp_project, location=vertex_location),
         pro=VertexGeminiPro(project_id=gcp_project, location=vertex_location),
@@ -230,7 +232,7 @@ async def _process(
         await scan_repo.update_status(
             scan_id,
             status="failed",
-            completed_at=datetime.now(tz=timezone.utc),
+            completed_at=datetime.now(tz=UTC),
         )
         return 1
 
@@ -254,7 +256,7 @@ async def _process(
         await scan_repo.update_status(
             scan_id,
             status="failed",
-            completed_at=datetime.now(tz=timezone.utc),
+            completed_at=datetime.now(tz=UTC),
         )
         return 1
 
@@ -270,7 +272,7 @@ async def _process(
 
 
 async def _mark_completed(
-    scan_repo: "PostgreSQLScanRepo",
+    scan_repo: PostgreSQLScanRepo,
     scan_id: uuid.UUID,
     started_at: float,
 ) -> None:
@@ -281,13 +283,11 @@ async def _mark_completed(
         scan_id: The scan to mark completed.
         started_at: Worker start time (monotonic seconds) for duration calc.
     """
-    from packages.db.src.adapters.pg_scan_repo import PostgreSQLScanRepo  # noqa: F401 (type hint)
-
     duration_ms = int((time.monotonic() - started_at) * 1000)
     await scan_repo.update_status(
         scan_id,
         status="completed",
-        completed_at=datetime.now(tz=timezone.utc),
+        completed_at=datetime.now(tz=UTC),
         duration_ms=duration_ms,
     )
 

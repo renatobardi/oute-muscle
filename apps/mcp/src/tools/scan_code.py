@@ -17,6 +17,7 @@ import asyncio
 import json
 import logging
 import os
+import pathlib
 import tempfile
 import uuid
 from datetime import UTC, datetime
@@ -74,9 +75,9 @@ async def scan_code(
 
     Returns:
         Dict with keys:
-            findings  – list of finding dicts
-            scan_id   – unique UUID for this scan
-            scanned_at – ISO-8601 timestamp
+            findings  - list of finding dicts
+            scan_id   - unique UUID for this scan
+            scanned_at - ISO-8601 timestamp
 
     Raises:
         QuotaExceededError: If the user has exceeded their scan quota.
@@ -125,7 +126,8 @@ async def run_semgrep(code: str, language: str) -> list[dict[str, Any]]:
         return []
 
     rules_path = os.environ.get("SEMGREP_RULES_PATH", "packages/semgrep-rules")
-    if not os.path.exists(rules_path):
+    rules_dir = pathlib.Path(rules_path)
+    if not rules_dir.exists():
         logger.warning("semgrep_rules_not_found", path=rules_path)
         return []
 
@@ -138,7 +140,8 @@ async def run_semgrep(code: str, language: str) -> list[dict[str, Any]]:
     try:
         proc = await asyncio.create_subprocess_exec(
             "semgrep",
-            "--config", rules_path,
+            "--config",
+            rules_path,
             "--json",
             "--quiet",
             "--no-git-ignore",
@@ -148,7 +151,7 @@ async def run_semgrep(code: str, language: str) -> list[dict[str, Any]]:
         )
         try:
             stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=30.0)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             proc.kill()
             logger.warning("semgrep_timeout", language=language)
             return []
@@ -157,7 +160,7 @@ async def run_semgrep(code: str, language: str) -> list[dict[str, Any]]:
         return []
     finally:
         try:
-            os.unlink(tmp_path)
+            pathlib.Path(tmp_path).unlink()
         except OSError:
             pass
 
