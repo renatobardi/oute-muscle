@@ -60,7 +60,7 @@ ENV APP_PORT=${APP_PORT} \
     PYTHONPATH="/app" \
     PATH="/opt/venv/bin:$PATH"
 
-# Runtime system deps (libpq for asyncpg, semgrep binary dep)
+# Runtime system deps (libpq for asyncpg)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
     && rm -rf /var/lib/apt/lists/*

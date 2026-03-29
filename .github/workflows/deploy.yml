@@ -177,6 +177,13 @@ jobs:
           image:      ${{ needs.build.outputs.image }}
           region:     ${{ vars.REGION }}
           project_id: ${{ vars.PROJECT_ID }}
+          flags: >-
+            --memory 1Gi
+            --cpu 1
+            --min-instances 0
+            --max-instances 10
+            --startup-cpu-boost
+            --set-env-vars PYTHONUNBUFFERED=1
 
       - name: Verify deployment (readiness probe)
         run: |
