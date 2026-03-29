@@ -13,9 +13,15 @@ Endpoints:
 from __future__ import annotations
 
 import datetime as dt
+import html
+import json
+import logging
+import re
 import uuid
+from html.parser import HTMLParser
 from typing import Annotated
 
+import httpx
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
@@ -28,6 +34,52 @@ from packages.core.src.ports.incident_repo import (
     IncidentHasActiveRuleError,
     OptimisticLockError,
 )
+
+logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# HTML text extractor (stdlib only — no BS4 dependency)
+# ---------------------------------------------------------------------------
+
+
+class _TextExtractor(HTMLParser):
+    """Minimal HTML→text extractor that skips scripts/styles."""
+
+    _SKIP_TAGS = frozenset(["script", "style", "nav", "footer", "header", "noscript"])
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._parts: list[str] = []
+        self._skip: int = 0
+
+    def handle_starttag(self, tag: str, attrs: list) -> None:  # type: ignore[override]
+        if tag in self._SKIP_TAGS:
+            self._skip += 1
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag in self._SKIP_TAGS and self._skip > 0:
+            self._skip -= 1
+
+    def handle_data(self, data: str) -> None:
+        if self._skip == 0 and data.strip():
+            self._parts.append(data)
+
+    def text(self) -> str:
+        raw = " ".join(self._parts)
+        # collapse whitespace and unescape HTML entities
+        return html.unescape(re.sub(r"\s+", " ", raw)).strip()
+
+
+def _html_to_text(markup: str, max_chars: int = 12_000) -> str:
+    """Extract readable text from HTML markup, capped at max_chars."""
+    parser = _TextExtractor()
+    try:
+        parser.feed(markup)
+    except Exception:
+        pass
+    return parser.text()[:max_chars]
+
 
 # ---------------------------------------------------------------------------
 # Request / Response schemas
@@ -255,14 +307,119 @@ async def ingest_url_post(
     POST /incidents/ingest-url
     {"url": "https://...post-mortem..."}
 
-    Fetches HTML, uses Gemini Flash to extract incident fields.
-    Returns a draft for review. Not persisted until confirmed.
+    1. Fetch HTML from the URL (10s timeout).
+    2. Extract readable text (skip scripts/nav).
+    3. Call Gemini Flash with a structured extraction prompt.
+    4. Return editable draft — NOT persisted until confirmed via POST /incidents.
     """
-    # TODO: Implement URL fetching + LLM extraction pipeline
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="URL ingestion requires LLM extraction — coming in next iteration",
+    from apps.api.src.dependencies import get_container
+
+    # ── 1. Fetch HTML ────────────────────────────────────────────────────────
+    try:
+        async with httpx.AsyncClient(follow_redirects=True, timeout=10.0) as client:
+            resp = await client.get(
+                request.url,
+                headers={"User-Agent": "OuteMuscle-Ingest/1.0 (+https://oute.me)"},
+            )
+            resp.raise_for_status()
+            html_body = resp.text
+    except httpx.TimeoutException:
+        raise HTTPException(status_code=408, detail=f"URL fetch timed out: {request.url}") from None
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail=f"URL returned HTTP {exc.response.status_code}: {request.url}",
+        ) from None
+    except httpx.RequestError as exc:
+        raise HTTPException(status_code=422, detail=f"Could not fetch URL: {exc}") from None
+
+    # ── 2. Extract text ──────────────────────────────────────────────────────
+    page_text = _html_to_text(html_body)
+    if len(page_text) < 100:
+        raise HTTPException(
+            status_code=422,
+            detail="Could not extract enough text from the URL. Is it a post-mortem page?",
+        )
+
+    # ── 3. LLM extraction ────────────────────────────────────────────────────
+    container = get_container()
+    llm = container.llm_flash
+
+    valid_categories = [e.value for e in IncidentCategory]
+    valid_severities = [e.value for e in IncidentSeverity]
+
+    prompt = f"""You are an expert at extracting structured incident data from engineering post-mortem reports.
+
+Given the following post-mortem text, extract the incident details and return a JSON object.
+
+POST-MORTEM TEXT:
+{page_text}
+
+SOURCE URL: {request.url}
+
+Return ONLY a valid JSON object with these exact fields (no markdown, no explanation):
+{{
+  "title": "concise incident title (≤100 chars)",
+  "category": one of {valid_categories},
+  "severity": one of {valid_severities},
+  "anti_pattern": "description of the code anti-pattern that caused this incident",
+  "remediation": "how to fix or prevent this in code",
+  "organization": "company/team name if mentioned, else null",
+  "affected_languages": ["list", "of", "programming", "languages", "if", "mentioned"],
+  "static_rule_possible": true or false (can a static analysis rule detect this pattern?),
+  "tags": ["relevant", "tags"]
+}}"""
+
+    try:
+        raw = await llm.generate(prompt, max_tokens=1024, temperature=0.1)
+        # Strip markdown fences if present
+        raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw.strip(), flags=re.MULTILINE)
+        extracted = json.loads(raw)
+    except json.JSONDecodeError:
+        logger.warning("LLM returned non-JSON for URL %s: %r", request.url, raw[:200])
+        raise HTTPException(
+            status_code=422,
+            detail="LLM could not extract structured data from this page. Try a different URL.",
+        ) from None
+    except Exception as exc:
+        logger.error("LLM extraction failed for %s: %s", request.url, exc)
+        raise HTTPException(status_code=503, detail="LLM extraction service unavailable") from None
+
+    # ── 4. Build draft response (not persisted) ──────────────────────────────
+    now = dt.datetime.now(dt.UTC)
+    fake_id = uuid.uuid4()
+
+    # Normalise category / severity (LLM might return slightly wrong casing)
+    raw_cat = str(extracted.get("category", "missing-error-handling")).lower()
+    category = raw_cat if raw_cat in valid_categories else "missing-error-handling"
+
+    raw_sev = str(extracted.get("severity", "medium")).lower()
+    severity = raw_sev if raw_sev in valid_severities else "medium"
+
+    draft = IncidentResponse(
+        id=str(fake_id),
+        tenant_id=None,
+        title=str(extracted.get("title", "Untitled incident"))[:500],
+        category=category,
+        severity=severity,
+        anti_pattern=str(extracted.get("anti_pattern", ""))[:5000],
+        remediation=str(extracted.get("remediation", ""))[:5000],
+        date=None,
+        organization=extracted.get("organization") or None,
+        source_url=request.url,
+        affected_languages=extracted.get("affected_languages") or [],
+        code_example=None,
+        tags=extracted.get("tags") or [],
+        static_rule_possible=bool(extracted.get("static_rule_possible", False)),
+        semgrep_rule_id=None,
+        version=1,
+        deleted_at=None,
+        created_by=None,
+        created_at=now,
+        updated_at=now,
     )
+
+    return IncidentIngestResponse(draft=draft)
 
 
 @router.get("/{incident_id}", response_model=IncidentResponse)
