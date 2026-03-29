@@ -40,15 +40,15 @@ async def list_relevant_incidents(
     Args:
         query: Optional natural-language search query.
         category: Optional category slug (e.g. 'unsafe-regex').
-        max_results: Maximum number of incidents to return (1–50).
+        max_results: Maximum number of incidents to return (1-50).
         tenant_id: Tenant UUID string for RLS scoping.
         user_id: User identifier for metering.
         metering: MeteringService instance (created fresh if None).
 
     Returns:
         Dict with keys:
-            incidents – list of incident dicts
-            total     – number of incidents returned
+            incidents - list of incident dicts
+            total     - number of incidents returned
     """
     if metering is None:
         metering = MeteringService()
@@ -128,9 +128,7 @@ async def _semantic_search(
     session_factory = SessionFactory(database_url=database_url)
     try:
         async for session in session_factory.get_session(tenant_id=tenant_id):
-            embedding_adapter = VertexAIEmbedding(
-                project_id=gcp_project, location=vertex_location
-            )
+            embedding_adapter = VertexAIEmbedding(project_id=gcp_project, location=vertex_location)
             query_embedding = await embedding_adapter.embed(query)
 
             if not query_embedding:

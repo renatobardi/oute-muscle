@@ -13,10 +13,10 @@ down_revision = None
 branch_labels = None
 depends_on = None
 
-from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
+from alembic import op
 from pgvector.sqlalchemy import Vector
+from sqlalchemy.dialects import postgresql
 
 
 def upgrade() -> None:
@@ -40,29 +40,19 @@ def upgrade() -> None:
     )
     incident_category.create(op.get_bind())
 
-    severity_enum = postgresql.ENUM(
-        "critical", "high", "medium", "low", name="severity"
-    )
+    severity_enum = postgresql.ENUM("critical", "high", "medium", "low", name="severity")
     severity_enum.create(op.get_bind())
 
-    plan_tier_enum = postgresql.ENUM(
-        "free", "team", "enterprise", name="plan_tier"
-    )
+    plan_tier_enum = postgresql.ENUM("free", "team", "enterprise", name="plan_tier")
     plan_tier_enum.create(op.get_bind())
 
-    user_role_enum = postgresql.ENUM(
-        "viewer", "editor", "admin", name="user_role"
-    )
+    user_role_enum = postgresql.ENUM("viewer", "editor", "admin", name="user_role")
     user_role_enum.create(op.get_bind())
 
-    rule_source_enum = postgresql.ENUM(
-        "manual", "synthesized", name="rule_source"
-    )
+    rule_source_enum = postgresql.ENUM("manual", "synthesized", name="rule_source")
     rule_source_enum.create(op.get_bind())
 
-    rule_severity_enum = postgresql.ENUM(
-        "error", "warning", "info", name="rule_severity"
-    )
+    rule_severity_enum = postgresql.ENUM("error", "warning", "info", name="rule_severity")
     rule_severity_enum.create(op.get_bind())
 
     scan_trigger_source_enum = postgresql.ENUM(
@@ -147,7 +137,12 @@ def upgrade() -> None:
         sa.Column("subcategory", sa.String(100), nullable=True),
         sa.Column("failure_mode", sa.Text, nullable=True),
         sa.Column("severity", sa.String(50), nullable=False),
-        sa.Column("affected_languages", postgresql.ARRAY(sa.String(50)), nullable=False, server_default="{}"),
+        sa.Column(
+            "affected_languages",
+            postgresql.ARRAY(sa.String(50)),
+            nullable=False,
+            server_default="{}",
+        ),
         sa.Column("anti_pattern", sa.Text, nullable=False),
         sa.Column("code_example", sa.Text, nullable=True),
         sa.Column("remediation", sa.Text, nullable=False),
@@ -185,7 +180,9 @@ def upgrade() -> None:
         sa.Column("sequence_number", sa.Integer, nullable=False, server_default="1"),
         sa.Column("yaml_content", sa.Text, nullable=False),
         sa.Column("test_file_content", sa.Text, nullable=False),
-        sa.Column("languages", postgresql.ARRAY(sa.String(50)), nullable=False, server_default="{}"),
+        sa.Column(
+            "languages", postgresql.ARRAY(sa.String(50)), nullable=False, server_default="{}"
+        ),
         sa.Column("severity", sa.String(50), nullable=False),
         sa.Column("message", sa.Text, nullable=False),
         sa.Column("remediation", sa.Text, nullable=False),
@@ -312,7 +309,9 @@ def upgrade() -> None:
         sa.Column("proposed_rule_id", sa.String(50), nullable=False),
         sa.Column("yaml_content", sa.Text, nullable=False),
         sa.Column("test_file_content", sa.Text, nullable=False),
-        sa.Column("languages", postgresql.ARRAY(sa.String(50)), nullable=False, server_default="{}"),
+        sa.Column(
+            "languages", postgresql.ARRAY(sa.String(50)), nullable=False, server_default="{}"
+        ),
         sa.Column("status", sa.String(50), nullable=False, server_default="pending"),
         sa.Column("reviewed_by", postgresql.UUID(as_uuid=True), nullable=True),
         sa.Column("reviewed_at", sa.DateTime, nullable=True),
@@ -327,9 +326,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index("ix_synthesis_candidate_tenant_id", "synthesis_candidate", ["tenant_id"])
-    op.create_index(
-        "ix_synthesis_candidate_incident_id", "synthesis_candidate", ["incident_id"]
-    )
+    op.create_index("ix_synthesis_candidate_incident_id", "synthesis_candidate", ["incident_id"])
     op.create_index("ix_synthesis_candidate_status", "synthesis_candidate", ["status"])
 
     # Enable pgvector extension

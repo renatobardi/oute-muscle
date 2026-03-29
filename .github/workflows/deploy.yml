@@ -177,6 +177,13 @@ jobs:
           image:      ${{ needs.build.outputs.image }}
           region:     ${{ vars.REGION }}
           project_id: ${{ vars.PROJECT_ID }}
+          flags: >-
+            --memory 1Gi
+            --cpu 1
+            --min-instances 0
+            --max-instances 10
+            --cpu-boost
+            --set-env-vars PYTHONUNBUFFERED=1
 
       - name: Verify deployment (readiness probe)
         run: |
@@ -188,7 +195,7 @@ jobs:
           echo "Service URL: $SERVICE_URL"
           # Poll /health/ready for up to 60s
           for i in $(seq 1 12); do
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$SERVICE_URL/health")
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$SERVICE_URL/health/live")
             if [[ "$STATUS" == "200" ]]; then
               echo "✓ Service healthy"
               exit 0

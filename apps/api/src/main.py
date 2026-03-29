@@ -57,9 +57,7 @@ class DIContainer:
             self.llm_pro = VertexGeminiPro(
                 project_id=gcp_project, location=settings.vertex_location
             )
-            self.llm_claude = VertexClaudeSonnet(
-                project_id=gcp_project, location="us-east5"
-            )
+            self.llm_claude = VertexClaudeSonnet(project_id=gcp_project, location="us-east5")
         else:
             from apps.api.src.adapters.vertex_llm import NullLLMAdapter
 
@@ -68,9 +66,9 @@ class DIContainer:
             self.llm_claude = NullLLMAdapter()  # type: ignore[assignment]
 
         logger.info(
-            "di_container_initialized",
-            gcp_configured=bool(gcp_project),
-            database_url=settings.database_url[:30] + "...",
+            "di_container_initialized gcp_configured=%s database_url=%s...",
+            bool(gcp_project),
+            settings.database_url[:30],
         )
 
     async def close(self) -> None:
@@ -96,7 +94,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     global _container
 
     configure_logging()
-    logger.info("starting_oute_muscle_api", version="0.1.0")
+    logger.info("starting_oute_muscle_api version=0.1.0")
 
     _container = DIContainer()
     logger.info("startup_complete")
@@ -129,8 +127,8 @@ def create_app() -> FastAPI:
 
     # Middleware stack — add_middleware in reverse execution order
     # (last added = outermost = first to process the request)
-    from apps.api.src.middleware.rate_limit import RateLimitMiddleware
     from apps.api.src.middleware.correlation import CorrelationMiddleware
+    from apps.api.src.middleware.rate_limit import RateLimitMiddleware
 
     app.add_middleware(RateLimitMiddleware)
     app.add_middleware(CorrelationMiddleware)
@@ -138,7 +136,7 @@ def create_app() -> FastAPI:
     # Global exception handler
     @app.exception_handler(Exception)
     async def global_exception_handler(request, exc):  # type: ignore[no-untyped-def]
-        logger.exception("unhandled_exception", path=str(request.url.path))
+        logger.exception("unhandled_exception path=%s", request.url.path)
         return JSONResponse(
             status_code=500,
             content={"error": "Internal server error", "code": "INTERNAL_SERVER_ERROR"},

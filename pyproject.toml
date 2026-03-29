@@ -29,6 +29,7 @@ ignore = ["E501"]  # line length handled by formatter
 "packages/semgrep-rules/**/*.test.py" = ["F821", "E402", "E722", "B007", "UP031", "PTH"]  # Semgrep test fixtures, not real Python
 "**/routes/**" = ["B008"]  # FastAPI Depends() in argument defaults is idiomatic
 "**/routers/**" = ["B008"]  # FastAPI Depends() in argument defaults is idiomatic
+"**/migrations/versions/**" = ["E402", "I001"]  # Alembic auto-generated migrations have imports after revision metadata
 
 [tool.ruff.format]
 quote-style = "double"

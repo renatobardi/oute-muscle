@@ -45,11 +45,8 @@ COPY apps/api/      apps/api/
 COPY packages/core/ packages/core/
 COPY packages/db/   packages/db/
 
-# Install local packages so they are importable as Python modules
-RUN pip install --no-cache-dir --no-deps \
-    -e packages/core \
-    -e packages/db \
-    -e apps/api
+# No need to pip-install local packages — they are importable
+# via PYTHONPATH=/app and implicit namespace packages.
 
 # ─────────────────────────────────────────────────────────────
 # Stage 2 – runtime
@@ -60,9 +57,10 @@ ARG APP_PORT=8000
 ENV APP_PORT=${APP_PORT} \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH="/app" \
     PATH="/opt/venv/bin:$PATH"
 
-# Runtime system deps (libpq for asyncpg, semgrep binary dep)
+# Runtime system deps (libpq for asyncpg)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
     && rm -rf /var/lib/apt/lists/*
@@ -87,8 +85,8 @@ USER appuser
 
 EXPOSE ${APP_PORT}
 
-# Uvicorn: 1 worker per CPU core, managed by Cloud Run autoscaling
-CMD ["sh", "-c", "uvicorn apps.api.src.main:app \
+# Uvicorn: 1 worker, managed by Cloud Run autoscaling
+CMD ["sh", "-c", "exec uvicorn apps.api.src.main:app \
     --host 0.0.0.0 \
     --port ${PORT:-${APP_PORT}} \
     --workers 1 \

@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import pathlib
 import re
 import uuid
 from typing import Any
@@ -246,7 +247,9 @@ async def _run_l1_and_l2_pipeline(
 
     summary_lines = [
         f"**Oute Muscle** scanned {pr_diff.diff_lines if diff_text else 0} diff lines.",
-        f"Found **{finding_count}** incident-linked pattern(s)." if finding_count else "No patterns found.",
+        f"Found **{finding_count}** incident-linked pattern(s)."
+        if finding_count
+        else "No patterns found.",
     ]
     if pr_diff.truncated if diff_text else False:
         summary_lines.append("⚠️ Diff truncated at 3000 lines — full diff not scanned.")
@@ -284,8 +287,7 @@ async def _run_l1_and_l2_pipeline(
         "low": IncidentSeverity.LOW,
     }
     severities = [
-        severity_map.get(f.get("severity", "low"), IncidentSeverity.LOW)
-        for f in findings
+        severity_map.get(f.get("severity", "low"), IncidentSeverity.LOW) for f in findings
     ]
     risk_score = compute_risk_score(severities)
     risk_level = score_to_risk_level(risk_score)
@@ -437,9 +439,7 @@ async def _handle_installation_created(payload: dict[str, Any]) -> None:
         from sqlalchemy import select
 
         existing = (
-            await session.execute(
-                select(TenantModel).where(TenantModel.slug == slug)
-            )
+            await session.execute(select(TenantModel).where(TenantModel.slug == slug))
         ).scalar_one_or_none()
 
         if existing is not None:
@@ -476,9 +476,7 @@ async def _handle_installation_deleted(payload: dict[str, Any]) -> None:
         payload: GitHub installation.deleted payload.
     """
     installation_id: int | None = payload.get("installation", {}).get("id")
-    account_login: str = (
-        payload.get("installation", {}).get("account", {}).get("login", "")
-    )
+    account_login: str = payload.get("installation", {}).get("account", {}).get("login", "")
 
     logger.info(
         "webhook_installation_deprovisioning",
@@ -508,9 +506,7 @@ async def _handle_installation_deleted(payload: dict[str, Any]) -> None:
         from sqlalchemy import select, update
 
         tenant = (
-            await session.execute(
-                select(TenantModel).where(TenantModel.slug == slug)
-            )
+            await session.execute(select(TenantModel).where(TenantModel.slug == slug))
         ).scalar_one_or_none()
 
         if tenant is None:
@@ -522,9 +518,7 @@ async def _handle_installation_deleted(payload: dict[str, Any]) -> None:
             return
 
         await session.execute(
-            update(TenantModel)
-            .where(TenantModel.slug == slug)
-            .values(is_active=False)
+            update(TenantModel).where(TenantModel.slug == slug).values(is_active=False)
         )
         await session.commit()
 
@@ -569,22 +563,23 @@ async def _run_semgrep_on_diff(diff: str) -> list[dict[str, Any]]:
 
     # Write diff to a temp .diff file and create a stub source file for semgrep
     with tempfile.TemporaryDirectory() as tmpdir:
-        diff_path = os.path.join(tmpdir, "changes.diff")
-        with open(diff_path, "w") as f:
+        diff_path = pathlib.Path(tmpdir) / "changes.diff"
+        with diff_path.open("w") as f:
             f.write(diff)
 
         try:
             proc = await asyncio.create_subprocess_exec(
                 "semgrep",
-                "--config", rules_path,
+                "--config",
+                rules_path,
                 "--json",
                 "--quiet",
                 diff_path,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
-            stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=30.0)
-        except (asyncio.TimeoutError, FileNotFoundError) as exc:
+            stdout, _stderr = await asyncio.wait_for(proc.communicate(), timeout=30.0)
+        except (TimeoutError, FileNotFoundError) as exc:
             logger.warning("webhook_semgrep_unavailable", error=str(exc))
             return []
 
