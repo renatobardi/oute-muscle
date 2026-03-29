@@ -154,7 +154,7 @@ GCP Project: oute-488706
 Region: us-central1
 
 Cloud Run:
-  oute-prod-api  (min: 0, max: 10 instances)
+  muscle-prod-api  (min: 0, max: 10 instances)
 
 Cloud SQL:
   oute-postgres (shared PostgreSQL 16 instance)
@@ -162,16 +162,16 @@ Cloud SQL:
     user: muscle_app
 
 Artifact Registry:
-  us-central1-docker.pkg.dev/oute-488706/oute-prod-docker
+  us-central1-docker.pkg.dev/oute-488706/muscle-prod-docker
 
 Secret Manager:
-  oute-prod-db-password
+  muscle-prod-db-password
 
 Terraform state:
   gs://oute-terraform-state/oute-muscle/prod/
 ```
 
-**Auth model**: Workload Identity Federation (no service account keys). GitHub Actions authenticates as `oute-prod-gh-actions@oute-488706.iam.gserviceaccount.com` via OIDC token exchange.
+**Auth model**: Workload Identity Federation (no service account keys). GitHub Actions authenticates as `muscle-prod-gh-actions@oute-488706.iam.gserviceaccount.com` via OIDC token exchange.
 
 ## CI/CD pipeline
 
@@ -187,9 +187,9 @@ PR → main (CI gate)
 merge main → deploy prod (automatic)
   └── deploy.yml
         ├── build Docker image
-        ├── push to Artifact Registry (oute-prod-docker)
+        ├── push to Artifact Registry (muscle-prod-docker)
         ├── run migrations (alembic upgrade head → oute_muscle_prod)
-        ├── deploy to Cloud Run (oute-prod-api)
+        ├── deploy to Cloud Run (muscle-prod-api)
         └── readiness probe (/health/live — 60s timeout)
 ```
 

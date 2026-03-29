@@ -40,11 +40,11 @@ GitHub PR → GitHub Actions (CI) → POST /v1/scans → Cloud Run (API)
 ```
 
 **Stack de produção:**
-- API: Cloud Run (`oute-prod-api`), mín 0 instâncias, máx 10
+- API: Cloud Run (`muscle-prod-api`), mín 0 instâncias, máx 10
 - DB: Cloud SQL `oute-postgres`, PostgreSQL 16, instância `db-f1-micro`, database `oute_muscle_prod`, user `muscle_app`
 - LLM: Vertex AI (Gemini 2.5 Flash/Pro) + Anthropic Claude Sonnet 4
 - Workers: background tasks rodando dentro do processo da API (asyncio)
-- Imagens: Artifact Registry `oute-prod-docker`
+- Imagens: Artifact Registry `muscle-prod-docker`
 - Estado Terraform: `gs://oute-terraform-state/oute-muscle/prod/`
 
 ---
@@ -55,7 +55,7 @@ Ambiente único: **prod** — Trunk-Based CD. Merge em `main` deploya automatica
 
 | Ambiente | API URL | Trigger de deploy |
 |----------|---------|-------------------|
-| Prod | `https://oute-prod-api-ujzimacvza-uc.a.run.app` | Merge em `main` |
+| Prod | `https://muscle.oute.pro/api` | Merge em `main` |
 
 **Console GCP**: https://console.cloud.google.com/run?project=oute-488706
 
@@ -67,7 +67,7 @@ Ambiente único: **prod** — Trunk-Based CD. Merge em `main` deploya automatica
 
 ### Cloud Run metrics (GCP Console)
 
-Acesse: **Cloud Run → oute-prod-api → Metrics**
+Acesse: **Cloud Run → muscle-prod-api → Metrics**
 
 Métricas críticas a acompanhar:
 
@@ -96,7 +96,7 @@ Acesse: **Cloud SQL → oute-postgres → Monitoring**
 ```
 # Erros 5xx
 resource.type="cloud_run_revision"
-resource.labels.service_name="oute-prod-api"
+resource.labels.service_name="muscle-prod-api"
 httpRequest.status>=500
 
 # Slow queries
@@ -124,10 +124,10 @@ jsonPayload.event="rate_limit_exceeded"
 
 ```bash
 # Prod — liveness
-curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/live
+curl https://muscle.oute.pro/api/health/live
 
 # Readiness (verifica DB + LLM)
-curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/ready
+curl https://muscle.oute.pro/api/health/ready
 ```
 
 **Resposta saudável do `/health/ready`:**
@@ -181,7 +181,7 @@ Campos padrão em todo log:
 # Todos os erros de prod (últimos 60 min)
 gcloud logging read \
   'resource.type="cloud_run_revision"
-   resource.labels.service_name="oute-prod-api"
+   resource.labels.service_name="muscle-prod-api"
    severity>=ERROR' \
   --limit=100 --freshness=1h \
   --format='json' | jq '.[].jsonPayload'
@@ -189,7 +189,7 @@ gcloud logging read \
 # Erros de um tenant específico
 gcloud logging read \
   'resource.type="cloud_run_revision"
-   resource.labels.service_name="oute-prod-api"
+   resource.labels.service_name="muscle-prod-api"
    jsonPayload.tenant_id="TENANT_UUID"
    severity>=ERROR' \
   --limit=50
@@ -203,7 +203,7 @@ gcloud logging read \
 # Scans com latência > 5s
 gcloud logging read \
   'resource.type="cloud_run_revision"
-   resource.labels.service_name="oute-prod-api"
+   resource.labels.service_name="muscle-prod-api"
    jsonPayload.event="scan_completed"
    jsonPayload.duration_ms>5000' \
   --limit=20
@@ -236,28 +236,28 @@ gcloud logging read \
 
 ```bash
 # 1. Verificar se o container está respondendo
-curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/live
+curl https://muscle.oute.pro/api/health/live
 
 # 2. Ver logs de erro recentes
 gcloud logging read \
   'resource.type="cloud_run_revision"
-   resource.labels.service_name="oute-prod-api"
+   resource.labels.service_name="muscle-prod-api"
    severity>=ERROR' \
   --limit=20 --freshness=10m --format=json | jq '.[].jsonPayload'
 
 # 3. Ver revisões ativas
 gcloud run revisions list \
-  --service=oute-prod-api \
+  --service=muscle-prod-api \
   --region=us-central1 \
   --limit=5
 
 # 4. Se o problema começou após um deploy, fazer rollback
-gcloud run services update-traffic oute-prod-api \
+gcloud run services update-traffic muscle-prod-api \
   --region=us-central1 \
-  --to-revisions=oute-prod-api-XXXXXX-xxx=100
+  --to-revisions=muscle-prod-api-XXXXXX-xxx=100
 
 # 5. Verificar health novamente
-curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/ready
+curl https://muscle.oute.pro/api/health/ready
 ```
 
 ### Runbook: DB inacessível
@@ -272,13 +272,13 @@ gcloud sql instances describe oute-postgres \
 
 # 3. Verificar se Cloud Run consegue alcançar o DB
 # (via /health/ready — verifica DB)
-curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/ready
+curl https://muscle.oute.pro/api/health/ready
 
 # 4. Reiniciar instância Cloud SQL (último recurso)
 gcloud sql instances restart oute-postgres
 
 # 5. Se o problema for de conexões esgotadas, forçar recycle das instâncias Cloud Run
-gcloud run services update oute-prod-api \
+gcloud run services update muscle-prod-api \
   --region=us-central1 \
   --max-instances=20   # trigger revision update
 ```
@@ -322,7 +322,7 @@ chmod +x cloud-sql-proxy
 
 # 3. Em outro terminal
 psql "host=127.0.0.1 port=5433 dbname=oute_muscle_prod user=muscle_app"
-# (senha em: gcloud secrets versions access latest --secret=oute-prod-db-password)
+# (senha em: gcloud secrets versions access latest --secret=muscle-prod-db-password)
 ```
 
 ### Migrations
@@ -443,7 +443,7 @@ Isso impede o login mas preserva todos os dados para fins de auditoria.
 
 ```bash
 # Via API (Enterprise only)
-curl https://oute-prod-api-ujzimacvza-uc.a.run.app/v1/audit-log \
+curl https://muscle.oute.pro/api/v1/audit-log \
   -H "X-API-Key: sk-..." \
   -G --data-urlencode "from=2026-03-01" --data-urlencode "per_page=200"
 
@@ -474,7 +474,7 @@ Os workers rodam dentro do processo da API (asyncio tasks). Em caso de crash do 
 # Logs de um worker específico
 gcloud logging read \
   'resource.type="cloud_run_revision"
-   resource.labels.service_name="oute-prod-api"
+   resource.labels.service_name="muscle-prod-api"
    jsonPayload.worker="synthesis"' \
   --limit=50 --freshness=1h
 
@@ -505,16 +505,16 @@ done
 
 | Secret | Conteúdo | Usado por |
 |--------|----------|-----------|
-| `oute-prod-db-password` | Senha do `muscle_app` no Cloud SQL | Cloud Run (prod API) |
+| `muscle-prod-db-password` | Senha do `muscle_app` no Cloud SQL | Cloud Run (prod API) |
 
 ### Acessar um segredo
 
 ```bash
 # Último valor
-gcloud secrets versions access latest --secret=oute-prod-db-password
+gcloud secrets versions access latest --secret=muscle-prod-db-password
 
 # Versão específica
-gcloud secrets versions access 3 --secret=oute-prod-db-password
+gcloud secrets versions access 3 --secret=muscle-prod-db-password
 ```
 
 ### Rotacionar a senha do banco
@@ -527,15 +527,15 @@ NEW_PASS=$(openssl rand -base64 32)
 psql ... -c "ALTER USER muscle_app PASSWORD '$NEW_PASS';"
 
 # 3. Criar nova versão no Secret Manager
-echo -n "$NEW_PASS" | gcloud secrets versions add oute-prod-db-password --data-file=-
+echo -n "$NEW_PASS" | gcloud secrets versions add muscle-prod-db-password --data-file=-
 
 # 4. Forçar nova revisão no Cloud Run para pegar a nova versão
-gcloud run services update oute-prod-api \
+gcloud run services update muscle-prod-api \
   --region=us-central1 \
   --update-env-vars=SECRET_ROTATION=$(date +%s)  # trigger revision
 
 # 5. Verificar health após rotação
-curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/ready
+curl https://muscle.oute.pro/api/health/ready
 ```
 
 ### GitHub Actions — Workload Identity Federation
@@ -544,13 +544,13 @@ A autenticação CI/CD usa WIF — sem service account keys. Se o deploy falhar 
 
 ```bash
 # Verificar provider
-gcloud iam workload-identity-pools providers describe oute-prod-gh-provider \
-  --workload-identity-pool=oute-prod-gh-pool \
+gcloud iam workload-identity-pools providers describe muscle-prod-gh-provider \
+  --workload-identity-pool=muscle-prod-gh-pool \
   --location=global
 
 # Verificar binding
 gcloud iam service-accounts get-iam-policy \
-  oute-prod-gh-actions@oute-488706.iam.gserviceaccount.com
+  muscle-prod-gh-actions@oute-488706.iam.gserviceaccount.com
 
 # Re-executar bootstrap se necessário
 bash scripts/deploy-bootstrap.sh prod
@@ -564,17 +564,17 @@ bash scripts/deploy-bootstrap.sh prod
 
 ```bash
 # Ver configuração atual
-gcloud run services describe oute-prod-api \
+gcloud run services describe muscle-prod-api \
   --region=us-central1 \
   --format="value(spec.template.spec.containerConcurrency,spec.template.metadata.annotations)"
 
 # Aumentar instâncias máximas
-gcloud run services update oute-prod-api \
+gcloud run services update muscle-prod-api \
   --region=us-central1 \
   --max-instances=50
 
 # Aumentar concorrência por instância (default: 80 requests/instância)
-gcloud run services update oute-prod-api \
+gcloud run services update muscle-prod-api \
   --region=us-central1 \
   --concurrency=100
 ```
@@ -634,7 +634,7 @@ git push origin v0.1.1
 gh run watch $(gh run list --workflow=deploy.yml --limit=1 --json databaseId -q '.[0].databaseId')
 
 # 6. Smoke test
-curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/live
+curl https://muscle.oute.pro/api/health/live
 ```
 
 ### Manutenção programada (janela de manutenção)
@@ -674,7 +674,7 @@ WHERE tenant_id = 'TENANT_UUID'
 **Verificação:**
 ```bash
 # Testar a key diretamente
-curl -I https://oute-prod-api-ujzimacvza-uc.a.run.app/v1/incidents \
+curl -I https://muscle.oute.pro/api/v1/incidents \
   -H "X-API-Key: sk-..."
 ```
 
@@ -694,7 +694,7 @@ WHERE key_hash = encode(sha256('sk-...'), 'hex');
 # Verificar latência nos logs
 gcloud logging read \
   'resource.type="cloud_run_revision"
-   resource.labels.service_name="oute-prod-api"
+   resource.labels.service_name="muscle-prod-api"
    jsonPayload.event="scan_completed"' \
   --limit=20 --format=json | jq '.[].jsonPayload.duration_ms'
 
@@ -746,13 +746,13 @@ alembic -c packages/db/alembic.ini stamp {revision_id}
 # Ver logs de startup
 gcloud logging read \
   'resource.type="cloud_run_revision"
-   resource.labels.service_name="oute-prod-api"
+   resource.labels.service_name="muscle-prod-api"
    jsonPayload.event="startup"' \
   --limit=10 --freshness=10m
 
 # Verificar se a imagem está acessível
 gcloud artifacts docker images list \
-  us-central1-docker.pkg.dev/oute-488706/oute-prod-docker
+  us-central1-docker.pkg.dev/oute-488706/muscle-prod-docker
 
 # Verificar variáveis de ambiente da revisão
 gcloud run revisions describe REVISION_NAME \
@@ -788,20 +788,20 @@ Use quando um deploy introduziu regressão:
 ```bash
 # 1. Listar revisões recentes
 gcloud run revisions list \
-  --service=oute-prod-api \
+  --service=muscle-prod-api \
   --region=us-central1 \
   --limit=5
 
 # 2. Identificar a revisão boa (anterior ao problema)
-# Nomenclatura: oute-prod-api-{NNNNN}-{xxx}
+# Nomenclatura: muscle-prod-api-{NNNNN}-{xxx}
 
 # 3. Rotear 100% do tráfego para a revisão boa
-gcloud run services update-traffic oute-prod-api \
+gcloud run services update-traffic muscle-prod-api \
   --region=us-central1 \
-  --to-revisions=oute-prod-api-00003-xyz=100
+  --to-revisions=muscle-prod-api-00003-xyz=100
 
 # 4. Verificar que a revisão boa está respondendo
-curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/live
+curl https://muscle.oute.pro/api/health/live
 
 # 5. Documentar o rollback e abrir issue de investigação
 ```
@@ -831,13 +831,13 @@ alembic -c packages/db/alembic.ini current
 | Recurso | Identificador | Acesso |
 |---------|--------------|--------|
 | Projeto | `oute-488706` | https://console.cloud.google.com/home/dashboard?project=oute-488706 |
-| Cloud Run (prod) | `oute-prod-api` | https://console.cloud.google.com/run/detail/us-central1/oute-prod-api/metrics?project=oute-488706 |
+| Cloud Run (prod) | `muscle-prod-api` | https://console.cloud.google.com/run/detail/us-central1/muscle-prod-api/metrics?project=oute-488706 |
 | Cloud SQL | `oute-postgres` | https://console.cloud.google.com/sql/instances/oute-postgres/overview?project=oute-488706 |
-| Artifact Registry (prod) | `oute-prod-docker` | `us-central1-docker.pkg.dev/oute-488706/oute-prod-docker` |
+| Artifact Registry (prod) | `muscle-prod-docker` | `us-central1-docker.pkg.dev/oute-488706/muscle-prod-docker` |
 | Secret Manager | — | https://console.cloud.google.com/security/secret-manager?project=oute-488706 |
 | Terraform state | `oute-terraform-state` | `gs://oute-terraform-state/oute-muscle/prod/` |
 | Cloud Logging | — | https://console.cloud.google.com/logs/query?project=oute-488706 |
 | Vertex AI | — | https://console.cloud.google.com/vertex-ai?project=oute-488706 |
 | IAM | — | https://console.cloud.google.com/iam-admin/iam?project=oute-488706 |
-| WIF Pool (prod) | `oute-prod-gh-pool` | https://console.cloud.google.com/iam-admin/workload-identity-pools?project=oute-488706 |
-| GH Actions SA (prod) | `oute-prod-gh-actions@oute-488706.iam.gserviceaccount.com` | — |
+| WIF Pool (prod) | `muscle-prod-gh-pool` | https://console.cloud.google.com/iam-admin/workload-identity-pools?project=oute-488706 |
+| GH Actions SA (prod) | `muscle-prod-gh-actions@oute-488706.iam.gserviceaccount.com` | — |

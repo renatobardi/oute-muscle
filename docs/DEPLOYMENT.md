@@ -6,7 +6,7 @@ Single environment: **prod** — Trunk-Based CD.
 
 | Environment | URL | Trigger |
 |-------------|-----|---------|
-| Prod | https://oute-prod-api-ujzimacvza-uc.a.run.app | Merge to `main` |
+| Prod | https://muscle.oute.pro/api | Merge to `main` |
 
 ## Normal deploy flow
 
@@ -24,12 +24,12 @@ Monitor at: https://github.com/renatobardi/oute-muscle/actions/workflows/deploy.
 
 ```bash
 # List recent Cloud Run revisions
-gcloud run revisions list --service=oute-prod-api --region=us-central1
+gcloud run revisions list --service=muscle-prod-api --region=us-central1
 
 # Roll back to a specific revision
-gcloud run services update-traffic oute-prod-api \
+gcloud run services update-traffic muscle-prod-api \
   --region=us-central1 \
-  --to-revisions=oute-prod-api-00003-xyz=100
+  --to-revisions=muscle-prod-api-00003-xyz=100
 ```
 
 Then fix the issue on a feature branch, open a PR, and let CI/CD redeploy.
@@ -142,7 +142,7 @@ terraform plan \
   -var="environment=prod" \
   -var="github_org=renatobardi" \
   -var="github_repo=oute-muscle" \
-  -var="api_image=$(gcloud run services describe oute-prod-api --region=us-central1 --format='value(spec.template.spec.containers[0].image)')" \
+  -var="api_image=$(gcloud run services describe muscle-prod-api --region=us-central1 --format='value(spec.template.spec.containers[0].image)')" \
   -var="existing_cloud_sql_instance=oute-postgres"
 
 # Apply
@@ -154,13 +154,13 @@ terraform apply [same vars]
 ```bash
 # Cloud Run logs (prod)
 gcloud logging read \
-  'resource.type="cloud_run_revision" resource.labels.service_name="oute-prod-api"' \
+  'resource.type="cloud_run_revision" resource.labels.service_name="muscle-prod-api"' \
   --limit=50 --format=json | jq '.[].jsonPayload'
 
 # Health endpoints
-curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/live
-curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/ready
-curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/startup
+curl https://muscle.oute.pro/api/health/live
+curl https://muscle.oute.pro/api/health/ready
+curl https://muscle.oute.pro/api/health/startup
 ```
 
 ## GCP resources reference
@@ -170,8 +170,8 @@ curl https://oute-prod-api-ujzimacvza-uc.a.run.app/health/startup
 | GCP project | `oute-488706` | |
 | Cloud SQL | `oute-postgres` | Shared instance, `us-central1` |
 | DB (prod) | `oute_muscle_prod` | User: `muscle_app` |
-| Cloud Run (prod) | `oute-prod-api` | Min 0 instances |
-| Artifact Registry (prod) | `oute-prod-docker` | |
+| Cloud Run (prod) | `muscle-prod-api` | Min 0 instances |
+| Artifact Registry (prod) | `muscle-prod-docker` | |
 | Terraform state bucket | `oute-terraform-state` | `gs://oute-terraform-state/oute-muscle/prod/` |
-| WIF pool (prod) | `oute-prod-gh-pool` | |
-| GH Actions SA (prod) | `oute-prod-gh-actions@oute-488706.iam.gserviceaccount.com` | |
+| WIF pool (prod) | `muscle-prod-gh-pool` | |
+| GH Actions SA (prod) | `muscle-prod-gh-actions@oute-488706.iam.gserviceaccount.com` | |

@@ -37,7 +37,7 @@ provider "google-beta" {
 # ─────────────────────────────────────────────────────────────
 
 locals {
-  name_prefix = "oute-${var.environment}"
+  name_prefix = "muscle-${var.environment}"
   labels = {
     app         = "oute-muscle"
     environment = var.environment

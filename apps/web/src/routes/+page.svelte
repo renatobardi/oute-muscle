@@ -11,7 +11,7 @@
   let errorMsg = $state('');
 
   // API URL — override via PUBLIC_API_URL env var at build time if needed
-  const API_BASE = 'https://oute-prod-api-ujzimacvza-uc.a.run.app';
+  const API_BASE = 'https://muscle.oute.pro/api';
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();

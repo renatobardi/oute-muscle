@@ -161,7 +161,7 @@ AR_URL=$(terraform output -raw artifact_registry_url)
 CLOUD_SQL_CONN=$(terraform output -raw cloud_sql_connection_name)
 
 # DB password from Secret Manager (terraform put it there)
-SECRET_NAME="oute-prod-db-password"
+SECRET_NAME="muscle-prod-db-password"
 DB_PASSWORD=$(gcloud secrets versions access latest \
   --secret="${SECRET_NAME}" \
   --project="${PROJECT_ID}" 2>/dev/null || echo "")
