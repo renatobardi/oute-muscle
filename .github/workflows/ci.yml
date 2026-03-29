@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, "001-*", "002-*", "003-*"]
+    branches: [main, "001-*", "002-*", "003-*", "004-*", "005-*"]
   pull_request:
     branches: [main]
 
@@ -28,11 +28,26 @@ jobs:
         run: uv run ruff format --check .
       - name: mypy type-check (core)
         run: uv run mypy --strict packages/core/src/
-        continue-on-error: true  # TODO: fix namespace conflicts from shared 'src' module name
 
   python-test:
     name: Python tests
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: oute
+          POSTGRES_PASSWORD: oute
+          POSTGRES_DB: oute_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql+asyncpg://oute:oute@localhost:5432/oute_test
     steps:
       - uses: actions/checkout@v6
       - uses: astral-sh/setup-uv@v3
@@ -40,9 +55,13 @@ jobs:
           version: "latest"
       - name: Install dependencies
         run: uv sync --all-packages --group dev
-      - name: Run tests with coverage
-        run: uv run pytest --cov --cov-report=xml
-        continue-on-error: true  # TODO: fix shared 'src' namespace conflicts across workspace packages
+      - name: Run migrations
+        run: uv run alembic -c packages/db/alembic.ini upgrade head
+      - name: Run unit tests (no DB required)
+        run: uv run pytest -m "not integration and not acceptance" --cov --cov-report=xml -q
+      - name: Run integration tests
+        run: uv run pytest -m integration --cov-append --cov-report=xml -q
+        continue-on-error: true  # integration tests may require external services (GCP)
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
@@ -71,7 +90,6 @@ jobs:
         run: npx prettier --check .
       - name: svelte-check
         run: npm run check
-        continue-on-error: true  # TODO: fix pre-existing type errors in Svelte components
 
   frontend-test:
     name: Frontend unit tests
