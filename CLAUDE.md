@@ -255,9 +255,10 @@ Design artifacts live in `specs/{feature-name}/`. Key scripts in `.specify/scrip
 - `create-new-feature.sh` — Creates feature branch + spec directory
 - `check-prerequisites.sh` — Validates feature context
 
+
 ## Active Technologies
-- Python 3.12+ (API), TypeScript strict (Web, SvelteKit) + firebase (client SDK), firebase-admin (server SDK), @sveltejs/adapter-node (237-admin-auth-domain)
-- PostgreSQL 16 + pgvector (Cloud SQL) — existing (237-admin-auth-domain)
+- TypeScript 5.5+ (strict), Svelte 5, SvelteKit 2.5+ + Tailwind CSS 4.2 (via @tailwindcss/postcss), bits-ui 2.16 (Dialog/Dropdown only), lucide-svelte (NEW -- to be added) (243-ui-design-system-polish)
+- N/A (frontend-only, no new persistence) (243-ui-design-system-polish)
 
 ## Recent Changes
-- 237-admin-auth-domain: Added Python 3.12+ (API), TypeScript strict (Web, SvelteKit) + firebase (client SDK), firebase-admin (server SDK), @sveltejs/adapter-node
+- 243-ui-design-system-polish: Added TypeScript 5.5+ (strict), Svelte 5, SvelteKit 2.5+ + Tailwind CSS 4.2 (via @tailwindcss/postcss), bits-ui 2.16 (Dialog/Dropdown only), lucide-svelte (NEW -- to be added)

@@ -5,6 +5,8 @@
   import { onMount } from 'svelte';
   import { apiClient, type Rule, type Category, ApiError } from '$lib/api';
   import { isAdmin } from '$lib/stores/auth';
+  import { PageHeader, Badge, Select, LoadingSkeleton, EmptyState } from '$components/ui';
+  import { ShieldCheck } from 'lucide-svelte';
 
   let rules = $state<Rule[]>([]);
   let total = $state(0);
@@ -25,6 +27,12 @@
     'data-consistency',
     'unsafe-api-usage',
     'cascading-failure',
+  ];
+
+  const categoryOptions = categories.map((c) => ({ value: c, label: c }));
+  const statusOptions = [
+    { value: 'true', label: 'Enabled' },
+    { value: 'false', label: 'Disabled' },
   ];
 
   async function load() {
@@ -64,94 +72,115 @@
 </script>
 
 <div>
-  <div class="mb-6 flex items-center justify-between">
-    <div>
-      <h1 class="text-2xl font-bold text-gray-900">Rules</h1>
-      <p class="mt-1 text-sm text-gray-500">Semgrep rules — {total} total</p>
-    </div>
-  </div>
+  <PageHeader title="Rules" description="Semgrep rules — {total} total" />
 
   <!-- Filters -->
   <div class="mb-4 flex gap-3">
-    <select
-      aria-label="category"
-      bind:value={filterCategory}
-      onchange={load}
-      class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
-    >
-      <option value="">All categories</option>
-      {#each categories as cat}
-        <option value={cat}>{cat}</option>
-      {/each}
-    </select>
+    <Select
+      options={categoryOptions}
+      value={filterCategory}
+      placeholder="All categories"
+      onchange={(v) => {
+        filterCategory = v;
+        load();
+      }}
+    />
 
-    <select
-      aria-label="status"
-      bind:value={filterEnabled}
-      onchange={load}
-      class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
-    >
-      <option value="">All statuses</option>
-      <option value="true">Enabled</option>
-      <option value="false">Disabled</option>
-    </select>
+    <Select
+      options={statusOptions}
+      value={filterEnabled}
+      placeholder="All statuses"
+      onchange={(v) => {
+        filterEnabled = v;
+        load();
+      }}
+    />
   </div>
 
   {#if toastError}
-    <div class="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{toastError}</div>
+    <div
+      class="bg-error-light border-error-border text-error-text mb-4 rounded-lg border p-3 text-sm"
+    >
+      {toastError}
+    </div>
   {/if}
 
   {#if error}
-    <div class="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>
+    <div
+      class="bg-error-light border-error-border text-error-text mb-4 rounded-lg border p-3 text-sm"
+    >
+      {error}
+    </div>
   {/if}
 
   {#if loading}
-    <div class="flex justify-center py-12">
-      <span
-        class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"
-      ></span>
+    <div class="bg-light-bg border-light-border rounded-xl border p-6">
+      <LoadingSkeleton variant="table-row" rows={5} />
     </div>
   {:else if rules.length === 0}
-    <div
-      class="rounded-xl border border-dashed border-gray-300 py-12 text-center text-sm text-gray-500"
-    >
-      No rules found.
+    <div class="bg-light-bg border-light-border rounded-xl border">
+      <EmptyState
+        icon={ShieldCheck}
+        title="No rules found"
+        description="Try adjusting your filters."
+      />
     </div>
   {:else}
-    <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
+    <div class="border-light-border bg-light-bg overflow-hidden rounded-xl border">
       <table class="w-full text-sm">
-        <thead class="border-b border-gray-200 bg-gray-50">
+        <thead class="border-light-border border-b">
           <tr>
-            <th class="px-4 py-3 text-left font-medium text-gray-500">Rule ID</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-500">Category</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-500">Severity</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-500">Source</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-500">Incident</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-500">Status</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-500">YAML</th>
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Rule ID</th
+            >
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Category</th
+            >
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Severity</th
+            >
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Source</th
+            >
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Incident</th
+            >
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Status</th
+            >
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >YAML</th
+            >
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100">
+        <tbody class="divide-light-border divide-y">
           {#each rules as rule}
-            <tr data-rule-id={rule.id}>
-              <td class="px-4 py-3 font-mono text-xs font-medium text-gray-900">{rule.id}</td>
-              <td class="px-4 py-3 text-gray-500">{rule.category}</td>
-              <td class="px-4 py-3 text-gray-500 capitalize">{rule.severity}</td>
+            <tr data-rule-id={rule.id} class="hover:bg-light-bg-hover transition-colors">
+              <td class="text-light-text px-4 py-3 font-mono text-xs font-medium">{rule.id}</td>
+              <td class="text-light-text-secondary px-4 py-3">{rule.category}</td>
               <td class="px-4 py-3">
-                <span class="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
-                  {rule.source}
-                </span>
+                <Badge severity={rule.severity} />
+              </td>
+              <td class="px-4 py-3">
+                <Badge label={rule.source} />
               </td>
               <td class="px-4 py-3">
                 {#if rule.incident_title}
                   <a
                     href="/incidents/{rule.incident_id}"
-                    class="block max-w-xs truncate text-indigo-600 hover:underline"
+                    class="text-primary-500 block max-w-xs truncate hover:underline"
                   >
                     {rule.incident_title}
                   </a>
                 {:else}
-                  <span class="text-gray-400">—</span>
+                  <span class="text-light-text-muted">—</span>
                 {/if}
               </td>
               <td class="px-4 py-3">
@@ -165,7 +194,7 @@
                     onclick={() => handleToggle(rule)}
                     class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent
                            transition-colors duration-200 ease-in-out focus:outline-none
-                           {rule.enabled ? 'bg-indigo-600' : 'bg-gray-200'}
+                           {rule.enabled ? 'bg-primary-500' : 'bg-neutral-300'}
                            disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <span
@@ -173,7 +202,9 @@
                              {rule.enabled ? 'translate-x-4' : 'translate-x-0'}"
                     ></span>
                   </button>
-                  <span class="text-xs {rule.enabled ? 'text-indigo-700' : 'text-gray-400'}">
+                  <span
+                    class="text-xs {rule.enabled ? 'text-primary-500' : 'text-light-text-muted'}"
+                  >
                     {rule.enabled ? 'Enabled' : 'Disabled'}
                   </span>
                 </div>
@@ -184,7 +215,7 @@
                     'https://muscle.oute.pro/api/v1'}/rules/{rule.id}/yaml"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="text-xs text-indigo-600 hover:underline"
+                  class="text-primary-500 text-xs hover:underline"
                 >
                   YAML ↗
                 </a>

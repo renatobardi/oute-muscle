@@ -9,6 +9,7 @@
     type SynthesisCandidate,
     ApiError,
   } from '$lib/api';
+  import { PageHeader, MetricCard, LoadingSkeleton, Button, EmptyState } from '$components/ui';
 
   let metrics = $state<AdminMetricsResponse | null>(null);
   let candidates = $state<SynthesisCandidate[]>([]);
@@ -57,99 +58,82 @@
 </script>
 
 <div>
-  <div class="mb-8">
-    <h1 class="text-2xl font-bold text-gray-900">Rules Overview</h1>
-    <p class="mt-1 text-sm text-gray-500">Active rules and synthesis candidates</p>
-  </div>
+  <PageHeader title="Rules Overview" description="Active rules and synthesis candidates" />
 
   {#if error}
-    <div class="rounded-lg bg-red-50 p-4 text-sm text-red-700">
+    <div class="bg-error-light border-error-border text-error-text rounded-lg border p-4 text-sm">
       <p>{error}</p>
-      <button
-        onclick={loadData}
-        class="mt-2 rounded bg-red-100 px-3 py-1 text-sm font-medium text-red-700 hover:bg-red-200"
-      >
-        Retry
-      </button>
+      <Button variant="danger" size="sm" onclick={loadData} class="mt-2">
+        {#snippet children()}Retry{/snippet}
+      </Button>
     </div>
   {:else if loading}
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
       {#each Array(3) as _}
-        <div class="animate-pulse rounded-xl border border-gray-200 bg-white p-6">
-          <div class="h-4 w-24 rounded bg-gray-200"></div>
-          <div class="mt-3 h-8 w-16 rounded bg-gray-200"></div>
-        </div>
+        <LoadingSkeleton variant="card" />
       {/each}
     </div>
   {:else if metrics}
     <!-- Summary cards -->
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
-      <div class="rounded-xl border border-gray-200 bg-white p-6">
-        <p class="text-sm font-medium text-gray-500">Active Rules</p>
-        <p class="mt-2 text-3xl font-bold text-gray-900">{metrics.rules.active}</p>
-      </div>
-
-      <div class="rounded-xl border border-gray-200 bg-white p-6">
-        <p class="text-sm font-medium text-gray-500">Auto-Disabled</p>
-        <p class="mt-2 text-3xl font-bold text-gray-900">{metrics.rules.auto_disabled}</p>
-      </div>
-
-      <div class="rounded-xl border border-gray-200 bg-white p-6">
-        <p class="text-sm font-medium text-gray-500">Synthesis Pending</p>
-        <p class="mt-2 text-3xl font-bold text-indigo-600">{metrics.rules.synthesis_pending}</p>
-      </div>
+      <MetricCard label="Active Rules" value={metrics.rules.active} />
+      <MetricCard label="Auto-Disabled" value={metrics.rules.auto_disabled} />
+      <MetricCard label="Synthesis Pending" value={metrics.rules.synthesis_pending} highlight />
     </div>
 
     <!-- Action error -->
     {#if actionError}
-      <div class="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{actionError}</div>
+      <div
+        class="bg-error-light border-error-border text-error-text mt-4 rounded-lg border p-3 text-sm"
+      >
+        {actionError}
+      </div>
     {/if}
 
     <!-- Pending candidates -->
     <div class="mt-8">
-      <h2 class="mb-4 text-lg font-semibold text-gray-900">Pending Synthesis Candidates</h2>
+      <h2 class="text-light-text mb-4 text-lg font-semibold">Pending Synthesis Candidates</h2>
 
       {#if candidates.length === 0}
-        <div
-          class="rounded-xl border border-dashed border-gray-300 py-8 text-center text-sm text-gray-500"
-        >
-          No pending candidates.
-        </div>
+        <EmptyState
+          title="No pending candidates"
+          description="All synthesis candidates have been reviewed."
+        />
       {:else}
-        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
+        <div class="border-light-border bg-light-bg overflow-hidden rounded-xl border">
           <table class="w-full text-sm">
-            <thead class="border-b border-gray-200 bg-gray-50">
+            <thead class="border-light-border-strong bg-light-bg-hover border-b">
               <tr>
-                <th class="px-4 py-3 text-left font-medium text-gray-500">Pattern Hash</th>
-                <th class="px-4 py-3 text-right font-medium text-gray-500">Advisory Count</th>
-                <th class="px-4 py-3 text-left font-medium text-gray-500">Created</th>
-                <th class="px-4 py-3 text-left font-medium text-gray-500">Actions</th>
+                <th class="text-light-text-secondary px-4 py-3 text-left font-medium"
+                  >Pattern Hash</th
+                >
+                <th class="text-light-text-secondary px-4 py-3 text-right font-medium"
+                  >Advisory Count</th
+                >
+                <th class="text-light-text-secondary px-4 py-3 text-left font-medium">Created</th>
+                <th class="text-light-text-secondary px-4 py-3 text-left font-medium">Actions</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-light-border divide-y">
               {#each candidates as candidate}
-                <tr class="hover:bg-gray-50">
-                  <td class="px-4 py-3 font-mono text-xs text-gray-700">
+                <tr class="hover:bg-light-bg-hover">
+                  <td class="text-light-text-secondary px-4 py-3 font-mono text-xs">
                     {candidate.anti_pattern_hash.slice(0, 16)}...
                   </td>
-                  <td class="px-4 py-3 text-right text-gray-600">{candidate.advisory_count}</td>
-                  <td class="px-4 py-3 text-xs text-gray-500">
+                  <td class="text-light-text-secondary px-4 py-3 text-right"
+                    >{candidate.advisory_count}</td
+                  >
+                  <td class="text-light-text-muted px-4 py-3 text-xs">
                     {new Date(candidate.created_at).toLocaleDateString()}
                   </td>
                   <td class="px-4 py-3">
                     <div class="flex gap-2">
-                      <button
-                        onclick={() => approve(candidate.id)}
-                        class="rounded bg-green-600 px-3 py-1 text-xs font-medium text-white hover:bg-green-500"
-                      >
-                        Approve
-                      </button>
-                      <button
-                        onclick={() => reject(candidate.id)}
-                        class="rounded bg-red-600 px-3 py-1 text-xs font-medium text-white hover:bg-red-500"
-                      >
-                        Reject
-                      </button>
+                      <Button variant="primary" size="sm" onclick={() => approve(candidate.id)}>
+                        {#snippet children()}Approve{/snippet}
+                      </Button>
+                      <Button variant="danger" size="sm" onclick={() => reject(candidate.id)}>
+                        {#snippet children()}Reject{/snippet}
+                      </Button>
                     </div>
                   </td>
                 </tr>

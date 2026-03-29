@@ -3,6 +3,7 @@
    * T147: Billing & usage page — plan limits, usage, upgrade prompts.
    */
   import { tenantStore, currentPlan } from '$lib/stores/tenant';
+  import { Button, Card, Badge, PageHeader } from '$components/ui';
 
   const PLANS = [
     {
@@ -48,73 +49,71 @@
 <div class="mx-auto max-w-4xl">
   <a
     href="/settings"
-    class="mb-6 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900"
+    class="text-light-text-muted hover:text-light-text mb-6 inline-flex items-center gap-1 text-sm"
   >
     ← Back to settings
   </a>
 
-  <h1 class="mb-8 text-2xl font-bold text-gray-900">Billing & Plan</h1>
+  <PageHeader title="Billing & Plan" />
 
   <!-- Current usage -->
   {#if $tenantStore.tenant}
-    <div class="mb-8 rounded-xl border border-gray-200 bg-white p-6">
-      <h2 class="mb-4 text-lg font-semibold text-gray-900">Current usage</h2>
+    <Card class="mb-8">
+      <h2 class="text-light-text mb-4 text-lg font-semibold">Current usage</h2>
       <div class="grid grid-cols-3 gap-6">
         <div>
-          <p class="text-sm text-gray-500">Plan</p>
-          <p class="mt-1 text-xl font-bold text-gray-900 capitalize">{$tenantStore.tenant.plan}</p>
+          <p class="text-light-text-secondary text-sm">Plan</p>
+          <p class="text-light-text mt-1 text-xl font-bold capitalize">
+            {$tenantStore.tenant.plan}
+          </p>
         </div>
         <div>
-          <p class="text-sm text-gray-500">Contributors</p>
-          <p class="mt-1 text-xl font-bold text-gray-900">
+          <p class="text-light-text-secondary text-sm">Contributors</p>
+          <p class="text-light-text mt-1 text-xl font-bold">
             {$tenantStore.tenant.contributor_count}
           </p>
         </div>
         <div>
-          <p class="text-sm text-gray-500">Repositories</p>
-          <p class="mt-1 text-xl font-bold text-gray-900">{$tenantStore.tenant.repo_count}</p>
+          <p class="text-light-text-secondary text-sm">Repositories</p>
+          <p class="text-light-text mt-1 text-xl font-bold">{$tenantStore.tenant.repo_count}</p>
         </div>
       </div>
-    </div>
+    </Card>
   {/if}
 
   <!-- Plan cards -->
   <div class="grid grid-cols-3 gap-6">
     {#each PLANS as plan}
       {@const isCurrent = $currentPlan === plan.id}
-      <div
-        class="relative rounded-xl border p-6 {isCurrent
-          ? 'border-indigo-500 bg-indigo-50'
-          : 'border-gray-200 bg-white'}"
-      >
-        {#if isCurrent}
-          <span
-            class="absolute top-4 right-4 rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700"
-          >
-            Current plan
-          </span>
-        {/if}
+      <Card class={isCurrent ? 'border-primary-500 bg-primary-50/30' : ''}>
+        <div class="relative">
+          {#if isCurrent}
+            <div class="absolute top-0 right-0">
+              <Badge status="active" label="Current plan" />
+            </div>
+          {/if}
 
-        <h3 class="text-lg font-bold text-gray-900">{plan.name}</h3>
-        <p class="mt-1 text-2xl font-bold text-gray-900">{plan.price}</p>
+          <h3 class="text-light-text text-lg font-bold">{plan.name}</h3>
+          <p class="text-light-text mt-1 text-2xl font-bold">{plan.price}</p>
 
-        <ul class="mt-4 space-y-2">
-          {#each plan.features as feature}
-            <li class="flex items-start gap-2 text-sm text-gray-700">
-              <span class="text-green-500">✓</span>
-              {feature}
-            </li>
-          {/each}
-        </ul>
+          <ul class="mt-4 space-y-2">
+            {#each plan.features as feature}
+              <li class="text-light-text-secondary flex items-start gap-2 text-sm">
+                <span class="text-status-active">&#10003;</span>
+                {feature}
+              </li>
+            {/each}
+          </ul>
 
-        {#if !isCurrent}
-          <button
-            class="mt-6 w-full rounded-lg border border-indigo-600 px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50"
-          >
-            {plan.id === 'enterprise' ? 'Contact sales' : 'Upgrade'}
-          </button>
-        {/if}
-      </div>
+          {#if !isCurrent}
+            <div class="mt-6">
+              <Button variant="secondary" class="w-full">
+                {plan.id === 'enterprise' ? 'Contact sales' : 'Upgrade'}
+              </Button>
+            </div>
+          {/if}
+        </div>
+      </Card>
     {/each}
   </div>
 </div>

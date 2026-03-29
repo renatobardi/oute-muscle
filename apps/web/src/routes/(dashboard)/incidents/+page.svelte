@@ -5,6 +5,16 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { apiClient, type Incident, type Category, type Severity, ApiError } from '$lib/api';
+  import {
+    PageHeader,
+    Badge,
+    Button,
+    Input,
+    Select,
+    LoadingSkeleton,
+    EmptyState,
+  } from '$components/ui';
+  import { Zap, Plus, Link } from 'lucide-svelte';
 
   let incidents = $state<Incident[]>([]);
   let total = $state(0);
@@ -35,12 +45,8 @@
 
   const severities: Severity[] = ['critical', 'high', 'medium', 'low'];
 
-  const severityColor: Record<Severity, string> = {
-    critical: 'bg-red-100 text-red-700',
-    high: 'bg-orange-100 text-orange-700',
-    medium: 'bg-yellow-100 text-yellow-700',
-    low: 'bg-green-100 text-green-700',
-  };
+  const categoryOptions = categories.map((c) => ({ value: c, label: c }));
+  const severityOptions = severities.map((s) => ({ value: s, label: s }));
 
   async function loadIncidents() {
     loading = true;
@@ -83,128 +89,136 @@
 
 <div>
   <!-- Header -->
-  <div class="mb-6 flex items-center justify-between">
-    <div>
-      <h1 class="text-2xl font-bold text-gray-900">Incidents</h1>
-      <p class="mt-1 text-sm text-gray-500">Post-mortem knowledge base — {total} total</p>
-    </div>
-    <div class="flex gap-2">
+  <PageHeader title="Incidents" description="Post-mortem knowledge base — {total} total">
+    {#snippet actions()}
       <a
         href="/incidents/ingest"
-        class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        class="border-light-border bg-light-bg text-light-text hover:bg-light-bg-hover inline-flex items-center gap-2 rounded-md border px-3.5 py-2 text-sm font-medium transition-colors"
       >
+        <Link size={16} />
         Ingest from URL
       </a>
       <a
         href="/incidents/new"
-        class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"
+        class="bg-primary-500 hover:bg-primary-600 inline-flex items-center gap-2 rounded-md px-3.5 py-2 text-sm font-medium text-white transition-colors"
       >
+        <Plus size={16} />
         New incident
       </a>
-    </div>
-  </div>
+    {/snippet}
+  </PageHeader>
 
   <!-- Filters -->
   <div class="mb-4 flex flex-wrap gap-3">
-    <input
-      type="search"
-      placeholder="Search incidents…"
-      bind:value={query}
-      oninput={onQueryInput}
-      class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
-    />
+    <div class="flex-1">
+      <Input
+        type="search"
+        placeholder="Search incidents…"
+        bind:value={query}
+        oninput={onQueryInput}
+      />
+    </div>
 
-    <label class="flex items-center gap-2 text-sm text-gray-700">
+    <label class="text-light-text-secondary flex items-center gap-2 text-sm">
       <input type="checkbox" bind:checked={semantic} onchange={onFilterChange} />
       Semantic search
     </label>
 
-    <select
-      aria-label="category"
-      bind:value={filterCategory}
-      onchange={onFilterChange}
-      class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
-    >
-      <option value="">All categories</option>
-      {#each categories as cat}
-        <option value={cat}>{cat}</option>
-      {/each}
-    </select>
+    <Select
+      options={categoryOptions}
+      value={filterCategory}
+      placeholder="All categories"
+      onchange={(v) => {
+        filterCategory = v;
+        onFilterChange();
+      }}
+    />
 
-    <select
-      aria-label="severity"
-      bind:value={filterSeverity}
-      onchange={onFilterChange}
-      class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
-    >
-      <option value="">All severities</option>
-      {#each severities as sev}
-        <option value={sev}>{sev}</option>
-      {/each}
-    </select>
+    <Select
+      options={severityOptions}
+      value={filterSeverity}
+      placeholder="All severities"
+      onchange={(v) => {
+        filterSeverity = v;
+        onFilterChange();
+      }}
+    />
   </div>
 
   <!-- Error -->
   {#if error}
-    <div class="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>
+    <div
+      class="bg-error-light border-error-border text-error-text mb-4 rounded-lg border p-3 text-sm"
+    >
+      {error}
+    </div>
   {/if}
 
   <!-- Table -->
   {#if loading}
-    <div class="flex justify-center py-12">
-      <span
-        class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent"
-      ></span>
+    <div class="bg-light-bg border-light-border rounded-xl border p-6">
+      <LoadingSkeleton variant="table-row" rows={5} />
     </div>
   {:else if incidents.length === 0}
-    <div
-      class="rounded-xl border border-dashed border-gray-300 py-12 text-center text-sm text-gray-500"
-    >
-      No incidents found.
+    <div class="bg-light-bg border-light-border rounded-xl border">
+      <EmptyState
+        icon={Zap}
+        title="No incidents found"
+        description="Try adjusting your search or filters."
+      />
     </div>
   {:else}
-    <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
+    <div class="border-light-border bg-light-bg overflow-hidden rounded-xl border">
       <table class="w-full text-sm">
-        <thead class="border-b border-gray-200 bg-gray-50">
+        <thead class="border-light-border border-b">
           <tr>
-            <th class="px-4 py-3 text-left font-medium text-gray-500">Title</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-500">Category</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-500">Severity</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-500">Languages</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-500">Rule</th>
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Title</th
+            >
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Category</th
+            >
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Severity</th
+            >
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Languages</th
+            >
+            <th
+              class="text-light-text-secondary px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
+              >Rule</th
+            >
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100">
+        <tbody class="divide-light-border divide-y">
           {#each incidents as incident}
             <tr
-              class="cursor-pointer hover:bg-gray-50"
+              class="hover:bg-light-bg-hover cursor-pointer transition-colors"
               onclick={() => goto(`/incidents/${incident.id}`)}
             >
-              <td class="px-4 py-3 font-medium text-gray-900">{incident.title}</td>
-              <td class="px-4 py-3 text-gray-500">{incident.category}</td>
+              <td class="text-light-text px-4 py-3 font-medium">{incident.title}</td>
+              <td class="text-light-text-secondary px-4 py-3">{incident.category}</td>
               <td class="px-4 py-3">
-                <span
-                  class="rounded-full px-2 py-0.5 text-xs font-medium {severityColor[
-                    incident.severity
-                  ]}"
-                >
-                  {incident.severity}
-                </span>
+                <Badge severity={incident.severity} />
               </td>
-              <td class="px-4 py-3 text-gray-500"
+              <td class="text-light-text-secondary px-4 py-3"
                 >{incident.affected_languages.join(', ') || '—'}</td
               >
               <td class="px-4 py-3">
                 {#if incident.linked_rule_id}
                   <a
                     href="/rules"
-                    class="text-indigo-600 hover:underline"
+                    class="text-primary-500 hover:underline"
                     onclick={(e) => e.stopPropagation()}
                   >
                     {incident.linked_rule_id}
                   </a>
                 {:else}
-                  <span class="text-gray-400">—</span>
+                  <span class="text-light-text-muted">—</span>
                 {/if}
               </td>
             </tr>
@@ -215,24 +229,26 @@
 
     <!-- Pagination -->
     {#if totalPages > 1}
-      <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
+      <div class="text-light-text-secondary mt-4 flex items-center justify-between text-sm">
         <span>Page {page} of {totalPages}</span>
         <div class="flex gap-2">
-          <button
+          <Button
+            variant="secondary"
+            size="sm"
             disabled={page <= 1}
             onclick={() => {
               page--;
               loadIncidents();
-            }}
-            class="rounded border border-gray-300 px-3 py-1 disabled:opacity-40">Previous</button
+            }}>Previous</Button
           >
-          <button
+          <Button
+            variant="secondary"
+            size="sm"
             disabled={page >= totalPages}
             onclick={() => {
               page++;
               loadIncidents();
-            }}
-            class="rounded border border-gray-300 px-3 py-1 disabled:opacity-40">Next</button
+            }}>Next</Button
           >
         </div>
       </div>

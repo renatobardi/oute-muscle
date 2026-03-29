@@ -4,6 +4,7 @@
    */
   import { onMount } from 'svelte';
   import { apiClient, type AdminMetricsResponse, ApiError } from '$lib/api';
+  import { PageHeader, MetricCard, LoadingSkeleton, Button } from '$components/ui';
 
   let metrics = $state<AdminMetricsResponse | null>(null);
   let loading = $state(true);
@@ -25,97 +26,83 @@
 </script>
 
 <div>
-  <div class="mb-8">
-    <h1 class="text-2xl font-bold text-gray-900">Admin Overview</h1>
-    <p class="mt-1 text-sm text-gray-500">Platform-wide metrics and health summary</p>
-  </div>
+  <PageHeader title="Admin Overview" description="Platform-wide metrics and health summary" />
 
   {#if error}
-    <div class="rounded-lg bg-red-50 p-4 text-sm text-red-700">
+    <div class="bg-error-light border-error-border text-error-text rounded-lg border p-4 text-sm">
       <p>{error}</p>
-      <button
-        onclick={loadMetrics}
-        class="mt-2 rounded bg-red-100 px-3 py-1 text-sm font-medium text-red-700 hover:bg-red-200"
-      >
-        Retry
-      </button>
+      <Button variant="danger" size="sm" onclick={loadMetrics} class="mt-2">
+        {#snippet children()}Retry{/snippet}
+      </Button>
     </div>
   {:else if loading}
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {#each Array(6) as _}
-        <div class="animate-pulse rounded-xl border border-gray-200 bg-white p-6">
-          <div class="h-4 w-24 rounded bg-gray-200"></div>
-          <div class="mt-3 h-8 w-16 rounded bg-gray-200"></div>
-          <div class="mt-2 h-3 w-32 rounded bg-gray-100"></div>
-        </div>
+        <LoadingSkeleton variant="card" />
       {/each}
     </div>
   {:else if metrics}
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      <!-- Users -->
-      <div class="rounded-xl border border-gray-200 bg-white p-6">
-        <p class="text-sm font-medium text-gray-500">Total Users</p>
-        <p class="mt-2 text-3xl font-bold text-gray-900">{metrics.users.total}</p>
-        <p class="mt-1 text-sm text-gray-400">{metrics.users.active_30d} active in last 30d</p>
-      </div>
+      <MetricCard label="Total Users" value={metrics.users.total}>
+        {#snippet children()}
+          <p class="text-light-text-muted mt-1 text-sm">
+            {metrics!.users.active_30d} active in last 30d
+          </p>
+        {/snippet}
+      </MetricCard>
 
-      <!-- Tenants -->
-      <div class="rounded-xl border border-gray-200 bg-white p-6">
-        <p class="text-sm font-medium text-gray-500">Tenants</p>
-        <p class="mt-2 text-3xl font-bold text-gray-900">{metrics.tenants.total}</p>
-        <p class="mt-1 text-sm text-gray-400">{metrics.tenants.active} active</p>
-      </div>
+      <MetricCard label="Tenants" value={metrics.tenants.total}>
+        {#snippet children()}
+          <p class="text-light-text-muted mt-1 text-sm">{metrics!.tenants.active} active</p>
+        {/snippet}
+      </MetricCard>
 
-      <!-- Scans (30d) -->
-      <div class="rounded-xl border border-gray-200 bg-white p-6">
-        <p class="text-sm font-medium text-gray-500">Scans (30d)</p>
-        <p class="mt-2 text-3xl font-bold text-gray-900">{metrics.scans.total_30d}</p>
-        <p class="mt-1 text-sm text-gray-400">{metrics.scans.active_now} running now</p>
-      </div>
+      <MetricCard label="Scans (30d)" value={metrics.scans.total_30d}>
+        {#snippet children()}
+          <p class="text-light-text-muted mt-1 text-sm">{metrics!.scans.active_now} running now</p>
+        {/snippet}
+      </MetricCard>
 
-      <!-- Findings (30d) -->
-      <div class="rounded-xl border border-gray-200 bg-white p-6">
-        <p class="text-sm font-medium text-gray-500">Findings (30d)</p>
-        <p class="mt-2 text-3xl font-bold text-gray-900">{metrics.findings.total_30d}</p>
-        <p class="mt-1 text-sm text-gray-400">Across all tenants</p>
-      </div>
+      <MetricCard label="Findings (30d)" value={metrics.findings.total_30d}>
+        {#snippet children()}
+          <p class="text-light-text-muted mt-1 text-sm">Across all tenants</p>
+        {/snippet}
+      </MetricCard>
 
-      <!-- Incidents -->
-      <div class="rounded-xl border border-gray-200 bg-white p-6">
-        <p class="text-sm font-medium text-gray-500">Incidents</p>
-        <p class="mt-2 text-3xl font-bold text-gray-900">{metrics.incidents.total}</p>
-        <p class="mt-1 text-sm text-gray-400">
-          {metrics.incidents.with_embedding} with embeddings ({metrics.incidents.total > 0
-            ? Math.round((metrics.incidents.with_embedding / metrics.incidents.total) * 100)
-            : 0}%)
-        </p>
-      </div>
+      <MetricCard label="Incidents" value={metrics.incidents.total}>
+        {#snippet children()}
+          <p class="text-light-text-muted mt-1 text-sm">
+            {metrics!.incidents.with_embedding} with embeddings ({metrics!.incidents.total > 0
+              ? Math.round((metrics!.incidents.with_embedding / metrics!.incidents.total) * 100)
+              : 0}%)
+          </p>
+        {/snippet}
+      </MetricCard>
 
-      <!-- Rules -->
-      <div class="rounded-xl border border-gray-200 bg-white p-6">
-        <p class="text-sm font-medium text-gray-500">Active Rules</p>
-        <p class="mt-2 text-3xl font-bold text-gray-900">{metrics.rules.active}</p>
-        <p class="mt-1 text-sm text-gray-400">
-          {metrics.rules.synthesis_pending} synthesis pending
-        </p>
-      </div>
+      <MetricCard label="Active Rules" value={metrics.rules.active}>
+        {#snippet children()}
+          <p class="text-light-text-muted mt-1 text-sm">
+            {metrics!.rules.synthesis_pending} synthesis pending
+          </p>
+        {/snippet}
+      </MetricCard>
     </div>
 
     <!-- LLM Usage -->
     <div class="mt-8">
-      <h2 class="mb-4 text-lg font-semibold text-gray-900">LLM Usage (30d)</h2>
+      <h2 class="text-light-text mb-4 text-lg font-semibold">LLM Usage (30d)</h2>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div class="rounded-lg border border-gray-200 bg-white p-4">
-          <p class="text-sm text-gray-500">Gemini Flash</p>
-          <p class="text-xl font-bold text-gray-900">{metrics.llm_usage_30d.flash}</p>
+        <div class="bg-light-bg border-light-border rounded-lg border p-4">
+          <p class="text-light-text-secondary text-sm">Gemini Flash</p>
+          <p class="text-light-text text-xl font-bold">{metrics.llm_usage_30d.flash}</p>
         </div>
-        <div class="rounded-lg border border-gray-200 bg-white p-4">
-          <p class="text-sm text-gray-500">Gemini Pro</p>
-          <p class="text-xl font-bold text-gray-900">{metrics.llm_usage_30d.pro}</p>
+        <div class="bg-light-bg border-light-border rounded-lg border p-4">
+          <p class="text-light-text-secondary text-sm">Gemini Pro</p>
+          <p class="text-light-text text-xl font-bold">{metrics.llm_usage_30d.pro}</p>
         </div>
-        <div class="rounded-lg border border-gray-200 bg-white p-4">
-          <p class="text-sm text-gray-500">Claude</p>
-          <p class="text-xl font-bold text-gray-900">{metrics.llm_usage_30d.claude}</p>
+        <div class="bg-light-bg border-light-border rounded-lg border p-4">
+          <p class="text-light-text-secondary text-sm">Claude</p>
+          <p class="text-light-text text-xl font-bold">{metrics.llm_usage_30d.claude}</p>
         </div>
       </div>
     </div>
