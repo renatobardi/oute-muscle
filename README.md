@@ -56,7 +56,7 @@ make dev
 make dev-web
 
 # Health check
-curl http://localhost:8000/health
+curl http://localhost:8000/health/live
 ```
 
 ### Run tests
@@ -64,7 +64,7 @@ curl http://localhost:8000/health
 ```bash
 make test          # all backend tests
 make test-unit     # unit tests only
-make test-cov      # with coverage (min 80%)
+make test-cov      # with coverage (min 40%, target 80%)
 make test-rules    # Semgrep rule tests
 make test-web      # frontend tests
 ```
@@ -93,8 +93,9 @@ docs/               Architecture, deployment, contributing guides
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/health` | Liveness check |
+| GET | `/health/live` | Liveness check |
 | GET | `/health/ready` | Readiness check (DB + LLM) |
+| GET | `/health/startup` | Startup probe |
 | POST | `/v1/waitlist` | Beta waitlist signup |
 | GET/POST | `/v1/incidents` | Incident CRUD |
 | POST | `/v1/scans` | Trigger code scan |
@@ -154,7 +155,7 @@ See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md). Key rules:
 - Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`)
 - TDD mandatory — no untested code merged
 - Every Semgrep rule requires a test file
-- 80% coverage gate enforced in CI
+- Coverage gate at 40% (target 80%)
 - `mypy --strict` on `packages/core/`
 
 ## Architecture
