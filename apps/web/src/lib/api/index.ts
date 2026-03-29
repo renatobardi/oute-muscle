@@ -3,7 +3,7 @@
  * Initialized with the token from the auth store when it becomes available.
  */
 
-import { ApiClient } from './client';
+import { ApiClient } from './client.js';
 import { browser } from '$app/environment';
 
 export const apiClient = new ApiClient({
@@ -11,4 +11,4 @@ export const apiClient = new ApiClient({
   token: browser ? (localStorage.getItem('auth_token') ?? undefined) : undefined,
 });
 
-export * from './client';
+export * from './client.js';

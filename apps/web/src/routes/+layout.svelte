@@ -17,7 +17,7 @@
   const PUBLIC_PATHS = ['/', '/auth/login', '/auth/callback', '/auth/register'];
 
   onMount(() => {
-    const unsubscribe = isAuthenticated.subscribe(async (authed) => {
+    const unsubscribe = isAuthenticated.subscribe(async (authed: boolean) => {
       const path = $page.url.pathname;
       const isPublic = PUBLIC_PATHS.some((p) => path.startsWith(p));
 

@@ -83,7 +83,9 @@ def configure_metrics(
     readers = []
     if exporter == "gcp":
         try:
-            from opentelemetry.exporter.cloud_monitoring import CloudMonitoringMetricsExporter
+            from opentelemetry.exporter.cloud_monitoring import (
+                CloudMonitoringMetricsExporter,  # type: ignore[import-not-found]
+            )
 
             readers.append(
                 PeriodicExportingMetricReader(
@@ -97,7 +99,9 @@ def configure_metrics(
 
     elif exporter == "prometheus":
         try:
-            from opentelemetry.exporter.prometheus import PrometheusMetricReader
+            from opentelemetry.exporter.prometheus import (
+                PrometheusMetricReader,  # type: ignore[import-not-found]
+            )
 
             readers.append(PrometheusMetricReader())
         except ImportError:
