@@ -49,7 +49,7 @@ class GitHubAdapter:
             )
 
         try:
-            from github import Github, GithubIntegration
+            from github import Github, GithubIntegration  # type: ignore[import-not-found]
         except ImportError as e:
             raise GitHubError("PyGithub not installed. Install with: pip install PyGithub") from e
 
