@@ -45,11 +45,8 @@ COPY apps/api/      apps/api/
 COPY packages/core/ packages/core/
 COPY packages/db/   packages/db/
 
-# Install local packages so they are importable as Python modules
-RUN pip install --no-cache-dir --no-deps \
-    -e packages/core \
-    -e packages/db \
-    -e apps/api
+# No need to pip-install local packages — they are importable
+# via PYTHONPATH=/app and implicit namespace packages.
 
 # ─────────────────────────────────────────────────────────────
 # Stage 2 – runtime
@@ -60,6 +57,7 @@ ARG APP_PORT=8000
 ENV APP_PORT=${APP_PORT} \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH="/app" \
     PATH="/opt/venv/bin:$PATH"
 
 # Runtime system deps (libpq for asyncpg, semgrep binary dep)
