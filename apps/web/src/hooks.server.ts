@@ -11,7 +11,7 @@ import { redirect } from '@sveltejs/kit';
 import { verifyAuthToken } from '$lib/server/auth';
 import { getUserByFirebaseUid } from '$lib/server/users';
 
-const PUBLIC_PATHS = ['/auth/login', '/auth/register', '/pending', '/api/auth/session'];
+const PUBLIC_PATHS = ['/auth/login', '/auth/register', '/pending', '/api/auth/session', '/health'];
 
 const authenticate: Handle = async ({ event, resolve }) => {
   const path = event.url.pathname;

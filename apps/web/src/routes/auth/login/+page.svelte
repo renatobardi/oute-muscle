@@ -32,6 +32,7 @@
     loading = true;
 
     try {
+      if (!auth) throw new Error('Firebase not initialized');
       const credential = await signInWithEmailAndPassword(auth, email, password);
       const idToken = await credential.user.getIdToken();
       await exchangeSession(idToken);
@@ -63,6 +64,7 @@
     loading = true;
 
     try {
+      if (!auth) throw new Error('Firebase not initialized');
       const credential = await signInWithPopup(auth, googleProvider);
       const idToken = await credential.user.getIdToken();
       await exchangeSession(idToken);
