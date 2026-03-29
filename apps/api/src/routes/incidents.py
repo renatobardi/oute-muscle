@@ -25,12 +25,23 @@ import httpx
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
+from apps.api.src.dependencies import get_incident_service
+from packages.core.src.domain.incidents.entity import Incident
+from packages.core.src.domain.incidents.enums import IncidentCategory, IncidentSeverity
+from packages.core.src.domain.incidents.service import IncidentService
+from packages.core.src.ports.incident_repo import (
+    DuplicateSourceUrlError,
+    IncidentHasActiveRuleError,
+    OptimisticLockError,
+)
+
 logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
 # HTML text extractor (stdlib only — no BS4 dependency)
 # ---------------------------------------------------------------------------
+
 
 class _TextExtractor(HTMLParser):
     """Minimal HTML→text extractor that skips scripts/styles."""
@@ -69,15 +80,6 @@ def _html_to_text(markup: str, max_chars: int = 12_000) -> str:
         pass
     return parser.text()[:max_chars]
 
-from apps.api.src.dependencies import get_incident_service
-from packages.core.src.domain.incidents.entity import Incident
-from packages.core.src.domain.incidents.enums import IncidentCategory, IncidentSeverity
-from packages.core.src.domain.incidents.service import IncidentService
-from packages.core.src.ports.incident_repo import (
-    DuplicateSourceUrlError,
-    IncidentHasActiveRuleError,
-    OptimisticLockError,
-)
 
 # ---------------------------------------------------------------------------
 # Request / Response schemas
@@ -322,14 +324,14 @@ async def ingest_url_post(
             resp.raise_for_status()
             html_body = resp.text
     except httpx.TimeoutException:
-        raise HTTPException(status_code=408, detail=f"URL fetch timed out: {request.url}")
+        raise HTTPException(status_code=408, detail=f"URL fetch timed out: {request.url}") from None
     except httpx.HTTPStatusError as exc:
         raise HTTPException(
             status_code=422,
             detail=f"URL returned HTTP {exc.response.status_code}: {request.url}",
-        )
+        ) from None
     except httpx.RequestError as exc:
-        raise HTTPException(status_code=422, detail=f"Could not fetch URL: {exc}")
+        raise HTTPException(status_code=422, detail=f"Could not fetch URL: {exc}") from None
 
     # ── 2. Extract text ──────────────────────────────────────────────────────
     page_text = _html_to_text(html_body)
@@ -378,13 +380,13 @@ Return ONLY a valid JSON object with these exact fields (no markdown, no explana
         raise HTTPException(
             status_code=422,
             detail="LLM could not extract structured data from this page. Try a different URL.",
-        )
+        ) from None
     except Exception as exc:
         logger.error("LLM extraction failed for %s: %s", request.url, exc)
-        raise HTTPException(status_code=503, detail="LLM extraction service unavailable")
+        raise HTTPException(status_code=503, detail="LLM extraction service unavailable") from None
 
     # ── 4. Build draft response (not persisted) ──────────────────────────────
-    now = dt.datetime.now(dt.timezone.utc)
+    now = dt.datetime.now(dt.UTC)
     fake_id = uuid.uuid4()
 
     # Normalise category / severity (LLM might return slightly wrong casing)

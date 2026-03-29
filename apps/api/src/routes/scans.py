@@ -10,7 +10,6 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import os
 import pathlib
 import tempfile
 import uuid
@@ -123,7 +122,9 @@ async def _run_l1_semgrep(diff: str, tenant_id: str) -> list[dict[str, Any]]:
 
     # Write diff lines that start with '+' (added lines) into a temp Python file
     added_lines = [
-        line[1:] for line in diff.splitlines() if line.startswith("+") and not line.startswith("+++")
+        line[1:]
+        for line in diff.splitlines()
+        if line.startswith("+") and not line.startswith("+++")
     ]
     code_snippet = "\n".join(added_lines)
 
@@ -137,7 +138,8 @@ async def _run_l1_semgrep(diff: str, tenant_id: str) -> list[dict[str, Any]]:
 
         cmd = [
             "semgrep",
-            "--config", str(_RULES_PATH),
+            "--config",
+            str(_RULES_PATH),
             "--json",
             "--no-git-ignore",
             "--quiet",
@@ -150,13 +152,13 @@ async def _run_l1_semgrep(diff: str, tenant_id: str) -> list[dict[str, Any]]:
         )
         try:
             stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=30.0)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             proc.kill()
             logger.warning("Semgrep timed out after 30s for tenant %s", tenant_id)
             return []
         finally:
             try:
-                os.unlink(tmp_path)
+                pathlib.Path(tmp_path).unlink()
             except OSError:
                 pass
 
@@ -168,18 +170,22 @@ async def _run_l1_semgrep(diff: str, tenant_id: str) -> list[dict[str, Any]]:
         findings: list[dict[str, Any]] = []
         for result in output.get("results", []):
             meta = result.get("extra", {}).get("metadata", {})
-            findings.append({
-                "rule_id": result.get("check_id", "unknown"),
-                "incident_id": meta.get("incident_id", ""),
-                "incident_url": meta.get("incident_url", ""),
-                "file_path": result.get("path", "diff"),
-                "start_line": result.get("start", {}).get("line", 1),
-                "end_line": result.get("end", {}).get("line", 1),
-                "severity": meta.get("severity", result.get("extra", {}).get("severity", "warning")).lower(),
-                "category": meta.get("category", "unknown"),
-                "message": result.get("extra", {}).get("message", ""),
-                "remediation": meta.get("remediation", ""),
-            })
+            findings.append(
+                {
+                    "rule_id": result.get("check_id", "unknown"),
+                    "incident_id": meta.get("incident_id", ""),
+                    "incident_url": meta.get("incident_url", ""),
+                    "file_path": result.get("path", "diff"),
+                    "start_line": result.get("start", {}).get("line", 1),
+                    "end_line": result.get("end", {}).get("line", 1),
+                    "severity": meta.get(
+                        "severity", result.get("extra", {}).get("severity", "warning")
+                    ).lower(),
+                    "category": meta.get("category", "unknown"),
+                    "message": result.get("extra", {}).get("message", ""),
+                    "remediation": meta.get("remediation", ""),
+                }
+            )
         return findings
 
     except FileNotFoundError:
