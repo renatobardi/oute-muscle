@@ -94,9 +94,7 @@ describe('Table', () => {
     it('applies right alignment class to right-aligned columns', () => {
       const { container } = render(Table, { props: { columns, data } });
       const headerCells = container.querySelectorAll('th');
-      const countHeader = Array.from(headerCells).find((th) =>
-        th.textContent?.includes('Count')
-      );
+      const countHeader = Array.from(headerCells).find((th) => th.textContent?.includes('Count'));
       expect(countHeader?.className).toContain('text-right');
     });
   });

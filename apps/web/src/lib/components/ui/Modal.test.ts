@@ -1,13 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
-import { createRawSnippet } from 'svelte';
 import Modal from './Modal.svelte';
-
-function textSnippet(text: string) {
-  return createRawSnippet(() => ({
-    render: () => `<span>${text}</span>`,
-  }));
-}
+import { textSnippet } from './test-helpers';
 
 describe('Modal', () => {
   const baseProps = {
