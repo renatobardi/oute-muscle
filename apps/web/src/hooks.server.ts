@@ -16,8 +16,8 @@ const PUBLIC_PATHS = ['/auth/login', '/auth/register', '/pending', '/api/auth/se
 const authenticate: Handle = async ({ event, resolve }) => {
   const path = event.url.pathname;
 
-  // Skip auth for public paths
-  if (PUBLIC_PATHS.some((p) => path.startsWith(p))) {
+  // Skip auth for landing page (exact match) and public paths (prefix match)
+  if (path === '/' || PUBLIC_PATHS.some((p) => path.startsWith(p))) {
     return resolve(event);
   }
 
@@ -45,7 +45,7 @@ const authenticate: Handle = async ({ event, resolve }) => {
 
 const gateUser: Handle = async ({ event, resolve }) => {
   const path = event.url.pathname;
-  if (PUBLIC_PATHS.some((p) => path.startsWith(p))) {
+  if (path === '/' || PUBLIC_PATHS.some((p) => path.startsWith(p))) {
     return resolve(event);
   }
 

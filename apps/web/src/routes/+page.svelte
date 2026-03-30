@@ -1,10 +1,9 @@
 <script lang="ts">
   /**
    * Landing page — muscle.oute.pro
-   * Dark, developer-focused, Vercel/Linear aesthetic.
-   * Captures beta waitlist emails via POST /v1/waitlist.
+   * Cybersecurity dark theme with neon green accents.
+   * "The Loop" pipeline visual + beta waitlist capture.
    */
-  import { Shield, Brain, Sparkles, FileText, Clock, Flame } from 'lucide-svelte';
   let email = $state('');
   let name = $state('');
   let company = $state('');
@@ -13,7 +12,6 @@
   let emailError = $state('');
   let step: 1 | 2 = $state(1);
 
-  // API URL — override via PUBLIC_API_URL env var at build time if needed
   const API_BASE = 'https://muscle.oute.pro/api';
 
   function validateEmail(): boolean {
@@ -69,322 +67,684 @@
 </script>
 
 <svelte:head>
-  <title>Oute Muscle — Stop repeating production incidents</title>
+  <title>Oute Muscle — Don't let history repeat itself in your code</title>
   <meta
     name="description"
-    content="Oute Muscle turns your post-mortems into code guardrails. Every incident becomes a rule that blocks the same mistake from ever reaching production again."
+    content="Analyze past incidents to forge future prevention. Oute Muscle's three-layer detection system converts post-mortems into actionable security rules."
   />
 </svelte:head>
 
-<!-- ─────────────────────────────────────────────────────── NAV -->
-<nav class="fixed top-0 z-50 w-full border-b border-white/5 bg-black/80 backdrop-blur-md">
-  <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-    <span class="font-mono text-sm font-semibold tracking-tight text-white">
-      oute<span class="text-violet-400">.</span>muscle
-    </span>
-    <a
-      href="#waitlist"
-      class="rounded-lg bg-violet-600 px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-violet-500"
-    >
-      Join waitlist
-    </a>
-  </div>
-</nav>
+<main class="landing">
+  <!-- NAV -->
+  <nav class="landing-nav">
+    <div class="landing-nav-inner">
+      <span class="landing-logo">
+        Oute<span class="landing-logo-bolt">&#9889;</span><span class="landing-logo-muscle"
+          >Muscle</span
+        >
+      </span>
+    </div>
+  </nav>
 
-<!-- ─────────────────────────────────────────────────────── HERO -->
-<main class="min-h-screen bg-[#080808] text-white">
-  <section class="relative overflow-hidden pt-40 pb-32">
-    <!-- subtle grid background -->
-    <div
-      class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:48px_48px]"
-    ></div>
-    <!-- glow -->
-    <div
-      class="pointer-events-none absolute top-0 left-1/2 h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-violet-600/10 blur-[120px]"
-    ></div>
+  <!-- HERO -->
+  <section class="landing-hero">
+    <div class="landing-circuit-bg"></div>
 
-    <div class="relative mx-auto max-w-4xl px-6 text-center">
-      <div
-        class="mb-6 inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-1.5 text-xs font-medium text-violet-300"
-      >
-        <span class="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-violet-400"></span>
-        Private beta — limited access
-      </div>
+    <div class="landing-hero-content">
+      <h1 class="landing-headline">Don't let history repeat itself in your code</h1>
 
-      <h1 class="text-5xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl">
-        Stop repeating<br />
-        <span class="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-          production incidents
-        </span>
-      </h1>
-
-      <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/70">
-        Oute Muscle turns your post-mortems into code guardrails. Every incident becomes a detection
-        rule that blocks the same mistake from ever reaching production again.
+      <p class="landing-subheadline">
+        Analyze past incidents to forge future prevention. Oute Muscle's three-layer detection
+        system converts post-mortems into actionable security rules, breaking the cycle of
+        production failures.
       </p>
+    </div>
+  </section>
 
-      <!-- CTA form -->
-      <div id="waitlist" class="mx-auto mt-12 max-w-md scroll-mt-24">
-        {#if status === 'success'}
-          <div class="rounded-xl border border-green-500/30 bg-green-500/10 px-6 py-8 text-center">
-            <p class="text-2xl">🎉</p>
-            <p class="mt-2 font-semibold text-green-400">You're on the list!</p>
-            <p class="mt-1 text-sm text-white/60">We'll reach out as soon as a spot opens up.</p>
+  <!-- THE LOOP -->
+  <section class="landing-loop-section">
+    <div class="landing-loop-container">
+      <h2 class="landing-loop-title">The Loop</h2>
+
+      <div class="landing-pipeline">
+        <!-- Post-Mortem Input -->
+        <div class="pipeline-node pipeline-input">
+          <div class="pipeline-node-label pipeline-label-red">
+            <span class="pipeline-icon">&#9888;</span>
+            Post-Mortem URL
           </div>
-        {:else if step === 1}
-          <form onsubmit={handleSubmit} class="space-y-3">
-            <div class="flex gap-2">
-              <input
-                type="email"
-                bind:value={email}
-                onblur={() => {
-                  if (email) validateEmail();
-                }}
-                required
-                placeholder="you@company.com"
-                aria-label="Email address"
-                aria-describedby={emailError ? 'email-error' : undefined}
-                aria-invalid={emailError ? 'true' : undefined}
-                class="flex-1 rounded-lg border bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-violet-500/60 focus:ring-1 focus:ring-violet-500/30 focus:outline-none {emailError
-                  ? 'border-red-500/60'
-                  : 'border-white/10'}"
-              />
-              <button
-                type="submit"
-                class="shrink-0 rounded-lg bg-violet-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-violet-500"
-              >
-                Join waitlist
-              </button>
-            </div>
+          <div class="pipeline-node-sub">jira.com/browse/INC-396:<br />SQL Injection Report</div>
+        </div>
 
-            {#if emailError}
-              <p id="email-error" class="text-sm text-red-400">{emailError}</p>
-            {/if}
+        <!-- L1 -->
+        <div class="pipeline-connector connector-red"></div>
+        <div class="pipeline-layer">
+          <div class="pipeline-layer-badge layer-red">L1</div>
+          <div class="pipeline-layer-body layer-body-red">
+            <div class="pipeline-layer-label">Detected:<br />Unsanitized Input</div>
+          </div>
+          <div class="pipeline-layer-sub">Detected:<br />Unsanitized Input Pattern</div>
+        </div>
 
-            {#if status === 'error'}
-              <p class="text-sm text-red-400">{errorMsg}</p>
-            {/if}
-          </form>
-          <p class="mt-3 text-xs text-white/50">No spam. Invite-only beta. Unsubscribe anytime.</p>
-        {:else}
-          <form onsubmit={handleSubmit} class="space-y-3">
-            <p class="text-sm text-white/60">
-              Almost there! Tell us a bit more <span class="text-white/40">(optional)</span>
-            </p>
-            <input
-              type="text"
-              bind:value={name}
-              placeholder="Your name"
-              aria-label="Your name"
-              class="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-violet-500/60 focus:ring-1 focus:ring-violet-500/30 focus:outline-none"
-            />
-            <input
-              type="text"
-              bind:value={company}
-              placeholder="Company"
-              aria-label="Company"
-              class="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-violet-500/60 focus:ring-1 focus:ring-violet-500/30 focus:outline-none"
-            />
+        <!-- L2 -->
+        <div class="pipeline-connector connector-blue"></div>
+        <div class="pipeline-layer">
+          <div class="pipeline-layer-badge layer-blue">L2</div>
+          <div class="pipeline-layer-body layer-body-blue">
+            <div class="pipeline-layer-label">Detected:<br />Unsanitized Input</div>
+          </div>
+          <div class="pipeline-layer-sub">Network Traffic<br />Analysis</div>
+        </div>
 
-            {#if status === 'error'}
-              <p class="text-sm text-red-400">{errorMsg}</p>
-            {/if}
+        <!-- L3 -->
+        <div class="pipeline-connector connector-green"></div>
+        <div class="pipeline-layer">
+          <div class="pipeline-layer-badge layer-green">L3</div>
+          <div class="pipeline-layer-body layer-body-green">
+            <div class="pipeline-layer-label">Anomalous<br />Behavior</div>
+          </div>
+          <div class="pipeline-layer-sub">Anomalous Behavior<br />Detection</div>
+        </div>
 
-            <button
-              type="submit"
-              disabled={status === 'loading'}
-              class="w-full rounded-lg bg-violet-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-violet-500 disabled:opacity-50"
-            >
-              {status === 'loading' ? 'Sending...' : 'Complete sign-up'}
-            </button>
-            <button
-              type="button"
-              onclick={handleSkip}
-              disabled={status === 'loading'}
-              class="w-full text-sm text-white/50 transition hover:text-white/70 disabled:opacity-50"
-            >
-              Skip — just add me to the list
-            </button>
-          </form>
+        <!-- Security Rule Output -->
+        <div class="pipeline-connector connector-green"></div>
+        <div class="pipeline-node pipeline-output">
+          <div class="pipeline-node-label pipeline-label-green">
+            <span class="pipeline-icon">&#10003;</span>
+            Security Rule
+          </div>
+          <div class="pipeline-node-sub">
+            New Rule:<br />Block recursive SQL calls<br />on user-controlled inputs
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REQUEST BETA ACCESS -->
+  <section id="waitlist" class="landing-cta-section">
+    <h2 class="landing-cta-title">Request Beta Access</h2>
+
+    <div class="landing-cta-form-wrapper">
+      {#if status === 'success'}
+        <div class="landing-success">
+          <p class="landing-success-title">You're on the list!</p>
+          <p class="landing-success-sub">We'll reach out as soon as a spot opens up.</p>
+        </div>
+      {:else if step === 1}
+        <form onsubmit={handleSubmit} class="landing-form-inline">
+          <input
+            type="email"
+            bind:value={email}
+            onblur={() => {
+              if (email) validateEmail();
+            }}
+            required
+            placeholder="Enter your work email..."
+            aria-label="Email address"
+            aria-describedby={emailError ? 'email-error' : undefined}
+            aria-invalid={emailError ? 'true' : undefined}
+            class="landing-input {emailError ? 'landing-input-error' : ''}"
+          />
+          <button type="submit" class="landing-btn">Request Beta Access</button>
+        </form>
+
+        {#if emailError}
+          <p id="email-error" class="landing-error-msg">{emailError}</p>
         {/if}
-      </div>
-    </div>
-  </section>
 
-  <!-- ─────────────────────────────────────────────────────── PROBLEM -->
-  <section class="border-t border-white/5 py-24">
-    <div class="mx-auto max-w-5xl px-6">
-      <p class="text-center font-mono text-xs tracking-widest text-white/40 uppercase">
-        The problem
-      </p>
-      <h2 class="mt-4 text-center text-3xl font-bold text-white sm:text-4xl">
-        Every team has a graveyard of avoidable incidents
-      </h2>
-      <p class="mx-auto mt-4 max-w-2xl text-center text-white/70">
-        You write the post-mortem, add an action item, and move on. Three sprints later, a new
-        engineer makes the same mistake. The incident repeats. The post-mortem is forgotten.
-      </p>
-
-      <div class="mt-16 grid gap-6 sm:grid-cols-3">
-        <div class="rounded-xl border border-white/10 bg-white/5 p-6">
-          <FileText class="h-8 w-8 text-white/60" />
-          <p class="mt-3 font-semibold text-white">Post-mortem written</p>
-          <p class="mt-1 text-sm text-white/60">
-            Root cause documented. Action items created. Filed away and forgotten.
+        {#if status === 'error'}
+          <p class="landing-error-msg">{errorMsg}</p>
+        {/if}
+      {:else}
+        <form onsubmit={handleSubmit} class="landing-form-stack">
+          <p class="landing-form-hint">
+            Almost there! Tell us a bit more <span class="landing-form-optional">(optional)</span>
           </p>
-        </div>
-        <div class="rounded-xl border border-white/10 bg-white/5 p-6">
-          <Clock class="h-8 w-8 text-white/60" />
-          <p class="mt-3 font-semibold text-white">3 sprints later</p>
-          <p class="mt-1 text-sm text-white/60">
-            New engineer joins. Same pattern coded. Same regex. Same race condition.
-          </p>
-        </div>
-        <div class="rounded-xl border border-white/10 bg-white/5 p-6">
-          <Flame class="h-8 w-8 text-white/60" />
-          <p class="mt-3 font-semibold text-white">Incident repeats</p>
-          <p class="mt-1 text-sm text-white/60">
-            Same alert fires. Same on-call woken. Same post-mortem written.
-          </p>
-        </div>
-      </div>
+          <input
+            type="text"
+            bind:value={name}
+            placeholder="Your name"
+            aria-label="Your name"
+            class="landing-input"
+          />
+          <input
+            type="text"
+            bind:value={company}
+            placeholder="Company"
+            aria-label="Company"
+            class="landing-input"
+          />
+
+          {#if status === 'error'}
+            <p class="landing-error-msg">{errorMsg}</p>
+          {/if}
+
+          <button
+            type="submit"
+            disabled={status === 'loading'}
+            class="landing-btn landing-btn-full"
+          >
+            {status === 'loading' ? 'Sending...' : 'Complete sign-up'}
+          </button>
+          <button
+            type="button"
+            onclick={handleSkip}
+            disabled={status === 'loading'}
+            class="landing-skip-btn"
+          >
+            Skip — just add me to the list
+          </button>
+        </form>
+      {/if}
     </div>
   </section>
 
-  <!-- ─────────────────────────────────────────────────────── HOW IT WORKS -->
-  <section class="border-t border-white/5 py-24">
-    <div class="mx-auto max-w-5xl px-6">
-      <p class="text-center font-mono text-xs tracking-widest text-white/40 uppercase">
-        How it works
-      </p>
-      <h2 class="mt-4 text-center text-3xl font-bold text-white sm:text-4xl">
-        Three layers. One goal: incidents that never repeat.
-      </h2>
-
-      <div class="mt-16">
-        <!-- L1 — Static Guardrails -->
-        <div class="flex gap-5">
-          <div class="flex shrink-0 flex-col items-center">
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-red-500/15">
-              <Shield class="h-5 w-5 text-red-400" />
-            </div>
-            <div class="w-px flex-1 bg-gradient-to-b from-red-500/40 to-amber-500/40"></div>
-          </div>
-          <div class="flex-1 pb-8">
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="font-mono text-xs font-bold text-red-400">L1</span>
-              <span
-                class="rounded-full bg-red-500/20 px-2 py-0.5 font-mono text-xs font-medium text-red-400"
-                >BLOCKING</span
-              >
-            </div>
-            <h3 class="mt-1 font-semibold text-white">Semgrep rules synthesized from incidents</h3>
-            <p class="mt-1 text-sm text-white/60">
-              Every post-mortem automatically becomes a Semgrep rule. The pattern that caused the
-              incident is blocked at CI time — before the PR even lands.
-            </p>
-          </div>
-        </div>
-
-        <!-- L2 — RAG Advisory -->
-        <div class="flex gap-5">
-          <div class="flex shrink-0 flex-col items-center">
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/15">
-              <Brain class="h-5 w-5 text-amber-400" />
-            </div>
-            <div class="w-px flex-1 bg-gradient-to-b from-amber-500/40 to-violet-500/40"></div>
-          </div>
-          <div class="flex-1 pb-8">
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="font-mono text-xs font-bold text-amber-400">L2</span>
-              <span
-                class="rounded-full bg-amber-500/20 px-2 py-0.5 font-mono text-xs font-medium text-amber-400"
-                >ADVISORY</span
-              >
-            </div>
-            <h3 class="mt-1 font-semibold text-white">
-              Semantic similarity against incident history
-            </h3>
-            <p class="mt-1 text-sm text-white/60">
-              Code that resembles past incidents gets flagged with full context: what went wrong,
-              when, and how to fix it. Advisory, not blocking — devs decide.
-            </p>
-          </div>
-        </div>
-
-        <!-- L3 — Auto-synthesis -->
-        <div class="flex gap-5">
-          <div class="flex shrink-0 flex-col items-center">
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/15">
-              <Sparkles class="h-5 w-5 text-violet-400" />
-            </div>
-          </div>
-          <div class="flex-1">
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="font-mono text-xs font-bold text-violet-400">L3</span>
-              <span
-                class="rounded-full bg-violet-500/20 px-2 py-0.5 font-mono text-xs font-medium text-violet-400"
-                >PROGRESSIVE</span
-              >
-            </div>
-            <h3 class="mt-1 font-semibold text-white">
-              LLM-generated rules from new incident patterns
-            </h3>
-            <p class="mt-1 text-sm text-white/60">
-              When the RAG layer catches something without an existing rule, the synthesis engine
-              proposes a new Semgrep rule. Reviewed by engineers, promoted to L1.
-            </p>
-          </div>
-        </div>
+  <!-- FOOTER -->
+  <footer class="landing-footer">
+    <div class="landing-footer-inner">
+      <span class="landing-footer-brand">oute.muscle</span>
+      <div class="landing-footer-links">
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms of Service</a>
+        <a href="mailto:contact@oute.pro">Contact</a>
       </div>
-    </div>
-  </section>
-
-  <!-- ─────────────────────────────────────────────────────── STATS -->
-  <section class="border-t border-white/5 py-24">
-    <div class="mx-auto max-w-5xl px-6">
-      <div class="grid gap-12 text-center sm:grid-cols-3">
-        {#each [{ value: '10+', label: 'Incident categories covered', sub: 'regex, injection, race conditions, and more' }, { value: '3', label: 'Detection layers', sub: 'from blocking to progressive synthesis' }, { value: '0', label: 'Repeated incidents', sub: 'once a rule is in place' }] as stat}
-          <div>
-            <p class="text-5xl font-bold text-white">{stat.value}</p>
-            <p class="mt-2 font-medium text-white/80">{stat.label}</p>
-            <p class="mt-1 text-sm text-white/50">{stat.sub}</p>
-          </div>
-        {/each}
-      </div>
-    </div>
-  </section>
-
-  <!-- ─────────────────────────────────────────────────────── BOTTOM CTA -->
-  <section class="border-t border-white/5 py-24">
-    <div class="mx-auto max-w-2xl px-6 text-center">
-      <h2 class="text-3xl font-bold text-white sm:text-4xl">
-        Ready to close the loop on incidents?
-      </h2>
-      <p class="mt-4 text-white/70">
-        Join the private beta. We're onboarding engineering teams one by one.
-      </p>
-      <a
-        href="#waitlist"
-        class="mt-8 inline-block rounded-lg bg-violet-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-violet-500"
-      >
-        Join the waitlist
-      </a>
-    </div>
-  </section>
-
-  <!-- ─────────────────────────────────────────────────────── FOOTER -->
-  <footer class="border-t border-white/5 py-10">
-    <div
-      class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 text-sm text-white/50"
-    >
-      <span class="font-mono">oute.muscle</span>
-      <div class="flex gap-6">
-        <a href="/privacy" class="transition hover:text-white/70">Privacy Policy</a>
-        <a href="/terms" class="transition hover:text-white/70">Terms of Service</a>
-        <a href="mailto:contact@oute.pro" class="transition hover:text-white/70">Contact</a>
-      </div>
-      <span>© 2026 Oute. All rights reserved.</span>
+      <span class="landing-footer-copy">&copy; 2026 Oute. All rights reserved.</span>
     </div>
   </footer>
 </main>
+
+<style>
+  /* ── Base ───────────────────────────────────────── */
+  .landing {
+    min-height: 100vh;
+    background: #060b11;
+    color: #fff;
+    font-family:
+      'Inter',
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      sans-serif;
+  }
+
+  /* ── Circuit board background ──────────────────── */
+  .landing-circuit-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.07;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cdefs%3E%3Cpattern id='circuit' width='200' height='200' patternUnits='userSpaceOnUse'%3E%3Cpath d='M0 100h40M60 100h80M160 100h40M100 0v40M100 60v80M100 160v40' stroke='%2322c55e' stroke-width='1' fill='none'/%3E%3Ccircle cx='50' cy='100' r='4' fill='%2322c55e'/%3E%3Ccircle cx='150' cy='100' r='4' fill='%2322c55e'/%3E%3Ccircle cx='100' cy='50' r='4' fill='%2322c55e'/%3E%3Ccircle cx='100' cy='150' r='4' fill='%2322c55e'/%3E%3Cpath d='M50 50h20v20M130 50h20v20M50 130h20v20M130 130h20v20' stroke='%2322c55e' stroke-width='0.8' fill='none'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='200' height='200' fill='url(%23circuit)'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  /* ── Nav ────────────────────────────────────────── */
+  .landing-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    padding: 1rem 1.5rem;
+    background: rgba(6, 11, 17, 0.85);
+    backdrop-filter: blur(12px);
+  }
+
+  .landing-nav-inner {
+    max-width: 72rem;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+  }
+
+  .landing-logo {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.02em;
+  }
+
+  .landing-logo-bolt {
+    color: #22c55e;
+    margin: 0 -0.05em;
+    font-size: 1rem;
+  }
+
+  .landing-logo-muscle {
+    color: #22c55e;
+  }
+
+  /* ── Hero ───────────────────────────────────────── */
+  .landing-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 10rem 1.5rem 4rem;
+    text-align: center;
+  }
+
+  .landing-hero-content {
+    position: relative;
+    max-width: 48rem;
+    margin: 0 auto;
+  }
+
+  .landing-headline {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+
+  .landing-subheadline {
+    margin-top: 1.5rem;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.55);
+    max-width: 40rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ── The Loop section ──────────────────────────── */
+  .landing-loop-section {
+    padding: 2rem 1.5rem 5rem;
+  }
+
+  .landing-loop-container {
+    max-width: 48rem;
+    margin: 0 auto;
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    border-radius: 1rem;
+    background: linear-gradient(135deg, rgba(6, 11, 17, 0.95), rgba(10, 20, 15, 0.9));
+    padding: 2.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      0 0 60px rgba(34, 197, 94, 0.05),
+      inset 0 1px 0 rgba(34, 197, 94, 0.1);
+  }
+
+  .landing-loop-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cdefs%3E%3Cpattern id='c2' width='200' height='200' patternUnits='userSpaceOnUse'%3E%3Cpath d='M0 100h40M60 100h80M160 100h40M100 0v40M100 60v80M100 160v40' stroke='%2322c55e' stroke-width='1' fill='none'/%3E%3Ccircle cx='50' cy='100' r='3' fill='%2322c55e'/%3E%3Ccircle cx='150' cy='100' r='3' fill='%2322c55e'/%3E%3Ccircle cx='100' cy='50' r='3' fill='%2322c55e'/%3E%3Ccircle cx='100' cy='150' r='3' fill='%2322c55e'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='200' height='200' fill='url(%23c2)'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  .landing-loop-title {
+    text-align: center;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 2rem;
+    position: relative;
+  }
+
+  /* ── Pipeline ──────────────────────────────────── */
+  .landing-pipeline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    overflow-x: auto;
+    padding: 1rem 0;
+    position: relative;
+  }
+
+  .pipeline-node {
+    flex-shrink: 0;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    min-width: 120px;
+  }
+
+  .pipeline-node-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.375rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .pipeline-label-red {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #f87171;
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.15);
+  }
+
+  .pipeline-label-green {
+    background: rgba(34, 197, 94, 0.15);
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    color: #4ade80;
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.15);
+  }
+
+  .pipeline-icon {
+    font-size: 0.8rem;
+  }
+
+  .pipeline-node-sub {
+    font-size: 0.6rem;
+    color: rgba(255, 255, 255, 0.4);
+    line-height: 1.4;
+  }
+
+  .pipeline-connector {
+    width: 2rem;
+    height: 2px;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .connector-red {
+    background: linear-gradient(90deg, #ef4444, #f59e0b);
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
+  }
+
+  .connector-blue {
+    background: linear-gradient(90deg, #3b82f6, #22c55e);
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+  }
+
+  .connector-green {
+    background: linear-gradient(90deg, #22c55e, #4ade80);
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
+  }
+
+  .pipeline-layer {
+    flex-shrink: 0;
+    text-align: center;
+    position: relative;
+  }
+
+  .pipeline-layer-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .layer-red {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    color: #f87171;
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.25);
+  }
+
+  .layer-blue {
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(59, 130, 246, 0.5);
+    color: #60a5fa;
+    box-shadow: 0 0 16px rgba(59, 130, 246, 0.25);
+  }
+
+  .layer-green {
+    background: rgba(34, 197, 94, 0.2);
+    border: 1px solid rgba(34, 197, 94, 0.5);
+    color: #4ade80;
+    box-shadow: 0 0 16px rgba(34, 197, 94, 0.25);
+  }
+
+  .pipeline-layer-body {
+    width: 5rem;
+    height: 3.5rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.5rem;
+  }
+
+  .layer-body-red {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(239, 68, 68, 0.04));
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+
+  .layer-body-blue {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(59, 130, 246, 0.04));
+    border: 1px solid rgba(59, 130, 246, 0.2);
+  }
+
+  .layer-body-green {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(34, 197, 94, 0.04));
+    border: 1px solid rgba(34, 197, 94, 0.2);
+  }
+
+  .pipeline-layer-label {
+    font-size: 0.5rem;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.3;
+  }
+
+  .pipeline-layer-sub {
+    font-size: 0.55rem;
+    color: rgba(255, 255, 255, 0.35);
+    line-height: 1.3;
+  }
+
+  /* ── CTA Section ───────────────────────────────── */
+  .landing-cta-section {
+    padding: 4rem 1.5rem 6rem;
+    text-align: center;
+  }
+
+  .landing-cta-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1.5rem;
+  }
+
+  .landing-cta-form-wrapper {
+    max-width: 36rem;
+    margin: 0 auto;
+  }
+
+  .landing-form-inline {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .landing-form-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .landing-input {
+    flex: 1;
+    padding: 0.875rem 1rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: 0.5rem;
+    color: #fff;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .landing-input::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  .landing-input:focus {
+    border-color: rgba(34, 197, 94, 0.6);
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.1);
+  }
+
+  .landing-input-error {
+    border-color: rgba(239, 68, 68, 0.6) !important;
+  }
+
+  .landing-btn {
+    flex-shrink: 0;
+    padding: 0.875rem 1.5rem;
+    background: transparent;
+    border: 1px solid rgba(34, 197, 94, 0.6);
+    border-radius: 0.5rem;
+    color: #4ade80;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .landing-btn:hover {
+    background: rgba(34, 197, 94, 0.1);
+    border-color: #4ade80;
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.15);
+  }
+
+  .landing-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .landing-btn-full {
+    width: 100%;
+  }
+
+  .landing-skip-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.875rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.2s;
+  }
+
+  .landing-skip-btn:hover {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .landing-skip-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .landing-form-hint {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .landing-form-optional {
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  .landing-error-msg {
+    font-size: 0.875rem;
+    color: #f87171;
+    margin-top: 0.5rem;
+    text-align: left;
+  }
+
+  .landing-success {
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    background: rgba(34, 197, 94, 0.08);
+    border-radius: 0.75rem;
+    padding: 1.5rem 2rem;
+  }
+
+  .landing-success-title {
+    font-weight: 600;
+    color: #4ade80;
+    font-size: 1.1rem;
+  }
+
+  .landing-success-sub {
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* ── Footer ────────────────────────────────────── */
+  .landing-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 2.5rem 1.5rem;
+  }
+
+  .landing-footer-inner {
+    max-width: 72rem;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .landing-footer-brand {
+    font-family: monospace;
+  }
+
+  .landing-footer-links {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .landing-footer-links a {
+    color: rgba(255, 255, 255, 0.4);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .landing-footer-links a:hover {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .landing-footer-copy {
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  /* ── Responsive ────────────────────────────────── */
+  @media (max-width: 640px) {
+    .landing-hero {
+      padding-top: 7rem;
+      padding-bottom: 2rem;
+    }
+
+    .landing-form-inline {
+      flex-direction: column;
+    }
+
+    .landing-btn {
+      width: 100%;
+    }
+
+    .landing-pipeline {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .pipeline-connector {
+      width: 1rem;
+    }
+
+    .landing-footer-inner {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+</style>
