@@ -61,7 +61,7 @@ jobs:
         run: uv run pytest -m integration --cov-append --cov-report=xml -q
         continue-on-error: true  # integration tests may require external services (GCP)
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v6
         with:
           file: ./coverage.xml
           fail_ci_if_error: false
