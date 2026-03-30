@@ -256,9 +256,19 @@ Design artifacts live in `specs/{feature-name}/`. Key scripts in `.specify/scrip
 - `check-prerequisites.sh` — Validates feature context
 
 
-## Active Technologies
-- TypeScript 5.5+ (strict), Svelte 5, SvelteKit 2.5+ + Tailwind CSS 4.2 (via @tailwindcss/postcss), bits-ui 2.16 (Dialog/Dropdown only), lucide-svelte (NEW -- to be added) (243-ui-design-system-polish)
-- N/A (frontend-only, no new persistence) (243-ui-design-system-polish)
+## Design System
 
-## Recent Changes
-- 243-ui-design-system-polish: Added TypeScript 5.5+ (strict), Svelte 5, SvelteKit 2.5+ + Tailwind CSS 4.2 (via @tailwindcss/postcss), bits-ui 2.16 (Dialog/Dropdown only), lucide-svelte (NEW -- to be added)
+The frontend uses a token-based design system (spec 243):
+
+- **Tokens**: 190+ CSS custom properties in `apps/web/src/app.css` — colors, typography, spacing, radius, shadows. Tailwind config references all tokens via `var()`.
+- **Components**: 13 Svelte 5 components in `apps/web/src/lib/components/ui/` — Button, Badge, Card, IconButton, PageHeader, EmptyState, LoadingSkeleton, Input, Select, Modal, MetricCard, Table, Sidebar. Barrel export at `$components/ui`.
+- **Icons**: `lucide-svelte` — tree-shakeable SVG icons. Never use emojis or inline SVG paths for navigation.
+- **Primitives**: `bits-ui` used only for Modal (Dialog) — never for simple components.
+- **Pattern**: Dark sidebar + light content area. Unified Sidebar component serves both Dashboard and Admin.
+- **Rule**: All UI changes MUST use design tokens and components. Never hardcode Tailwind color classes (indigo-*, gray-*, red-*, etc.).
+
+### Web Health Check & Firebase SSR
+
+- `/health` endpoint (server-only, no Firebase) — used by Cloud Run deploy verification
+- Firebase client SDK guarded by `browser` check in `$lib/firebase.ts` — SSR-safe
+- `PUBLIC_FIREBASE_*` env vars must be set on Cloud Run for client-side auth to work

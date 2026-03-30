@@ -40,7 +40,7 @@ A developer building a new page never writes inline Tailwind for common patterns
 4. **Given** the component Modal, **When** opened, **Then** it traps focus, closes on Escape, renders a backdrop overlay, and prevents body scroll. On mobile viewports (< 640px) it renders full-screen.
 5. **Given** the component Input, **When** rendered with an error prop, **Then** it shows a red border (token color), error icon, and error message text below the field. Focus state uses the primary accent ring.
 6. **Given** the component MetricCard, **When** rendered with a trend (up/down/neutral), **Then** it shows a directional arrow with semantic color (green up, red down, gray neutral). A highlight variant adds a primary accent border.
-7. **Given** any component rendered in SSR (server-side), **When** the page loads without JavaScript, **Then** the component renders correctly with no hydration errors.
+7. **Given** any component rendered in SSR (server-side), **When** the page loads without JavaScript, **Then** the component renders correctly with no hydration errors. Verification: `svelte-check` passes AND `grep -r "window\.\|document\." apps/web/src/lib/components/ui/ --include="*.svelte"` returns zero results outside `browser`-guarded blocks.
 
 ---
 

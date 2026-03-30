@@ -5,7 +5,7 @@
 
 ## Summary
 
-Establish a design token system (CSS custom properties) and component library (12 Svelte 5 components) to replace all hardcoded Tailwind color classes across 13 pages. Unify Dashboard and Admin sidebars into a single component with lucide-svelte icons. Polish login page with Muscle branding. Ensure responsive behavior down to 320px. Frontend-only -- no backend/API changes.
+Establish a design token system (CSS custom properties) and component library (13 Svelte 5 components, including Sidebar) to replace all hardcoded Tailwind color classes across 18 pages. Unify Dashboard and Admin sidebars into a single component with lucide-svelte icons. Polish login page with Muscle branding. Ensure responsive behavior down to 320px. Frontend-only -- no backend/API changes.
 
 ## Technical Context
 
@@ -152,7 +152,7 @@ This order minimizes risk: each step builds on the previous, and pages can be mi
    - Complex: Table (sortable headers, empty state, skeleton), Input (icon prefix, error state), MetricCard (trend indicator)
 5. Create barrel export `index.ts`
 
-**Exit criteria**: All components render in isolation with correct token colors. `svelte-check` passes.
+**Exit criteria**: All components render in isolation with correct token colors. `svelte-check` passes. Unit tests for Button, Badge, Table, Modal, Input, MetricCard pass (Constitution VII). Zero `window`/`document` references outside `browser` guards (FR-023 SSR safety).
 
 ### Phase 2: Navigation & Login (US3 + US4)
 
@@ -163,11 +163,11 @@ This order minimizes risk: each step builds on the previous, and pages can be mi
 3. Replace Admin `+layout.svelte` sidebar with `<Sidebar variant="admin">` component
 4. Polish login page: dark background, Muscle branding, Input/Button components, Google OAuth button styling
 
-**Exit criteria**: Dashboard and Admin share Sidebar component. Login shows branding and all visual states. Mobile sidebar collapses.
+**Exit criteria**: Dashboard and Admin share Sidebar component. Sidebar unit tests pass. Login shows branding and all visual states. Mobile sidebar collapses.
 
 ### Phase 3: Page Migration (US5 + US6)
 
-**Goal**: All 13 pages use design system components, zero hardcoded color classes.
+**Goal**: All 18 pages use design system components, zero hardcoded color classes.
 
 1. Dashboard pages (9): incidents list, incident detail, incident ingest, rules, rules/candidates, scans, audit, settings, settings/billing
 2. Admin pages (7): overview, users, tenants, health, incidents, rules, access
@@ -187,4 +187,4 @@ This order minimizes risk: each step builds on the previous, and pages can be mi
 5. Verify touch targets >= 44px
 6. Run Lighthouse accessibility audit on /auth/login, /(dashboard), and /admin -- verify score >= 90
 
-**Exit criteria**: No horizontal overflow at 320px. Accessibility score >= 90 on key pages. All existing tests pass.
+**Exit criteria**: No horizontal overflow at 320px. All unit tests pass. Deferred post-deploy: Lighthouse accessibility >= 90 (SC-007) and e2e tests (SC-008) — require Firebase ADC on Cloud Run.
