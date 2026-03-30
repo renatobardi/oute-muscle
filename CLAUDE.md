@@ -247,7 +247,7 @@ Ruff (lint + format), mypy strict on `packages/core/`, Semgrep on staged Python 
 
 ## SpecKit Workflow
 
-This project uses SpecKit v0.4.3 for structured feature development:
+This project uses SpecKit for structured feature development:
 
 1. `/speckit.constitution` → `/speckit.specify` → `/speckit.clarify` → `/speckit.plan` → `/speckit.tasks` → `/speckit.analyze` → `/speckit.implement`
 
@@ -261,7 +261,7 @@ Design artifacts live in `specs/{feature-name}/`. Key scripts in `.specify/scrip
 The frontend uses a token-based design system (spec 243):
 
 - **Tokens**: 190+ CSS custom properties in `apps/web/src/app.css` — colors, typography, spacing, radius, shadows. Tailwind config references all tokens via `var()`.
-- **Components**: 13 Svelte 5 components in `apps/web/src/lib/components/ui/` — Button, Badge, Card, IconButton, PageHeader, EmptyState, LoadingSkeleton, Input, Select, Modal, MetricCard, Table, Sidebar. Barrel export at `$components/ui`.
+- **Components**: Svelte 5 components in `apps/web/src/lib/components/ui/` — barrel export at `$components/ui`.
 - **Icons**: `lucide-svelte` — tree-shakeable SVG icons. Never use emojis or inline SVG paths for navigation.
 - **Primitives**: `bits-ui` used only for Modal (Dialog) — never for simple components.
 - **Pattern**: Dark sidebar + light content area. Unified Sidebar component serves both Dashboard and Admin.

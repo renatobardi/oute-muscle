@@ -66,6 +66,11 @@
   --color-primary-500: var(--palette-indigo-500);
   --color-primary-600: var(--palette-indigo-600);
 
+  /* ── Brand / Marketing (landing page accent — violet) ────────────────── */
+  --color-brand-400: #a78bfa;
+  --color-brand-500: #8b5cf6;
+  --color-brand-600: #7c3aed;
+
   /* ── Neutral Scale ─────────────────────────────────────────────────────── */
   --color-neutral-50: var(--palette-gray-50);
   --color-neutral-100: var(--palette-gray-100);
@@ -236,3 +241,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ── Global Focus States ─────────────────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+}
+
+/* ── Smooth Scroll ───────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ── Reduced Motion ──────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-pulse {
+    animation: none;
+  }
+}
