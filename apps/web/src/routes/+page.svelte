@@ -137,13 +137,17 @@
               <input
                 type="email"
                 bind:value={email}
-                onblur={() => { if (email) validateEmail(); }}
+                onblur={() => {
+                  if (email) validateEmail();
+                }}
                 required
                 placeholder="you@company.com"
                 aria-label="Email address"
                 aria-describedby={emailError ? 'email-error' : undefined}
                 aria-invalid={emailError ? 'true' : undefined}
-                class="flex-1 rounded-lg border bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-violet-500/60 focus:ring-1 focus:ring-violet-500/30 focus:outline-none {emailError ? 'border-red-500/60' : 'border-white/10'}"
+                class="flex-1 rounded-lg border bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-violet-500/60 focus:ring-1 focus:ring-violet-500/30 focus:outline-none {emailError
+                  ? 'border-red-500/60'
+                  : 'border-white/10'}"
               />
               <button
                 type="submit"
@@ -164,7 +168,9 @@
           <p class="mt-3 text-xs text-white/50">No spam. Invite-only beta. Unsubscribe anytime.</p>
         {:else}
           <form onsubmit={handleSubmit} class="space-y-3">
-            <p class="text-sm text-white/60">Almost there! Tell us a bit more <span class="text-white/40">(optional)</span></p>
+            <p class="text-sm text-white/60">
+              Almost there! Tell us a bit more <span class="text-white/40">(optional)</span>
+            </p>
             <input
               type="text"
               bind:value={name}
@@ -223,17 +229,23 @@
         <div class="rounded-xl border border-white/10 bg-white/5 p-6">
           <FileText class="h-8 w-8 text-white/60" />
           <p class="mt-3 font-semibold text-white">Post-mortem written</p>
-          <p class="mt-1 text-sm text-white/60">Root cause documented. Action items created. Filed away and forgotten.</p>
+          <p class="mt-1 text-sm text-white/60">
+            Root cause documented. Action items created. Filed away and forgotten.
+          </p>
         </div>
         <div class="rounded-xl border border-white/10 bg-white/5 p-6">
           <Clock class="h-8 w-8 text-white/60" />
           <p class="mt-3 font-semibold text-white">3 sprints later</p>
-          <p class="mt-1 text-sm text-white/60">New engineer joins. Same pattern coded. Same regex. Same race condition.</p>
+          <p class="mt-1 text-sm text-white/60">
+            New engineer joins. Same pattern coded. Same regex. Same race condition.
+          </p>
         </div>
         <div class="rounded-xl border border-white/10 bg-white/5 p-6">
           <Flame class="h-8 w-8 text-white/60" />
           <p class="mt-3 font-semibold text-white">Incident repeats</p>
-          <p class="mt-1 text-sm text-white/60">Same alert fires. Same on-call woken. Same post-mortem written.</p>
+          <p class="mt-1 text-sm text-white/60">
+            Same alert fires. Same on-call woken. Same post-mortem written.
+          </p>
         </div>
       </div>
     </div>
@@ -252,7 +264,7 @@
       <div class="mt-16">
         <!-- L1 — Static Guardrails -->
         <div class="flex gap-5">
-          <div class="flex flex-col items-center shrink-0">
+          <div class="flex shrink-0 flex-col items-center">
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-red-500/15">
               <Shield class="h-5 w-5 text-red-400" />
             </div>
@@ -261,16 +273,22 @@
           <div class="flex-1 pb-8">
             <div class="flex flex-wrap items-center gap-2">
               <span class="font-mono text-xs font-bold text-red-400">L1</span>
-              <span class="rounded-full bg-red-500/20 px-2 py-0.5 font-mono text-xs font-medium text-red-400">BLOCKING</span>
+              <span
+                class="rounded-full bg-red-500/20 px-2 py-0.5 font-mono text-xs font-medium text-red-400"
+                >BLOCKING</span
+              >
             </div>
             <h3 class="mt-1 font-semibold text-white">Semgrep rules synthesized from incidents</h3>
-            <p class="mt-1 text-sm text-white/60">Every post-mortem automatically becomes a Semgrep rule. The pattern that caused the incident is blocked at CI time — before the PR even lands.</p>
+            <p class="mt-1 text-sm text-white/60">
+              Every post-mortem automatically becomes a Semgrep rule. The pattern that caused the
+              incident is blocked at CI time — before the PR even lands.
+            </p>
           </div>
         </div>
 
         <!-- L2 — RAG Advisory -->
         <div class="flex gap-5">
-          <div class="flex flex-col items-center shrink-0">
+          <div class="flex shrink-0 flex-col items-center">
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/15">
               <Brain class="h-5 w-5 text-amber-400" />
             </div>
@@ -279,16 +297,24 @@
           <div class="flex-1 pb-8">
             <div class="flex flex-wrap items-center gap-2">
               <span class="font-mono text-xs font-bold text-amber-400">L2</span>
-              <span class="rounded-full bg-amber-500/20 px-2 py-0.5 font-mono text-xs font-medium text-amber-400">ADVISORY</span>
+              <span
+                class="rounded-full bg-amber-500/20 px-2 py-0.5 font-mono text-xs font-medium text-amber-400"
+                >ADVISORY</span
+              >
             </div>
-            <h3 class="mt-1 font-semibold text-white">Semantic similarity against incident history</h3>
-            <p class="mt-1 text-sm text-white/60">Code that resembles past incidents gets flagged with full context: what went wrong, when, and how to fix it. Advisory, not blocking — devs decide.</p>
+            <h3 class="mt-1 font-semibold text-white">
+              Semantic similarity against incident history
+            </h3>
+            <p class="mt-1 text-sm text-white/60">
+              Code that resembles past incidents gets flagged with full context: what went wrong,
+              when, and how to fix it. Advisory, not blocking — devs decide.
+            </p>
           </div>
         </div>
 
         <!-- L3 — Auto-synthesis -->
         <div class="flex gap-5">
-          <div class="flex flex-col items-center shrink-0">
+          <div class="flex shrink-0 flex-col items-center">
             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/15">
               <Sparkles class="h-5 w-5 text-violet-400" />
             </div>
@@ -296,10 +322,18 @@
           <div class="flex-1">
             <div class="flex flex-wrap items-center gap-2">
               <span class="font-mono text-xs font-bold text-violet-400">L3</span>
-              <span class="rounded-full bg-violet-500/20 px-2 py-0.5 font-mono text-xs font-medium text-violet-400">PROGRESSIVE</span>
+              <span
+                class="rounded-full bg-violet-500/20 px-2 py-0.5 font-mono text-xs font-medium text-violet-400"
+                >PROGRESSIVE</span
+              >
             </div>
-            <h3 class="mt-1 font-semibold text-white">LLM-generated rules from new incident patterns</h3>
-            <p class="mt-1 text-sm text-white/60">When the RAG layer catches something without an existing rule, the synthesis engine proposes a new Semgrep rule. Reviewed by engineers, promoted to L1.</p>
+            <h3 class="mt-1 font-semibold text-white">
+              LLM-generated rules from new incident patterns
+            </h3>
+            <p class="mt-1 text-sm text-white/60">
+              When the RAG layer catches something without an existing rule, the synthesis engine
+              proposes a new Semgrep rule. Reviewed by engineers, promoted to L1.
+            </p>
           </div>
         </div>
       </div>
@@ -341,7 +375,9 @@
 
   <!-- ─────────────────────────────────────────────────────── FOOTER -->
   <footer class="border-t border-white/5 py-10">
-    <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 text-sm text-white/50">
+    <div
+      class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 text-sm text-white/50"
+    >
       <span class="font-mono">oute.muscle</span>
       <div class="flex gap-6">
         <a href="/privacy" class="transition hover:text-white/70">Privacy Policy</a>
