@@ -24,7 +24,7 @@
     "@testing-library/svelte": "^5.3.1",
     "autoprefixer": "^10.4.19",
     "eslint": "^9.5.0",
-    "eslint-plugin-svelte": "^2.42.0",
+    "eslint-plugin-svelte": "^3.16.0",
     "globals": "^15.6.0",
     "jsdom": "^29.0.1",
     "postcss": "^8.4.38",
