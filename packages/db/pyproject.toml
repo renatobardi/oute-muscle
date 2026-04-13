@@ -7,7 +7,7 @@ dependencies = [
     "sqlalchemy[asyncio]>=2.0.30",
     "asyncpg>=0.29.0",
     "alembic>=1.13.0",
-    "pgvector>=0.3.0",
+    "pgvector>=0.4.2",
     "oute-muscle-core",
 ]
 
