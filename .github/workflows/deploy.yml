@@ -33,7 +33,7 @@ jobs:
       image: ${{ steps.image.outputs.image }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Authenticate to GCP
         id: auth
@@ -75,7 +75,7 @@ jobs:
     environment: production
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Authenticate to GCP
         uses: google-github-actions/auth@v2
@@ -184,7 +184,7 @@ jobs:
     environment: production
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Authenticate to GCP
         uses: google-github-actions/auth@v2
